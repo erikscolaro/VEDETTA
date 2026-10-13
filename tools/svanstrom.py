@@ -734,6 +734,100 @@ def sam_clip(model, frames: Path, clip: str, rows: list[dict]) -> list:
     return out
 
 
+def _cvat_client():
+    """Client CVAT su localhost:8080, credenziali in ~/.config/cvat.env
+    (CVAT_USER, CVAT_PASS)."""
+    from cvat_sdk import make_client
+
+    env = dict(ln.split("=", 1) for ln in (Path.home() / ".config" / "cvat.env").read_text().split())
+    return make_client("http://localhost:8080", credentials=(env["CVAT_USER"], env["CVAT_PASS"]))
+
+
+def clip_boxes(box: Path, clip: str) -> dict[tuple, list]:
+    """Box attuali di una clip, {(frame, k): [classe, x, y, w, h]}: SAM se la
+    clip e' passata da SAM, altrimenti quello di `box.csv`."""
+    import csv
+
+    rows = {(int(r["frame"]), r["k"]): r for r in csv.DictReader(open(box / "box.csv")) if r["clip"] == clip}
+    out = {key: [int(r["classe"])] + [float(r[c]) for c in BOX_COLS] for key, r in rows.items()}
+    sam = box / "sam" / f"{clip.replace('/', '_')}.json"
+    if sam.exists():
+        d = json.loads(sam.read_text())
+        for f, k, b in zip(d["frame"], d["k"], d["box"]):
+            if b:
+                out[(f, k)][1:] = b
+    return out
+
+
+def cvat_export(src: Path, clips: list[str], key_every: int = 50) -> None:
+    """Un task CVAT per clip, immagini dalla cartella condivisa (`src` montata
+    in /home/django/share), box attuali come tracce con un frame chiave ogni
+    `key_every` (piu' primo e ultimo di ogni tratto visibile): CVAT interpola
+    in mezzo, si correggono le chiavi. Salta le clip che hanno gia' un task."""
+    import csv
+    from cvat_sdk.core.proxies.tasks import ResourceType
+    from cvat_sdk.api_client import models
+
+    frames = defaultdict(list)
+    for r in csv.DictReader(open(src / "2_sequenze" / "sequenze.csv")):
+        frames[f"{r['video']}/s{r['sequenza']}"].append(int(r["frame"]))
+    with _cvat_client() as client:
+        done = {tk.name for tk in client.tasks.list()}
+        for clip in clips:
+            if clip in done:
+                continue
+            v, fr = clip.split("/")[0], sorted(frames[clip])
+            task = client.tasks.create_from_data(
+                spec={"name": clip, "labels": [{"name": n} for n in NAMES]},
+                resource_type=ResourceType.SHARE,
+                resources=[f"1_frame/{v}/images/{v}_f{i:05d}.jpg" for i in fr],
+                data_params={"sorting_method": "predefined", "image_quality": 95})
+            label = {lb.name: lb.id for lb in task.get_labels()}
+            pos = {f: j for j, f in enumerate(fr)}
+            tracks = defaultdict(dict)
+            for (f, k), (c, x, y, w, h) in clip_boxes(src / "4_box", clip).items():
+                tracks[(k, c)][pos[f]] = [x, y, x + w, y + h]
+            req = []
+            for (k, c), shapes in tracks.items():
+                seq, prev = [], None
+                for j in range(min(shapes), max(shapes) + 2):
+                    edge = j - 1 not in shapes or j + 1 not in shapes
+                    if j in shapes and ((j - min(shapes)) % key_every == 0 or edge):
+                        seq.append(models.TrackedShapeRequest(type="rectangle", frame=j, points=shapes[j],
+                                                              outside=False, keyframe=True))
+                    elif j not in shapes and prev is not None and j < len(fr):  # oggetto sparito: fuori fino al ritorno
+                        seq.append(models.TrackedShapeRequest(type="rectangle", frame=j, points=shapes[prev],
+                                                              outside=True, keyframe=True))
+                    prev = j if j in shapes else None
+                req.append(models.LabeledTrackRequest(frame=min(shapes), label_id=label[NAMES[c]], shapes=seq))
+            task.update_annotations(models.PatchedLabeledDataRequest(tracks=req))
+            print(f"cvat: {clip} task {task.id}, {len(fr)} frame, {len(req)} tracce", flush=True)
+
+
+def cvat_import(src: Path) -> None:
+    """Correzioni a mano: gli zip esportati da CVAT ("Ultralytics YOLO
+    Detection 1.0", con o senza immagini) lasciati in `4_box/cvat_zip/`. Le
+    label vanno in `4_box/manuale/<video>_sN/<frame>.txt`, la clip ricavata dal
+    nome del frame; uno zip piu' recente sovrascrive i frame di uno vecchio."""
+    import csv
+    import zipfile
+
+    box = src / "4_box"
+    seq = {(r["video"], int(r["frame"])): r["sequenza"] for r in csv.DictReader(open(src / "2_sequenze" / "sequenze.csv"))}
+    for z in sorted((box / "cvat_zip").glob("*.zip"), key=lambda p: p.stat().st_mtime):
+        clips = Counter()
+        with zipfile.ZipFile(z) as zf:
+            for n in zf.namelist():
+                if n.startswith("labels/") and n.endswith(".txt"):
+                    stem = Path(n).stem
+                    v, f = stem.rsplit("_f", 1)
+                    d = box / "manuale" / f"{v}_s{seq[(v, int(f))]}"
+                    d.mkdir(parents=True, exist_ok=True)
+                    (d / f"{stem}.txt").write_bytes(zf.read(n))
+                    clips[d.name] += 1
+        print(f"cvat: {z.name} -> " + ", ".join(f"{c} ({n} frame)" for c, n in clips.items()))
+
+
 def _yolo(boxes: np.ndarray, W: int, H: int) -> str:
     """(classe, x, y, w, h) in pixel 0-based -> righe YOLO, box tagliati al frame."""
     lines = []
@@ -943,7 +1037,7 @@ def main(argv=None) -> int:
                    help="dataset finale (local_path in conf/dataset/svanstrom.yaml)")
     p.add_argument("--src", type=Path, default=ROOT / "data" / "svanstrom",
                    help="una cartella per passo (docs/procedura.md): 0_raw, 1_frame, ...")
-    p.add_argument("--step", choices=["frames", "tagli", "sequenze", "sessioni", "unione", "box", "sam"],
+    p.add_argument("--step", choices=["frames", "tagli", "sequenze", "sessioni", "unione", "box", "sam", "fogli_sam", "cvat", "cvat_import"],
                    help="solo questo passo della nuova procedura; senza, la pipeline vecchia")
     p.add_argument("--hash-thr", type=int, default=8,
                    help="bit di dHash (su 64) sotto cui due frame sono uguali")
@@ -959,6 +1053,7 @@ def main(argv=None) -> int:
                    help="punteggio sopra cui una coppia di frame e' candidata taglio")
     p.add_argument("--session-thr", type=float, default=0.95,
                    help="somiglianza media DINOv2 sopra cui due gruppi di video si uniscono")
+    p.add_argument("--clips", type=Path, help="file con le clip, una per riga ('n clip' o 'clip')")
     p.add_argument("--n-calib", type=int, default=512)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) // 2))
@@ -1025,6 +1120,51 @@ def main(argv=None) -> int:
                 dst.write_text(json.dumps({"frame": [int(r["frame"]) for r in rows], "k": [r["k"] for r in rows],
                                            "box": sam_clip(model, a.src / "1_frame", clip, rows)}))
             print(f"{n}/{len(clips)} {clip} {time.time() - t0:.0f}s", flush=True)
+        return 0
+    if a.step == "fogli_sam":
+        # fogli delle clip gia' passate da SAM (anche a SAM in corso), senza le clip con scia
+        import csv
+        box = a.src / "4_box"
+        scie = set((box / "scie.txt").read_text().split()) if (box / "scie.txt").exists() else set()
+        by = defaultdict(dict)
+        for r in csv.DictReader(open(box / "box.csv")):
+            by[r["clip"]][(int(r["frame"]), r["k"])] = r
+        clips = {}
+        for p in sorted((box / "sam").glob("*.json")):
+            clip = "/".join(p.stem.rsplit("_", 1))
+            if clip in scie:
+                continue
+            d = json.loads(p.read_text())
+            rows = []
+            for f, k, b in zip(d["frame"], d["k"], d["box"]):
+                r = dict(by[clip][(f, k)])
+                r.update(zip(BOX_COLS, b) if b else zip(BOX_COLS, (float(r["ox"]), float(r["oy"]), 0.0, 0.0)),
+                         fonte="sam" if b else "vuoto")
+                rows.append(r)
+            clips[clip] = rows
+        box_sheets(a.src / "1_frame", box / "fogli_sam", clips)
+        (box / "fogli_sam" / "clip.txt").write_text("".join(f"{n} {c}\n" for n, c in enumerate(clips, 1)))
+        print(f"4_box: {len(clips)} clip SAM nei fogli ({len(scie)} con scia escluse)")
+        return 0
+    if a.step == "cvat_import":
+        cvat_import(a.src)
+        return 0
+    if a.step == "cvat":
+        # senza --clips: tutte le clip tranne le scie, per rivedere tutto il dataset; le clip che
+        # aspettano SAM (difficili e pulite bocciate senza json in sam/) si saltano e si
+        # caricano rilanciando quando SAM ha finito
+        import csv
+        box = a.src / "4_box"
+        if a.clips:
+            clips = [ln.split()[-1] for ln in a.clips.read_text().splitlines() if ln.strip() and not ln.startswith("#")]
+        else:
+            scie = set((box / "scie.txt").read_text().split())
+            bad = {ln.split()[1] for ln in open(box / "pulite_sbagliate.txt") if not ln.startswith("#")}
+            kind = {r["clip"]: r["tipo_clip"] for r in csv.DictReader(open(box / "box.csv"))}
+            sam = lambda c: (box / "sam" / f"{c.replace('/', '_')}.json").exists()
+            clips = [c for c in sorted(kind) if c not in scie and (kind[c] == "pulita" and c not in bad or sam(c))]
+            print(f"cvat: {len(clips)} clip pronte, {len(kind) - len(scie) - len(clips)} aspettano SAM", flush=True)
+        cvat_export(a.src, clips)
         return 0
     if a.step == "unione":
         apply_sessions(a.src / "3_sessioni")
