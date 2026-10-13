@@ -1,4 +1,4 @@
-# Status — 13/10/2026, 18:00
+# Status — 13/10/2026, 19:15
 
 Passaggio di consegne per il prossimo agente. Procedura completa: [`docs/procedura.md`](docs/procedura.md); regole:
 [`docs/regole.md`](docs/regole.md). Rispondere in italiano, poche parole, spiegazioni semplici; l'utente rivede a mano
@@ -39,15 +39,13 @@ L'utente vuole rivedere **tutto** il dataset in CVAT, non solo le clip bocciate:
 scie (329 clip), con i box migliori disponibili (SAM se la clip è passata da SAM, altrimenti contrasto). Le label
 finali vengono tutte dagli export CVAT (`4_box/cvat_zip/` → `--step cvat_import` → `4_box/manuale/`).
 
-In background (in questa sessione) c'è un comando che aspetta la fine di SAM e poi lancia `--step cvat` senza
-`--clips` (tutte le clip; log in `4_box/cvat.log`). Se la sessione è stata chiusa prima, rilanciarlo a mano:
-`NO_PROXY=localhost,127.0.0.1 .venv/bin/python tools/svanstrom.py --step cvat` (salta i task già creati e le clip
-che aspettano ancora SAM).
+Aggiornamento 19:15: **SAM finito** (165/165, json in `4_box/sam/`) e **tutte le 329 clip caricate in CVAT**
+(task 4–332; il 4 è V_AIRPLANE_017/s0, già corretto). Log in `4_box/cvat.log`.
 
 ## Cosa deve fare il prossimo agente
 
-1. Controllare che SAM abbia finito (`tail data/svanstrom/4_box/sam.log`, 165/165); se no, rilanciare `--step sam`.
-2. Controllare `4_box/cvat.log`: tutte le 329 clip devono avere un task (chiavi ogni 50 frame). La revisione con i
+1. SAM è finito (165/165).
+2. I task ci sono tutti (329, chiavi ogni 50 frame). La revisione con i
    fogli di SAM (`fogli_sam`, `sam_sbagliate.txt`) non serve più: l'utente rivede tutto in CVAT; `sam_sbagliate.txt`
    resta come elenco delle clip da guardare per prime.
 3. L'utente corregge in CVAT, esporta **Ultralytics YOLO Detection 1.0** e lascia gli zip in `4_box/cvat_zip/`; poi
