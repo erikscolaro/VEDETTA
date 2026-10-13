@@ -23,7 +23,7 @@ Da `NEW_MASTERPLAN.md` (§2, §5).
   - oggetto tagliato dal bordo: box sulla parte visibile;
   - stormi: un box per uccello visibile;
   - oggetto coperto (alberi, pali): box sulla parte visibile.
-  - scie degli aerei escluse: box solo sull'aereo.
+  - scie degli aerei escluse: box solo sull'aereo; le clip con la scia si tolgono dal dataset.
 - **Tutti** gli oggetti visibili delle 4 classi etichettati (anche stormi e oggetti non bersaglio).
 - Oggetti fuori dalle 4 classi (mongolfiere, alianti, parapendii, aquiloni): **senza label**, immagine tenuta.
 

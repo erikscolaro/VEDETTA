@@ -56,8 +56,20 @@ ripartire da zero. Nelle cartelle di soli indici (2, 3, 5) vanno CSV, non copie 
      rami, pale), in `pulite_sbagliate.txt`.
    - **SAM 2 con un punto** come prompt (centro del box a contrasto) sulle difficili e sulle pulite sbagliate (`--step
      sam`, 47.920 box, un json per clip in `sam/`): meglio con nuvole, alberi e pale; sbaglia ancora su scie e rami.
-   - Poi revisione per clip dei box SAM; quello che resta sbagliato si rifà a mano (frame chiave + interpolazione) o
-     si scarta la clip.
+   - Clip con scia tolte dal dataset (revisione umana di tutte le clip di aerei, `fogli_scie/`): 12 clip in
+     `scie.txt`.
+   - Poi revisione per clip dei box SAM (`--step fogli_sam`); basta un frame sbagliato e la clip va a mano
+     (`sam_sbagliate.txt`).
+   - **A mano in CVAT** (locale, `~/Desktop/cvat`, `localhost:8080`, cartella `data/svanstrom` montata in sola
+     lettura): `--step cvat --clips <file>`, un task per clip con i box attuali come traccia; frame chiave uno ogni 50
+     più primo e ultimo di ogni tratto visibile, CVAT interpola in mezzo. Si correggono le chiavi e se ne aggiungono
+     dove serve. Credenziali in `~/.config/cvat.env`. In alternativa si scarta la clip.
+   - Decisione del 13/10: **tutte** le clip in CVAT (tranne le scie) per la revisione finale del dataset, non solo le
+     bocciate; `--step cvat` senza `--clips` carica tutte le clip pronte, con il box migliore (SAM, altrimenti
+     contrasto). Le label finali vengono dagli export CVAT.
+   - Rientro: da CVAT si esporta il task in **Ultralytics YOLO Detection 1.0** (Actions → Export task dataset, poi
+     Requests → Download) e lo zip si lascia in `4_box/cvat_zip/`; `--step cvat_import` scrive le label per frame,
+     interpolate da CVAT, in `4_box/manuale/<video>_sN/`.
    - Oggetti non etichettati (stormi): da fare. Si riporta il rapporto fra √area originale e corretta, per classe e
      fascia.
 6. **Contare** istanze, video e sessioni per cella, sui box corretti.
