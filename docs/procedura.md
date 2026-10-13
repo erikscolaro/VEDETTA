@@ -1,64 +1,87 @@
-# Procedura di costruzione
+# Procedura
 
-Ogni passo dipende da quello prima. Le regole sono in [`regole.md`](regole.md).
+Ogni passo dipende dal precedente. Regole in [`regole.md`](regole.md).
 
-1. **Fissare le regole, prima di toccare i dati**: classi, fasce, regola del box aderente, requisiti delle fonti, e i
-   **valori minimi di istanze e di video per cella** della matrice classe × fascia (ancora da decidere, vedi
-   [`da_decidere.md`](da_decidere.md)).
+Ogni passo ha la sua cartella in `data/<fonte>/`: legge solo da quelle dei passi prima, così si rifà un passo senza
+ripartire da zero. Nelle cartelle di soli indici (2, 3, 5) vanno CSV, non copie delle immagini.
 
-2. **Correggere i box di Svanström (indispensabile).** Le label originali sono larghe e incoerenti: un box di 16 px
-   contiene un oggetto di 4–6 px. Con box così le fasce non dicono niente, la mAP50-95 penalizza alle IoU alte anche
-   un box preciso, e mescolare fonti con box aderenti insegnerebbe al modello due modi di disegnare il box.
-   - Ogni box si dà come prompt a **SAM 2**; dalla sagoma si ricava il box aderente. Sugli oggetti su cielo uniforme
-     si confronta con una soglia di contrasto locale dentro il box.
-   - Revisione a mano di un campione e di tutti i casi critici: sfondi complessi (edifici, alberi, pali), box che
-     cambiano molto, sagome vuote o spezzate.
-   - Si misura e si riporta **quanto erano larghi i box originali** (rapporto fra √area originale e aderente, per
-     classe e fascia).
-   - Nello stesso passaggio si cercano e si etichettano gli **oggetti visibili non etichettati** (per esempio gli
-     stormi).
+| cartella | contenuto | passo |
+|---|---|---|
+| `0_raw/` | video `.mp4` + label `.mat` | download |
+| `1_frame/` | frame `.png` + label originali YOLO, per frame | 2 |
+| `2_sequenze/` | `candidati/` (fogli + `candidati.csv`) e `sequenze.csv` (video, frame, sequenza) | 3 |
+| `3_sessioni/` | `embedding.npz`, `fogli/`, `proposta.csv`, `correzioni.txt`, `sessioni.csv` (video, sessione) | 4 |
+| `4_box/` | `labels/` corrette + `revisione/` (campione rivisto a mano) | 5 |
+| `5_dedup/` | `tenuti.csv` (frame che restano) | 9 |
+| `6_split/` | `images/` e `labels/{train,val,test}` in hardlink + `manifest.json` + report | 10–13 |
 
-3. **Contare.** Matrice classe × fascia con Svanström corretto: istanze e video per cella. Va fatto **dopo** il passo
-   2, perché le fasce dipendono dalla grandezza dei box.
+1. **Regole** fissate prima di toccare i dati (fatto, salvo i casi dubbi del box: [`da_decidere.md`](da_decidere.md)).
+2. **Frame** (`0_raw → 1_frame`): frame estratti, label `.mat` in YOLO. Clip scartata se label ≠ frame.
+3. **Sequenze** (`1_frame → 2_sequenze`): un video ne contiene più di una.
+   - Candidati a soglia bassa, tanti falsi positivi: per ogni coppia di frame consecutivi, picco rispetto ai 5 frame
+     prima e dopo di due misure, distanza degli istogrammi HSV e 1 − correlazione in scala di grigi (80×64); punteggio
+     = somma, candidato sopra 0,07 (398 coppie in 182 video, 34 fogli da 12 coppie).
+   - Revisione umana di tutti i candidati: si elencano i numeri dei tagli veri, il resto è scartato.
+   - Nessuna soglia automatica regge: panoramiche, cambi di esposizione e tagli si sovrappongono anche dopo aver
+     compensato il movimento della camera (taglio vero più debole: 0,13, V_DRONE_101 frame 228).
+   - Numeri dei tagli veri in `tagli.txt`. Esito: 57 tagli in 33 video, 341 sequenze su 284 video.
+   - Uscita: `sequenze.csv` con l'ID `video/sequenza` per ogni frame (`--step sequenze`).
+4. **Sessioni** (`1_frame + 2_sequenze → 3_sessioni`): l'unità è la **clip** (`video/sN`), non il video. Clip di
+   video diversi possono essere la stessa ripresa (il tramonto in fondo a V_AIRPLANE_005 è V_AIRPLANE_014); clip dello
+   stesso video possono essere di giorni diversi.
+   - Striscia per clip: il primo frame e poi uno al secondo (341 clip, 3.164 frame).
+   - Embedding DINOv2 ViT-S/14 (token CLS) di ogni frame della striscia; somiglianza fra due clip = massimo fra le
+     coppie dei loro frame.
+   - Proposta automatica larga: gruppi per legame medio sopra 0,95 (`--session-thr`). Il legame singolo incatena
+     tutto, su cielo uniforme quasi ogni coppia supera 0,9. Esito: 47 gruppi e 131 clip sole; dopo la revisione 112
+     sessioni (62 da una clip, la più grande 49 clip).
+   - Fogli in `fogli/`: uno per gruppo (`gNN.jpg`, una riga per clip, in fondo in grigio la clip più simile fuori dal
+     gruppo) e le clip sole a 6 per foglio (`soli_NN.jpg`), ognuna con la sua più simile.
+   - Revisione umana: si confrontano le righe fra loro (stesso posto, stesso giorno?), non i frame di una riga. Si
+     scrivono solo le eccezioni in `correzioni.txt`: `gNN: via <clip>`, `<clip> con gNN`, `gNN + gMM`. Nel dubbio,
+     stessa sessione; le clip di solo cielo, senza indizi sul luogo, restano come proposte.
+   - Le risposte (anche "tutto stessa sessione", "v/f" per coppia sui fogli dei soli) si traducono in righe
+     esplicite per clip in `correzioni.txt`.
+   - Uscita: `sessioni.csv` (clip, sessione) con `--step unione`: gruppi meno i `via`, più le unioni, per
+     transitività.
+5. **Correggere i box di Svanström** (`1_frame → 4_box`). Le label sono per frame, il tracking non serve.
+   - SAM 2.1 Large con il box originale come prompt non serve: ridà il box stesso (prova su 44 box).
+   - **Contrasto locale** su tutti i box (`--step box`, 20 s): pixel che si staccano dallo sfondo (mediana e MAD
+     dell'anello attorno), dentro il box allargato del 20%. I box corretti sono circa un terzo degli originali come
+     lato (mediana 0,35): il 64% sotto i 16 px.
+   - Box segnalati: vuoto, sotto i 3 px, allungato oltre 3:1 (scie), sfondo non uniforme (MAD > 15). Clip **pulite**
+     con al più il 10% di segnalati (226), **difficili** le altre (115). Nelle pulite i segnalati si interpolano dai
+     box buoni vicini della stessa clip. Tutto in `box.csv`.
+   - Revisione umana per clip delle pulite (`fogli_pulite/`, 6 frame ingranditi per clip): 50 sbagliate (nuvole,
+     rami, pale), in `pulite_sbagliate.txt`.
+   - **SAM 2 con un punto** come prompt (centro del box a contrasto) sulle difficili e sulle pulite sbagliate (`--step
+     sam`, 47.920 box, un json per clip in `sam/`): meglio con nuvole, alberi e pale; sbaglia ancora su scie e rami.
+   - Poi revisione per clip dei box SAM; quello che resta sbagliato si rifà a mano (frame chiave + interpolazione) o
+     si scarta la clip.
+   - Oggetti non etichettati (stormi): da fare. Si riporta il rapporto fra √area originale e corretta, per classe e
+     fascia.
+6. **Contare** istanze, video e sessioni per cella, sui box corretti.
+7. **Buchi**: celle sotto il minimo.
+8. **Aggiunte** per i buchi, a 640×512: box proposti da un detector a vocabolario aperto, resi aderenti con SAM 2,
+   rivisti a mano. Ogni fonte ha le sue cartelle `0_raw`…`4_box`.
+9. **Quasi-duplicati** (`4_box + 2_sequenze → 5_dedup`): hash semantico dentro ogni clip.
+10. **Split per sessione** (`5_dedup + 3_sessioni → 6_split`): ogni sessione di clip tutta in uno split, quindi un
+    video con clip di sessioni diverse può finire in split diversi. Su tutte le fonti, bilanciato su classe × fascia. Da val
+    e test via le immagini con oggetti < 16 px e i quasi-duplicati del train.
+11. **Bilanciamento** in ogni split: tetti per cella e per sessione (i droni abbondano), minimi in val e test.
+12. **Background** circa 10%.
+13. **Mosaici di deploy, report, manifest**, bootstrap per sessione su val e test, **congelamento**.
 
-4. **Elenco dei buchi**: le celle sotto il minimo diventano la lista di cosa cercare. Con i box originali gli uccelli
-   grandi sono zero e i droni grandi 37 frame di un solo video ([`svanstrom.md`](svanstrom.md)).
+## Da cambiare in `tools/svanstrom.py`
 
-5. **Riempire i buchi**, con le regole del passo 1. Fonti scelte in questo momento (candidate in
-   [`ricerca_fonti.md`](ricerca_fonti.md)), a colori, da terra verso il cielo, portate a **640×512**. Box proposti da
-   un detector a vocabolario aperto, resi aderenti con SAM 2 e rivisti a mano; anche qui si etichettano tutti gli
-   oggetti visibili.
-
-6. **Selezione dei frame per video**: via i quasi-duplicati con l'hash semantico (`tools/svanstrom.py`).
-
-7. **Split per video** (70/20/10), su tutte le fonti insieme, bilanciato sulla matrice classe × fascia (schema di
-   `tools/svanstrom.py`). Prima del bilanciamento finale, così nessun video finisce in due split.
-   - Dai video di val e test si tolgono le immagini con oggetti sotto i 16 px (restano solo nel train).
-   - Controllo fra split con lo stesso hash: i quasi-duplicati di immagini del train (video diversi della stessa
-     scena) si tolgono da val e test.
-
-8. **Bilanciamento dentro ogni split**: tetti per cella e per video (i droni sono molto più numerosi delle altre
-   classi). Anche val e test con un minimo per cella: la mAP di una cella con 5 oggetti non vuol dire niente.
-
-9. **Background**: circa il 10% di frame senza oggetti, dagli stessi video (inpainting del bersaglio su cielo
-   uniforme, come già fa `tools/svanstrom.py`).
-
-10. **Set di deploy, statistiche, congelamento.**
-    - `val_480p`, `val_720p`, `val_1080p` (e gli stessi per il test) a mosaico ([`regole.md`](regole.md)).
-    - Statistiche: matrice classe × fascia per split, quota di ogni fonte per classe, immagini senza oggetti, oggetti
-      sotto i 16 px (solo per sapere quanti sono).
-    - **Manifest** e **congelamento**: da qui il dataset non cambia più, e il test si chiude.
-
-## Cosa cambiare in `tools/svanstrom.py`
-
-Lo script fa già download, lettura delle label, hash semantico, background, split per video e sottoinsiemi. Va
-adattato:
-
-- fasce: oggi soglie COCO (32, 96) sul box più grande dell'immagine; servono 16–32, 32–64, 64–96, sopra 96;
-- regola dei 16 px: oggi non c'è; immagini con oggetti sotto i 16 px solo nel train;
-- box corretti: oggi usa i box originali; deve leggere quelli corretti del passo 2;
-- più fonti: oggi solo Svanström;
-- controllo dei duplicati fra split dopo lo split;
-- bilanciamento con tetti e minimi per cella;
-- set di deploy a mosaico e sottoinsiemi per fascia anche per val e test;
-- nel report, la matrice a 4 fasce con istanze e video per cella.
+- una cartella per passo, come sopra;
+- hash dentro la sequenza invece che dentro il video;
+- split per sessione invece che per video;
+- fasce 16/32/64/96 invece di COCO (32/96);
+- regola dei 16 px;
+- box corretti al posto degli originali;
+- più fonti;
+- duplicati fra split;
+- tetti e minimi per cella;
+- mosaici di deploy e sottoinsiemi per fascia di val e test;
+- report con matrice a 4 fasce e video per cella.
