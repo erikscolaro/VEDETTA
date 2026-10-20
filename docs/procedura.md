@@ -624,6 +624,12 @@ Su tutte le fonti:
       `n G`, `n N` per la notte sfuggita alla soglia); `--step grigi` → `0_raw/grigi.txt`; `tools/preselezione.py`
       li toglie (`grigio`, `notte`) dopo il tetto. Operatore: 312 G (994794, archivio), 308 N (990959, luci nel buio)
       → 47 + 9 ritagli tolti, segnati cancellati in CVAT nei task 628 e 627; altre fonti invariate.
+    - Box doppi DVIDS (utente, 20/10/2026: "gli errori più comuni che correggo sono box sullo stesso oggetto"; "solo
+      doppioni veri"): nei soli job ancora in `annotation`/`new` (944–969, task 599–624; non toccati 625–628 in
+      acceptance né i completati) tolte le box con IoU ≥ 0,8 con un'altra dello stesso frame, tenendo prima quella
+      della classe del video, poi la più grande: **1.973 box** tolte (su 3.822 coppie sovrapposte; le 1.674 con
+      una box dentro l'altra, IoU < 0,7, gruppo intero o rotore, restano all'operatore). Elenco in
+      `data/dvids/5_box/doppioni_cvat.csv`.
     - Disco: `fbd_sv` 1_frame 13 GB + zip 1,8 GB (tenuto: niente riscaricamenti), `dvids` 1_frame 3,3 GB; 43 GB
       liberi.
 11. **Split per sessione** (`data/<fonte>/6_dedup + 3_sessioni → data/aggregati/9_split`, su tutte le fonti, fuori da `svanstrom.py`): ogni sessione di clip tutta in uno split, quindi un
