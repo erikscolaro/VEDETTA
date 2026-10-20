@@ -665,6 +665,12 @@ Su tutte le fonti:
       helicopter); ~115–140k token e 3–7 min per agente, ~1,2M in tutto. Originale 645 cancellato, copia **669**
       rinominata `dvids_1007216-1012504`. Per i prossimi giri (utente): Haiku, letture forzate a 10 immagini per
       turno (meno andate e ritorno).
+    - **Sonnet a 10 immagini per turno** (20/10/2026): task 646 (copia 671, job 1016), 5 agenti da 185 immagini con 10
+      letture in parallelo per turno. Su 1.807 box: **154 via**, **366 classe** (soprattutto elicotteri etichettati
+      airplane); ~185–200k token e ~3 min per agente (prima 5–6 min). Revisione dell'utente: Sonnet meglio di Haiku,
+      e più immagini per turno aiutano (stessa classe ai frame della stessa sequenza). Originale 646 e una copia
+      doppia (670) cancellati, **671** rinominato `dvids_1012564-1015747`. Da qui Sonnet a 10 immagini per turno
+      direttamente sugli originali.
     - Disco: `fbd_sv` 1_frame 13 GB + zip 1,8 GB (tenuto: niente riscaricamenti), `dvids` 1_frame 3,3 GB; 43 GB
       liberi.
 11. **Split per sessione** (`data/<fonte>/6_dedup + 3_sessioni → data/aggregati/9_split`, su tutte le fonti, fuori da `svanstrom.py`): ogni sessione di clip tutta in uno split, quindi un
