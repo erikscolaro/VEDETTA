@@ -616,6 +616,14 @@ Su tutte le fonti:
       nome), tenuto il crepuscolo delle 18:34–18:39 (drone visibile). `tools/preselezione.py` le toglie **dopo il
       tetto**, così le altre fonti non cambiano: +55 ritagli `notte` (20190925_200805, 20190926_193515, _195921,
       _200510), nient'altro diverso. Segnati cancellati in CVAT: task 631 (8) e 633 (47).
+    - DVIDS in scala di grigi e filmati d'archivio (utente in CVAT, 20/10/2026, job 973: "non fanno parte della
+      distribuzione"; es. 994794, storia dei paracadutisti). Il colore da solo non basta (cielo coperto a colori
+      quasi grigio, archivio a colori sbiaditi), quindi fogli all'operatore come per il fumo: `--step fogli_grigi`
+      → `0_raw/fogli_grigi/` (324 tratti, 21 fogli, tratti con un ritaglio tenuto di colore ≤ 20, `_gray`;
+      a sinistra il più grigio, a destra il mediano); **[operatore]** scrive `0_raw/scarti_grigi.txt` (righe
+      `n G`, `n N` per la notte sfuggita alla soglia); `--step grigi` → `0_raw/grigi.txt`; `tools/preselezione.py`
+      li toglie (`grigio`, `notte`) dopo il tetto. Operatore: 312 G (994794, archivio), 308 N (990959, luci nel buio)
+      → 47 + 9 ritagli tolti, segnati cancellati in CVAT nei task 628 e 627; altre fonti invariate.
     - Disco: `fbd_sv` 1_frame 13 GB + zip 1,8 GB (tenuto: niente riscaricamenti), `dvids` 1_frame 3,3 GB; 43 GB
       liberi.
 11. **Split per sessione** (`data/<fonte>/6_dedup + 3_sessioni → data/aggregati/9_split`, su tutte le fonti, fuori da `svanstrom.py`): ogni sessione di clip tutta in uno split, quindi un

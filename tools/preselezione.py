@@ -12,6 +12,9 @@
    applica dopo il tetto (6), che cosi' non cambia.
 4. Fumo degli airshow (utente, 19/10/2026): via i ritagli dei tratti DVIDS in
    `0_raw/fumo.txt` (id, inizio in frame), segnati sui `fogli_fumo/`.
+4b. Scala di grigi e filmati d'archivio (utente, 20/10/2026): via i ritagli dei
+   tratti DVIDS in `0_raw/grigi.txt`, segnati sui `fogli_grigi/` (G; N per la notte sfuggita alla
+   soglia); dopo il tetto (6).
 5. Box sotto i 4 px^2 (sqrt(w*h) < 2 px, utente, 19/10/2026): tolte dalle label
    di tutte le fonti.
 6. Tetto con margine: (4.000 train + 857 val/test) * 1,1 istanze per cella su
@@ -76,23 +79,24 @@ def fix_labels() -> None:
         print(f"{s}: {n['box']} box, classe del video cambiata {n['classe']}, sotto i {MIN_AREA} px^2 tolte {n['piccole']}")
 
 
-def smoke() -> set[str]:
-    """Ritagli dei tratti in `0_raw/fumo.txt` (id, inizio del tratto in frame; tratti.csv, +-1 frame)."""
-    f = DATA / "dvids" / "0_raw" / "fumo.txt"
+def smoke(nome: str = "fumo") -> dict[str, str]:
+    """Ritagli dei tratti in `0_raw/<nome>.txt` (fumo o grigi; id, inizio del tratto in frame; tratti.csv, +-1 frame)
+    -> lettera dell'operatore (quarta colonna, se c'e')."""
+    f = DATA / "dvids" / "0_raw" / f"{nome}.txt"
     if not f.exists():
         return set()
-    want = {(i, float(k)) for i, k in (ln.split()[:2] for ln in open(f) if ln.strip() and not ln.startswith("#"))}
+    want = {(x[0], float(x[1])): (x[3] if len(x) > 3 else "") for x in (ln.split() for ln in open(f) if ln.strip() and not ln.startswith("#"))}
     T = defaultdict(list)
     for r in csv.DictReader(open(DATA / "dvids" / "0_raw" / "tratti.csv")):
         T[r["id"]].append((float(r["inizio"]) * 5, float(r["fine"]) * 5))
-    out = set()
+    out = {}
     for d in (DATA / "dvids" / "4_ritagli").glob("DVIDS_*"):
         i = d.name.split("_")[1]
         for p in (d / "images").glob("*.jpg"):
             k = int(p.stem.rsplit("_f", 1)[1])
             a = next((a for a, b in T[i] if a - 1 <= k <= b + 1), -1)
             if (i, a) in want:
-                out.add(p.stem)
+                out[p.stem] = want[i, a]
     return out
 
 
@@ -151,6 +155,11 @@ def select() -> None:
     for s, _, stem, _ in crops:
         if s == "anti_uav" and int(stem.split("_")[2][:2]) >= 19:
             drop[s][stem] = "notte"
+    # DVIDS in scala di grigi o d'archivio (utente, 20/10/2026), anch'essi dopo il tetto
+    grigi = smoke("grigi")
+    for s, _, stem, _ in crops:
+        if stem in grigi:
+            drop[s][stem] = "notte" if grigi[stem] == "N" else "grigio"  # N: luci di notte segnate sui fogli
     for s in FONTI:
         f = DATA / s / "5_box" / "preselezione" / "esclusi.txt"
         f.write_text("".join(f"{k} {m}\n" for k, m in sorted(drop[s].items())))

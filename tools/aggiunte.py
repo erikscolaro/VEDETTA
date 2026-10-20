@@ -26,6 +26,8 @@ pagine in `data/dvids/0_raw/candidati.csv` (url, classe, titolo).
     python tools/aggiunte.py --fonte dvids --step escludi --fogli fogli_tratti4 --scarti scarti.txt  # revisione -> esclusi.txt
     python tools/aggiunte.py --fonte dvids --step frame --secondi 600  # tratti a giri fino a 600 s nuovi per classe, 5 fps, + YOLO -> 1_frame
     python tools/aggiunte.py --fonte dvids --step catena / sessioni / conta / cvat
+    python tools/aggiunte.py --fonte dvids --step fogli_grigi  # tratti poco colorati -> fogli_grigi, poi grigi.txt
+    python tools/aggiunte.py --fonte dvids --step grigi --fogli fogli_grigi --scarti data/dvids/0_raw/scarti_grigi.txt
 """
 
 from __future__ import annotations
@@ -534,16 +536,34 @@ def dvids_exclude(src: Path, fogli: str, scarti: Path) -> None:
     print(f"dvids: {len(sc)} tratti esclusi su {len(idx)} di {fogli}")
 
 
-def dvids_smoke_sheets(src: Path, per: int = 16) -> None:
+def _gray(p: Path) -> float:
+    """Colore del ritaglio: 99,5 percentile della differenza massima fra i canali
+    (0-3 in bianco e nero, per il rumore del JPEG; un cielo coperto a colori resta sopra)."""
+    import cv2
+
+    im = cv2.imread(str(p)).astype(np.int16)
+    b, g, r = im[..., 0], im[..., 1], im[..., 2]
+    return float(np.percentile(np.maximum(np.maximum(abs(r - g), abs(g - b)), abs(r - b)), 99.5))
+
+
+def dvids_smoke_sheets(src: Path, per: int = 16, nome: str = "fumo", grigio: float = 20) -> None:
     """Tratti di aerei gia' scaricati, mai visti in un `0_raw/fogli_fumo*/`: due
     ritagli per tratto (a 1/4 e 3/4), fogli numerati in `0_raw/fogli_fumoN/` con
     `indice.csv` (n, id, inizio_k = inizio del tratto in frame, ritagli). L'operatore
     scrive le righe `n F` dei tratti con una scia di fumo o condensa (regole.md) e
-    le passa a `--step fumo`."""
+    le passa a `--step fumo`. Con `nome="grigi"` (utente, 20/10/2026: video in scala
+    di grigi e filmati d'archivio fuori distribuzione): tratti di tutte le classi con
+    almeno un ritaglio tenuto dalla preselezione con colore (`_gray`) fino a `grigio`,
+    in `0_raw/fogli_grigiN/`; l'operatore segna i tratti in bianco e nero o d'archivio
+    e li passa a `--step grigi`."""
     import cv2
 
     raw = src / "0_raw"
-    seen = {(r["id"], float(r["inizio_k"])) for f in raw.glob("fogli_fumo*/indice.csv") for r in csv.DictReader(open(f))}
+    seen = {(r["id"], float(r["inizio_k"])) for f in raw.glob(f"fogli_{nome}*/indice.csv") for r in csv.DictReader(open(f))}
+    tenuti = None
+    if nome == "grigi":
+        ex = fred.excluded(src)
+        tenuti = {p.stem for p in (src / "5_box" / "preselezione").glob("DVIDS_*/*.txt") if p.stem not in ex}
     info = {r["id"]: r["classe"] for r in csv.DictReader(open(raw / "video.csv"))}
     T = {}
     for r in csv.DictReader(open(raw / "tratti.csv")):
@@ -551,18 +571,25 @@ def dvids_smoke_sheets(src: Path, per: int = 16) -> None:
     seg = {}
     for d in sorted((src / "4_ritagli").glob("DVIDS_*")):
         i = d.name.split("_")[1]
-        if info.get(i) != "airplane":
+        if tenuti is None and info.get(i) != "airplane":
             continue
         for p in sorted((d / "images").glob("*.jpg")):
+            if tenuti is not None and p.stem not in tenuti:
+                continue
             k = int(p.stem.rsplit("_f", 1)[1])
             a = next((a for a, b in T.get(i, []) if a - 1 <= k <= b + 1), -1)
             if (i, a) not in seen:
                 seg.setdefault((i, a), []).append(p)
-    out = raw / f"fogli_fumo{len(list(raw.glob('fogli_fumo*'))) + 1 if seen else ''}"
+    if tenuti is not None:
+        with ThreadPoolExecutor(16) as ex_:
+            col = {k: list(ex_.map(_gray, ps)) for k, ps in seg.items()}
+        # dal meno colorato: sul foglio il piu' grigio e quello mediano
+        seg = {k: [p for _, p in sorted(zip(col[k], ps))] for k, ps in seg.items() if min(col[k]) <= grigio}
+    out = raw / f"fogli_{nome}{len(list(raw.glob(f'fogli_{nome}*'))) + 1 if seen else ''}"
     out.mkdir(exist_ok=True)
     rows, tiles = [], []
     for n, ((i, a), ps) in enumerate(sorted(seg.items()), 1):
-        t = np.hstack([cv2.resize(cv2.imread(str(p)), (240, 192)) for p in (ps[len(ps) // 4], ps[3 * len(ps) // 4])])
+        t = np.hstack([cv2.resize(cv2.imread(str(p)), (240, 192)) for p in ((ps[0], ps[len(ps) // 2]) if tenuti is not None else (ps[len(ps) // 4], ps[3 * len(ps) // 4]))])
         cv2.rectangle(t, (0, 0), (52, 24), (0, 0, 0), -1)
         cv2.putText(t, str(n), (3, 19), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (255, 255, 255), 2)
         tiles.append(cv2.copyMakeBorder(t, 3, 3, 3, 3, cv2.BORDER_CONSTANT, value=(255, 255, 255)))
@@ -574,19 +601,19 @@ def dvids_smoke_sheets(src: Path, per: int = 16) -> None:
         w = csv.writer(fh)
         w.writerow(["n", "id", "inizio_k", "ritagli"])
         w.writerows(rows)
-    print(f"dvids: {len(rows)} tratti di aerei in {-(-len(rows) // per)} fogli -> {out}")
+    print(f"dvids: {len(rows)} tratti in {-(-len(rows) // per)} fogli -> {out}")
 
 
-def dvids_smoke(src: Path, fogli: str, scarti: Path) -> None:
+def dvids_smoke(src: Path, fogli: str, scarti: Path, nome: str = "fumo") -> None:
     """Righe `n F` dell'operatore su `0_raw/<fogli>/` -> righe `id inizio_k n` in
-    `0_raw/fumo.txt`, letto da tools/preselezione.py."""
+    `0_raw/<nome>.txt` (fumo o grigi), letto da tools/preselezione.py."""
     d = src / "0_raw" / fogli
     idx = {r["n"]: r for r in csv.DictReader(open(d / "indice.csv"))}
-    sc = [ln.split()[0] for ln in open(scarti) if ln.strip()]
-    with open(src / "0_raw" / "fumo.txt", "a") as f:
+    sc = [ln.split()[:2] for ln in open(scarti) if ln.strip()]
+    with open(src / "0_raw" / f"{nome}.txt", "a") as f:
         f.write(f"# {fogli}\n")
-        f.writelines(f"{idx[n]['id']} {idx[n]['inizio_k']} {n}\n" for n in sc)
-    print(f"dvids: {len(sc)} tratti con fumo su {len(idx)} di {fogli}")
+        f.writelines(f"{idx[n]['id']} {idx[n]['inizio_k']} {n} {c}\n" for n, c in sc)
+    print(f"dvids: {len(sc)} tratti {nome} su {len(idx)} di {fogli}")
 
 
 def dvids_frames(src: Path, ids: list[str], secondi: float = 0, grandezza: float = 0, classe: str = "",
@@ -719,7 +746,7 @@ def sessions(src: Path, thr: float = 0.9) -> None:
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--fonte", choices=list(FONTI), required=True)
-    p.add_argument("--step", required=True, choices=["frame", "escludi", "fogli_fumo", "fumo", "cerca", "info", "anteprima", "doppioni", "scegli", "fogli", "catena", "sessioni",
+    p.add_argument("--step", required=True, choices=["frame", "escludi", "fogli_fumo", "fumo", "fogli_grigi", "grigi", "cerca", "info", "anteprima", "doppioni", "scegli", "fogli", "catena", "sessioni",
                                                      "conta", "cvat", "cvat_import"])
     p.add_argument("--seq", nargs="+", default=[], help="sequenze (vuoto: tutte quelle in 1_frame)")
     p.add_argument("--secondi", type=float, default=0, help="DVIDS frame: secondi nuovi per classe in questo giro (0: tutti)")
@@ -745,6 +772,10 @@ def main(argv=None) -> int:
         dvids_smoke_sheets(src)
     if a.step == "fumo":
         dvids_smoke(src, a.fogli, a.scarti)
+    if a.step == "fogli_grigi":
+        dvids_smoke_sheets(src, nome="grigi")
+    if a.step == "grigi":
+        dvids_smoke(src, a.fogli, a.scarti, nome="grigi")
     if a.step == "doppioni":
         dvids_duplicates(src)
     if a.step == "info":
