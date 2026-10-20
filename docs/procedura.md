@@ -646,7 +646,7 @@ Su tutte le fonti:
       box dentro un'altra per ≥ 90% della loro area → 3.678 doppie e 6.555 interne tolte. Tutte le regole nuove
       dopo il tetto: FRED, FBD, Anti-UAV e tetto invariati.
     - **Task DVIDS rifatti** (utente: "ricostruisci i job mancanti evitando di metterci dentro queste immagini"):
-      cancellati i task 600–622 (tutti `annotation`/`new`) e rifatti con `--step cvat` → task 645–667 (21.553
+      cancellati i task 600–622 (tutti `annotation`/`new`) e rifatti con `--step cvat` → task 645–667 (21.203
       ritagli; i video in task già
       rivisti si saltano). Nei task già rivisti (599, 623–628) i ritagli con stella o visore restano in CVAT ma
       sono esclusi dal dataset da `esclusi.txt`.
