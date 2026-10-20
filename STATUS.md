@@ -49,6 +49,7 @@ clip tenuti apposta. Il rapporto √area originale/corretta non si calcola (deci
 
 ## Note pratiche
 
+- Task CVAT DVIDS da rivedere (20/10/2026): 645–667, rifatti senza stella, visore e box doppie o interne.
 - Python: `air-detection/.venv/bin/python` (torch, ultralytics, cvat-sdk). Pesi SAM in `data/modelli/sam2.1_l.pt`.
 - CVAT dagli script: `NO_PROXY=localhost,127.0.0.1` (c'è un proxy di sistema); credenziali in `~/.config/cvat.env`
   (`CVAT_USER`, `CVAT_PASS`, utente `erikscolaro`). Docker vuole `sudo` (password): se CVAT è spento, l'utente lancia

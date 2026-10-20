@@ -15,6 +15,10 @@
 4b. Scala di grigi e filmati d'archivio (utente, 20/10/2026): via i ritagli dei
    tratti DVIDS in `0_raw/grigi.txt`, segnati sui `fogli_grigi/` (G; N per la notte sfuggita alla
    soglia); dopo il tetto (6).
+4d. Stella gialla del logo "U.S. ARMY" nei ritagli DVIDS (`stars`, utente,
+   20/10/2026: rompe il modello); dopo il tetto (6).
+4e. Box DVIDS doppie (IoU >= 0,8) o dentro un'altra (>= 90%), dopo il tetto
+   (`clean_boxes`, utente, 20/10/2026).
 4c. Sequenze FRED in `fred/0_raw/esclusi.txt` (sequenza, motivo), scritto
    dall'operatore (utente, 20/10/2026: 209); dopo il tetto (6).
 5. Box sotto i 4 px^2 (sqrt(w*h) < 2 px, utente, 19/10/2026): tolte dalle label
@@ -86,7 +90,7 @@ def smoke(nome: str = "fumo") -> dict[str, str]:
     -> lettera dell'operatore (quarta colonna, se c'e')."""
     f = DATA / "dvids" / "0_raw" / f"{nome}.txt"
     if not f.exists():
-        return set()
+        return {}
     want = {(x[0], float(x[1])): (x[3] if len(x) > 3 else "") for x in (ln.split() for ln in open(f) if ln.strip() and not ln.startswith("#"))}
     T = defaultdict(list)
     for r in csv.DictReader(open(DATA / "dvids" / "0_raw" / "tratti.csv")):
@@ -100,6 +104,34 @@ def smoke(nome: str = "fumo") -> dict[str, str]:
             if (i, a) in want:
                 out[p.stem] = want[i, a]
     return out
+
+
+STAR_REF = DATA / "dvids" / "4_ritagli" / "DVIDS_1002305" / "images" / "DVIDS_1002305_f00283.jpg"  # stella a (5-100, 190-280)
+
+
+def _yellow(im: np.ndarray) -> np.ndarray:
+    h = cv2.cvtColor(im, cv2.COLOR_BGR2HSV)
+    return (((h[..., 0] >= 21) & (h[..., 0] <= 30) & (h[..., 1] >= 170) & (h[..., 2] >= 170)) * 255).astype(np.uint8)
+
+
+def stars() -> set[str]:
+    """Ritagli DVIDS con la stella gialla del logo "U.S. ARMY" (utente, 20/10/2026: rompe
+    il modello): una macchia gialla (H 21-30, S e V >= 170), larga quanto alta, con la
+    forma della stella di riferimento (matchShapes <= 0,2; le stelle stanno sotto 0,13,
+    luci e fiori sopra 0,26)."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    cs, _ = cv2.findContours(_yellow(cv2.imread(str(STAR_REF)))[190:280, 5:100], cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    ref = max(cs, key=cv2.contourArea)
+
+    def one(p: Path) -> bool:
+        cs, _ = cv2.findContours(_yellow(cv2.imread(str(p))), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        return any(cv2.contourArea(c) >= 60 and 0.75 <= cv2.boundingRect(c)[2] / cv2.boundingRect(c)[3] <= 1.35
+                   and cv2.matchShapes(c, ref, cv2.CONTOURS_MATCH_I1, 0) <= 0.2 for c in cs)
+
+    ps = sorted((DATA / "dvids" / "4_ritagli").glob("DVIDS_*/images/*.jpg"))
+    with ThreadPoolExecutor(16) as ex:
+        return {p.stem for p, y in zip(ps, ex.map(one, ps)) if y}
 
 
 def big(cx: float, cy: float, w: float, h: float) -> bool:
@@ -158,10 +190,15 @@ def select() -> None:
         if s == "anti_uav" and int(stem.split("_")[2][:2]) >= 19:
             drop[s][stem] = "notte"
     # DVIDS in scala di grigi o d'archivio (utente, 20/10/2026), anch'essi dopo il tetto
-    grigi = smoke("grigi")
+    grigi = smoke("grigi") | smoke("verdi")  # verdi: visore notturno (N)
     for s, _, stem, _ in crops:
         if stem in grigi:
             drop[s][stem] = "notte" if grigi[stem] == "N" else "grigio"  # N: luci di notte segnate sui fogli
+    # stella gialla del logo "U.S. ARMY" (DVIDS, utente 20/10/2026), dopo il tetto
+    st = stars()
+    for s, _, stem, _ in crops:
+        if s == "dvids" and stem in st:
+            drop[s][stem] = "stella"
     # sequenze FRED tolte dall'operatore (`fred/0_raw/esclusi.txt`, utente 20/10/2026), anch'esse dopo il tetto
     f = DATA / "fred" / "0_raw" / "esclusi.txt"
     via = {f"FRED_{x[0]}": x[1] for x in (ln.split() for ln in open(f) if ln.strip() and not ln.startswith("#"))} if f.exists() else {}
@@ -174,6 +211,47 @@ def select() -> None:
         print(f"{s}: esclusi {len(drop[s])} ({dict(Counter(drop[s].values()))}) -> {f}")
 
 
+def clean_boxes(dup: float = 0.8, inside: float = 0.9) -> None:
+    """DVIDS, dopo il tetto (che non cambia): via le box doppie (IoU >= `dup`, si tiene
+    prima la classe del video, poi la piu' grande) e quelle dentro un'altra per almeno
+    `inside` della loro area (si tiene la piu' esterna). Utente, 20/10/2026: gli errori
+    piu' comuni in CVAT."""
+    vc = {r["id"]: NAMES.index(r["classe"]) for r in csv.DictReader(open(DATA / "dvids" / "0_raw" / "video.csv"))}
+
+    def xyxy(b):
+        cx, cy, w, h = map(float, b[1:])
+        return cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2
+
+    def inter(a, b):
+        return max(0, min(a[2], b[2]) - max(a[0], b[0])) * max(0, min(a[3], b[3]) - max(a[1], b[1]))
+
+    area = lambda a: (a[2] - a[0]) * (a[3] - a[1])  # noqa: E731
+    n = Counter()
+    for t in (DATA / "dvids" / "5_box" / "preselezione").glob("DVIDS_*/*.txt"):
+        bs = [ln.split() for ln in t.read_text().splitlines()]
+        if len(bs) < 2:
+            continue
+        k = str(vc[t.parent.name.split("_")[1]])
+        keep = []
+        for b in sorted(bs, key=lambda b: (b[0] != k, -area(xyxy(b)))):
+            x = xyxy(b)
+            if any(inter(x, xyxy(o)) / (area(x) + area(xyxy(o)) - inter(x, xyxy(o))) >= dup for o in keep):
+                n["doppie"] += 1
+            else:
+                keep.append(b)
+        out = []
+        for b in sorted(keep, key=lambda b: -area(xyxy(b))):
+            x = xyxy(b)
+            if any(inter(x, xyxy(o)) >= inside * area(x) for o in out):
+                n["dentro"] += 1
+            else:
+                out.append(b)
+        if len(out) < len(bs):
+            t.write_text("".join(" ".join(b) + "\n" for b in out))
+    print(f"dvids: box doppie tolte {n['doppie']}, dentro un'altra {n['dentro']}")
+
+
 if __name__ == "__main__":
     fix_labels()
     select()
+    clean_boxes()

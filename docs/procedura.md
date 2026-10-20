@@ -632,8 +632,24 @@ Su tutte le fonti:
       `data/dvids/5_box/doppioni_cvat.csv`.
     - **FRED_209 tolta** (utente, 20/10/2026: "aggiungere alle esclusioni, non lo voglio vedere"): riga `209 utente`
       in `data/fred/0_raw/esclusi.txt`, letta da `tools/preselezione.py` dopo il tetto → 706 ritagli `utente` (385
-      tenuti prima), altre fonti e resto di FRED invariati. Task CVAT 551 (`fred_209`) da cancellare. Job FRED
+      tenuti prima), altre fonti e resto di FRED invariati. Task CVAT 551 (`fred_209`, job 896) cancellato. Job FRED
       887–895 (task 542–550) portati in `acceptance`/`completed`: rivisti tutti dall'utente.
+    - **Visore notturno verde** (utente, 20/10/2026): `--step fogli_verdi` → `0_raw/fogli_verdi/` (54 tratti, `_green`
+      ≥ 5: 20 percentile di G − max(R, B), il più verde a sinistra); operatore in `scarti_verdi.txt`: 6, 11, 12,
+      14–16, 19–23, 25, 27, 29–31, 33, 34, 37, 40, 42–46, 54 (26 tratti, `N`) → `0_raw/verdi.txt`, tolti come `notte`.
+    - **Stella gialla del logo "U.S. ARMY"** (utente, 20/10/2026: "rompe il modello"): `stars()` in
+      `tools/preselezione.py`, macchia gialla H 21–30, S e V ≥ 170, larga quanto alta, forma confrontata con la
+      stella di `DVIDS_1002305_f00283` (matchShapes ≤ 0,2: stelle fino a 0,124, luci rosse e fiori da 0,26; 24
+      a caso e i 18 al confine visti a occhio) → 317 ritagli `stella`.
+    - **Box doppie e interne** (utente, 20/10/2026, "se una box include un'altra tieni solo la più esterna"):
+      `clean_boxes()` dopo il tetto, solo DVIDS: via IoU ≥ 0,8 (prima la classe del video, poi la più grande) e le
+      box dentro un'altra per ≥ 90% della loro area → 3.678 doppie e 6.555 interne tolte. Tutte le regole nuove
+      dopo il tetto: FRED, FBD, Anti-UAV e tetto invariati.
+    - **Task DVIDS rifatti** (utente: "ricostruisci i job mancanti evitando di metterci dentro queste immagini"):
+      cancellati i task 600–622 (tutti `annotation`/`new`) e rifatti con `--step cvat` → task 645–667 (21.553
+      ritagli; i video in task già
+      rivisti si saltano). Nei task già rivisti (599, 623–628) i ritagli con stella o visore restano in CVAT ma
+      sono esclusi dal dataset da `esclusi.txt`.
     - Disco: `fbd_sv` 1_frame 13 GB + zip 1,8 GB (tenuto: niente riscaricamenti), `dvids` 1_frame 3,3 GB; 43 GB
       liberi.
 11. **Split per sessione** (`data/<fonte>/6_dedup + 3_sessioni → data/aggregati/9_split`, su tutte le fonti, fuori da `svanstrom.py`): ogni sessione di clip tutta in uno split, quindi un
