@@ -677,6 +677,11 @@ Su tutte le fonti:
       sotto-agenti; 1 frame ogni 10, intorno a ogni errore ±5 frame, estesi di 5 finché il bordo è pulito; i frame
       non letti restano come sono. Letti 423 frame su 990 (43%), 762 box su 1.618: 116 via, 155 classe (Black Hawk
       etichettati airplane). Errori isolati tra un campione e l'altro possono sfuggire.
+    - **Task 649 a campione, un solo agente** (originale, job 994; quota 83% → 91%, "abbiamo un vincitore"): un Sonnet
+      senza orchestratore né sotto-agenti, stesso schema; letti 241 frame su 925 (26%), 553 box su 1.626: 85 via,
+      105 classe (sciame di DVIDS_1026196, bird → drone, dubbio dichiarato dall'agente); ~249k token, ~6,5 min.
+      Quota per task: 26 punti tutto letto (647), 15 a campione con orchestratore (648), **8 un solo agente (649)**.
+      Metodo scelto per i task rimasti.
     - Disco: `fbd_sv` 1_frame 13 GB + zip 1,8 GB (tenuto: niente riscaricamenti), `dvids` 1_frame 3,3 GB; 43 GB
       liberi.
 11. **Split per sessione** (`data/<fonte>/6_dedup + 3_sessioni → data/aggregati/9_split`, su tutte le fonti, fuori da `svanstrom.py`): ogni sessione di clip tutta in uno split, quindi un
