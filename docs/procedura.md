@@ -659,6 +659,12 @@ Su tutte le fonti:
       caschi sfuggite a `stars`), **7 classe** (caccia etichettati bird → airplane). ~186k token per agente, ~5–6
       min in parallelo. Originale 655 cancellato, copia **668** (job 1013) rinominata `dvids_858903-871650`. File
       intermedi fuori dal repo (richiesta dell'utente).
+    - **Revisione con agenti Haiku** (20/10/2026, utente: "ha funzionato anche così"): stessa procedura sul task 645
+      (copia 669, job 1014), 10 subagenti Haiku da 99 immagini (contesto sotto i 100K token, fascia di prezzo più
+      bassa). Su 1.192 box: **55 via**, **194 classe** (C-130 helicopter → airplane, V-22 drone → airplane, 1 bird →
+      helicopter); ~115–140k token e 3–7 min per agente, ~1,2M in tutto. Originale 645 cancellato, copia **669**
+      rinominata `dvids_1007216-1012504`. Per i prossimi giri (utente): Haiku, letture forzate a 10 immagini per
+      turno (meno andate e ritorno).
     - Disco: `fbd_sv` 1_frame 13 GB + zip 1,8 GB (tenuto: niente riscaricamenti), `dvids` 1_frame 3,3 GB; 43 GB
       liberi.
 11. **Split per sessione** (`data/<fonte>/6_dedup + 3_sessioni → data/aggregati/9_split`, su tutte le fonti, fuori da `svanstrom.py`): ogni sessione di clip tutta in uno split, quindi un
