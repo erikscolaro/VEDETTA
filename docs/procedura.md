@@ -671,6 +671,12 @@ Su tutte le fonti:
       e più immagini per turno aiutano (stessa classe ai frame della stessa sequenza). Originale 646 e una copia
       doppia (670) cancellati, **671** rinominato `dvids_1012564-1015747`. Da qui Sonnet a 10 immagini per turno
       direttamente sugli originali.
+    - **Task 647** (originale, job 992; quota della sessione 40% → 66%): 5 agenti Sonnet a 10 immagini per turno su
+      989 immagini. Su 1.221 box: 176 via, 325 classe (C-130 e antincendio etichettati helicopter → airplane).
+    - **Task 648 a campione** (originale, job 993; quota 66% → 81%, idea dell'utente): orchestratore Sonnet con 5
+      sotto-agenti; 1 frame ogni 10, intorno a ogni errore ±5 frame, estesi di 5 finché il bordo è pulito; i frame
+      non letti restano come sono. Letti 423 frame su 990 (43%), 762 box su 1.618: 116 via, 155 classe (Black Hawk
+      etichettati airplane). Errori isolati tra un campione e l'altro possono sfuggire.
     - Disco: `fbd_sv` 1_frame 13 GB + zip 1,8 GB (tenuto: niente riscaricamenti), `dvids` 1_frame 3,3 GB; 43 GB
       liberi.
 11. **Split per sessione** (`data/<fonte>/6_dedup + 3_sessioni → data/aggregati/9_split`, su tutte le fonti, fuori da `svanstrom.py`): ogni sessione di clip tutta in uno split, quindi un
