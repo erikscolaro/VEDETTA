@@ -650,6 +650,15 @@ Su tutte le fonti:
       ritagli; i video in task già
       rivisti si saltano). Nei task già rivisti (599, 623–628) i ritagli con stella o visore restano in CVAT ma
       sono esclusi dal dataset da `esclusi.txt`.
+    - **Revisione con agenti Sonnet** (prova dell'utente, 20/10/2026, poi "valutazione estremamente positiva": la copia
+      diventa il task ufficiale). Copia del task 655 (job 1000) in CVAT; per ogni frame con box un'immagine con i box
+      numerati e il loro ingrandimento; 5 subagenti Sonnet da ~200 immagini, ognuno scrive `img,box,azione` (`ok`,
+      `via`, `classe <nome>`; solo classe ed eliminazione, i bordi li corregge l'utente; nel dubbio `ok`); uno script
+      applica in CVAT. Su 1.284 box: 978 ok, **299 via** (carichi appesi al verricello, cavo, scritte e stemmi,
+      volti e caschi, macchie nella polvere, oggetti a terra, box sul cielo vuoto o su due velivoli, stelle sui
+      caschi sfuggite a `stars`), **7 classe** (caccia etichettati bird → airplane). ~186k token per agente, ~5–6
+      min in parallelo. Originale 655 cancellato, copia **668** (job 1013) rinominata `dvids_858903-871650`. File
+      intermedi fuori dal repo (richiesta dell'utente).
     - Disco: `fbd_sv` 1_frame 13 GB + zip 1,8 GB (tenuto: niente riscaricamenti), `dvids` 1_frame 3,3 GB; 43 GB
       liberi.
 11. **Split per sessione** (`data/<fonte>/6_dedup + 3_sessioni → data/aggregati/9_split`, su tutte le fonti, fuori da `svanstrom.py`): ogni sessione di clip tutta in uno split, quindi un
