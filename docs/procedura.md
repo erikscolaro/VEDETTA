@@ -630,6 +630,10 @@ Su tutte le fonti:
       della classe del video, poi la più grande: **1.973 box** tolte (su 3.822 coppie sovrapposte; le 1.674 con
       una box dentro l'altra, IoU < 0,7, gruppo intero o rotore, restano all'operatore). Elenco in
       `data/dvids/5_box/doppioni_cvat.csv`.
+    - **FRED_209 tolta** (utente, 20/10/2026: "aggiungere alle esclusioni, non lo voglio vedere"): riga `209 utente`
+      in `data/fred/0_raw/esclusi.txt`, letta da `tools/preselezione.py` dopo il tetto → 706 ritagli `utente` (385
+      tenuti prima), altre fonti e resto di FRED invariati. Task CVAT 551 (`fred_209`) da cancellare. Job FRED
+      887–895 (task 542–550) portati in `acceptance`/`completed`: rivisti tutti dall'utente.
     - Disco: `fbd_sv` 1_frame 13 GB + zip 1,8 GB (tenuto: niente riscaricamenti), `dvids` 1_frame 3,3 GB; 43 GB
       liberi.
 11. **Split per sessione** (`data/<fonte>/6_dedup + 3_sessioni → data/aggregati/9_split`, su tutte le fonti, fuori da `svanstrom.py`): ogni sessione di clip tutta in uno split, quindi un

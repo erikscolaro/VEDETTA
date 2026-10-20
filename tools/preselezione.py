@@ -15,6 +15,8 @@
 4b. Scala di grigi e filmati d'archivio (utente, 20/10/2026): via i ritagli dei
    tratti DVIDS in `0_raw/grigi.txt`, segnati sui `fogli_grigi/` (G; N per la notte sfuggita alla
    soglia); dopo il tetto (6).
+4c. Sequenze FRED in `fred/0_raw/esclusi.txt` (sequenza, motivo), scritto
+   dall'operatore (utente, 20/10/2026: 209); dopo il tetto (6).
 5. Box sotto i 4 px^2 (sqrt(w*h) < 2 px, utente, 19/10/2026): tolte dalle label
    di tutte le fonti.
 6. Tetto con margine: (4.000 train + 857 val/test) * 1,1 istanze per cella su
@@ -160,6 +162,12 @@ def select() -> None:
     for s, _, stem, _ in crops:
         if stem in grigi:
             drop[s][stem] = "notte" if grigi[stem] == "N" else "grigio"  # N: luci di notte segnate sui fogli
+    # sequenze FRED tolte dall'operatore (`fred/0_raw/esclusi.txt`, utente 20/10/2026), anch'esse dopo il tetto
+    f = DATA / "fred" / "0_raw" / "esclusi.txt"
+    via = {f"FRED_{x[0]}": x[1] for x in (ln.split() for ln in open(f) if ln.strip() and not ln.startswith("#"))} if f.exists() else {}
+    for s, v, stem, _ in crops:
+        if v in via:
+            drop[s][stem] = via[v]
     for s in FONTI:
         f = DATA / s / "5_box" / "preselezione" / "esclusi.txt"
         f.write_text("".join(f"{k} {m}\n" for k, m in sorted(drop[s].items())))
