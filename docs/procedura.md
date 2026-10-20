@@ -611,6 +611,11 @@ Su tutte le fonti:
       aerei 16–32 3.353 e 64–96 4.092 (**chiusi**), 8–16 1.296. Buchi **5 su 20**: aerei 8–16, elicotteri 8–16,
       elicotteri 16–32 (2.797, accettato), uccelli 64–96 e > 96. Task CVAT ricreati (nessuno toccato): DVIDS 599–628
       (28.520 ritagli), Anti-UAV 629–633 (4.616), FBD 634–644 (10.544); FRED 541–551 invariati.
+    - Notte di Anti-UAV sfuggita alla soglia di luminosità (utente in CVAT, 20/10/2026, job 978: luci della città
+      forti alzano la media sopra 35). Decisione (utente, "concordo"): via le riprese dalle **19 in poi** (ora nel
+      nome), tenuto il crepuscolo delle 18:34–18:39 (drone visibile). `tools/preselezione.py` le toglie **dopo il
+      tetto**, così le altre fonti non cambiano: +55 ritagli `notte` (20190925_200805, 20190926_193515, _195921,
+      _200510), nient'altro diverso. Segnati cancellati in CVAT: task 631 (8) e 633 (47).
     - Disco: `fbd_sv` 1_frame 13 GB + zip 1,8 GB (tenuto: niente riscaricamenti), `dvids` 1_frame 3,3 GB; 43 GB
       liberi.
 11. **Split per sessione** (`data/<fonte>/6_dedup + 3_sessioni → data/aggregati/9_split`, su tutte le fonti, fuori da `svanstrom.py`): ogni sessione di clip tutta in uno split, quindi un

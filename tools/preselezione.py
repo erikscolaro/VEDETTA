@@ -6,7 +6,10 @@
    tagliata su 2+ lati (prima: oltre meta').
 3. Notte (utente, 19/10/2026: "no dominio notturno"): via i ritagli di Anti-UAV
    e DVIDS con luminosita' media sotto 35 (luci nel buio, visori notturni). Non
-   FRED: i suoi ritagli bui sono cortili di giorno sottoesposti.
+   FRED: i suoi ritagli bui sono cortili di giorno sottoesposti. Per Anti-UAV anche
+   le riprese dalle 19 in poi (ora nel nome): luci della citta' forti alzano la media
+   sopra la soglia (utente, 20/10/2026); il crepuscolo delle 18 resta. Si
+   applica dopo il tetto (6), che cosi' non cambia.
 4. Fumo degli airshow (utente, 19/10/2026): via i ritagli dei tratti DVIDS in
    `0_raw/fumo.txt` (id, inizio in frame), segnati sui `fogli_fumo/`.
 5. Box sotto i 4 px^2 (sqrt(w*h) < 2 px, utente, 19/10/2026): tolte dalle label
@@ -144,6 +147,10 @@ def select() -> None:
                     cnt[c] -= 1
                 drop[s][stem] = "tetto"
                 changed = True
+    # Anti-UAV dalle 19 in poi: dopo il tetto, che resta quello dei task CVAT gia' caricati
+    for s, _, stem, _ in crops:
+        if s == "anti_uav" and int(stem.split("_")[2][:2]) >= 19:
+            drop[s][stem] = "notte"
     for s in FONTI:
         f = DATA / s / "5_box" / "preselezione" / "esclusi.txt"
         f.write_text("".join(f"{k} {m}\n" for k, m in sorted(drop[s].items())))
