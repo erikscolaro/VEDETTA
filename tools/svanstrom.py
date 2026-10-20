@@ -567,6 +567,107 @@ def apply_sessions(ses: Path) -> None:
           f"da una clip, la piu' grande {max(sizes.values())} clip -> {ses / 'sessioni.csv'}")
 
 
+# --- meteo --------------------------------------------------------------------
+
+WEATHER = {  # piu' frasi per classe, media degli embedding di testo; nomi = tag in CVAT
+    "sole": ["a photo of a clear blue sky on a sunny day", "a photo taken on a bright sunny day"],
+    "nuvole": ["a photo of an overcast grey sky", "a photo of a cloudy sky on a dull day"],
+    "pioggia": ["a photo taken in the rain", "a photo of a rainy day with rain falling"],
+    "neve": ["a photo taken while it is snowing", "a photo of a snowy winter day"],
+    "nebbia": ["a photo taken in thick fog", "a photo of a hazy misty sky with low visibility"],
+}
+CLIP_MODEL = ("ViT-SO400M-14-SigLIP-384", "webli")  # open_clip
+
+
+def weather_probs(frames: Path, strips: dict[str, list[int]]) -> dict[str, np.ndarray]:
+    """Probabilita' per classe di WEATHER di ogni clip: SigLIP zero-shot sui
+    frame della striscia, softmax sui logit, media sui frame."""
+    import open_clip
+    import torch
+    from PIL import Image
+
+    dev = "cuda" if torch.cuda.is_available() else "cpu"
+    model, _, prep = open_clip.create_model_and_transforms(*CLIP_MODEL, device=dev)
+    tok, norm = open_clip.get_tokenizer(CLIP_MODEL[0]), torch.nn.functional.normalize
+    out = {}
+    with torch.no_grad():
+        t = norm(model.eval().encode_text(tok(sum(WEATHER.values(), [])).to(dev)), dim=1)
+        t = norm(t.view(len(WEATHER), -1, t.shape[1]).mean(1), dim=1)
+        for clip, idx in strips.items():
+            x = torch.stack([prep(Image.open(_jpg(frames, clip, i)).convert("RGB")) for i in idx]).to(dev)
+            p = torch.softmax(model.logit_scale.exp() * norm(model.encode_image(x), dim=1) @ t.T, dim=1)
+            out[clip] = p.mean(0).float().cpu().numpy()
+    return out
+
+
+def weather_proposal(strips: dict, probs: dict, session: dict) -> list[dict]:
+    """Un frame per clip (quello a meta' striscia), ordinate per classe
+    proposta e dalla meno sicura; n = posizione del frame nel task CVAT."""
+    names = list(WEATHER)
+    recs = [{"clip": c, "frame": strips[c][len(strips[c]) // 2], "sessione": session.get(c, ""),
+             "meteo": names[int(p.argmax())], "confidenza": round(float(p.max()), 3)}
+            | {k: round(float(v), 3) for k, v in zip(names, p)} for c, p in probs.items()]
+    recs.sort(key=lambda r: (names.index(r["meteo"]), r["confidenza"]))
+    for n, r in enumerate(recs):
+        r["n"] = n
+    return recs
+
+
+def cvat_weather(met: Path, recs: list[dict], name: str = "meteo") -> None:
+    """`proposta.csv` e task CVAT `name` per la revisione: un frame per clip
+    nell'ordine della proposta, la classe proposta come tag del frame; si
+    correggono i tag. Se il task c'e' gia' non tocca niente: la proposta
+    deve restare quella del task."""
+    import csv
+    from cvat_sdk.core.proxies.tasks import ResourceType
+    from cvat_sdk.api_client import models
+
+    with _cvat_client() as client:
+        if any(tk.name == name for tk in client.tasks.list()):
+            raise SystemExit(f"meteo: il task '{name}' esiste gia' in CVAT, cancellarlo a mano per rifarlo")
+        with open(met / "proposta.csv", "w", newline="") as f:
+            w = csv.DictWriter(f, ["n", "clip", "frame", "sessione", "meteo", "confidenza", *WEATHER])
+            w.writeheader()
+            w.writerows(recs)
+        v = lambda r: r["clip"].split("/")[0]
+        task = client.tasks.create_from_data(
+            spec={"name": name, "labels": [{"name": c, "type": "tag"} for c in WEATHER]},
+            resource_type=ResourceType.SHARE,
+            resources=[f"1_frame/{v(r)}/images/{v(r)}_f{r['frame']:05d}.jpg" for r in recs],
+            data_params={"sorting_method": "predefined", "image_quality": 95})
+        label = {lb.name: lb.id for lb in task.get_labels()}
+        task.update_annotations(models.PatchedLabeledDataRequest(
+            tags=[models.LabeledImageRequest(frame=r["n"], label_id=label[r["meteo"]]) for r in recs]))
+    print(f"meteo: {len(recs)} clip, " + ", ".join(f"{c} {sum(r['meteo'] == c for r in recs)}" for c in WEATHER)
+          + f"; task CVAT {task.id}, proposta in {met / 'proposta.csv'}")
+
+
+def weather_import(met: Path, name: str = "meteo") -> None:
+    """`meteo.csv` (clip, sessione, meteo, modello) dai tag del task CVAT `name`;
+    frame senza tag o con piu' tag segnalati e lasciati vuoti."""
+    import csv
+
+    recs = {int(r["n"]): r for r in csv.DictReader(open(met / "proposta.csv"))}
+    with _cvat_client() as client:
+        task = next(tk for tk in client.tasks.list() if tk.name == name)
+        label = {lb.id: lb.name for lb in task.get_labels()}
+        tags = defaultdict(set)
+        for t in task.get_annotations().tags:
+            tags[t.frame].add(label[t.label_id])
+    bad = [r["clip"] for n, r in recs.items() if len(tags[n]) != 1]
+    with open(met / "meteo.csv", "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["clip", "sessione", "meteo", "modello"])
+        w.writerows((r["clip"], r["sessione"], next(iter(tags[n])) if len(tags[n]) == 1 else "", r["meteo"])
+                    for n, r in sorted(recs.items(), key=lambda x: x[1]["clip"]))
+    count = Counter(next(iter(tags[n])) for n in recs if len(tags[n]) == 1)
+    changed = sum(tags[n] != {r["meteo"]} for n, r in recs.items() if len(tags[n]) == 1)
+    print(f"meteo: {len(recs)} clip, {changed} cambiate in CVAT; " + ", ".join(f"{c} {count[c]}" for c in WEATHER)
+          + f" -> {met / 'meteo.csv'}")
+    for c in bad:
+        print(f"  senza un tag solo: {c}")
+
+
 def _crop(shape, box, ctx: float = 4, min_side: int = 96):
     """Ritaglio quadrato attorno al box, `ctx` volte il lato maggiore (almeno
     `min_side`), tagliato al frame: SAM lo porta a 1024, gli oggetti di pochi
@@ -581,18 +682,6 @@ def _crop(shape, box, ctx: float = 4, min_side: int = 96):
 def _mask_box(m: np.ndarray):
     ys, xs = np.nonzero(m)
     return None if not len(xs) else (xs.min(), ys.min(), xs.max() + 1 - xs.min(), ys.max() + 1 - ys.min())
-
-
-def refine_sam(model, img: np.ndarray, box) -> tuple | None:
-    """Box aderente dalla maschera SAM 2 con il box originale come prompt, sul
-    ritaglio ingrandito; None se la maschera e' vuota."""
-    x0, y0, x1, y1 = _crop(img.shape, box)
-    x, y, w, h = box
-    r = model(img[y0:y1, x0:x1], bboxes=[[x - x0, y - y0, x - x0 + w, y - y0 + h]], verbose=False)[0]
-    if r.masks is None or not len(r.masks.data):
-        return None
-    b = _mask_box(r.masks.data[0].cpu().numpy() > 0.5)
-    return None if b is None else (b[0] + x0, b[1] + y0, b[2], b[3])
 
 
 def refine_contrast(img: np.ndarray, box, k: float = 4) -> tuple[tuple | None, float]:
@@ -744,10 +833,20 @@ def _cvat_client():
 
 
 def clip_boxes(box: Path, clip: str) -> dict[tuple, list]:
-    """Box attuali di una clip, {(frame, k): [classe, x, y, w, h]}: SAM se la
+    """Box attuali di una clip, {(frame, k): [classe, x, y, w, h]}: quelli a
+    mano se la clip e' in `manuale/` (k = riga del file), altrimenti SAM se la
     clip e' passata da SAM, altrimenti quello di `box.csv`."""
     import csv
 
+    man = box / "manuale" / clip.replace("/", "_")
+    if man.exists():
+        out = {}
+        for t in man.glob("*.txt"):
+            f = int(t.stem.rsplit("_f", 1)[1])
+            for k, ln in enumerate(t.read_text().splitlines()):
+                c, xc, yc, w, h = map(float, ln.split())
+                out[(f, str(k))] = [int(c), (xc - w / 2) * 640, (yc - h / 2) * 512, w * 640, h * 512]
+        return out
     rows = {(int(r["frame"]), r["k"]): r for r in csv.DictReader(open(box / "box.csv")) if r["clip"] == clip}
     out = {key: [int(r["classe"])] + [float(r[c]) for c in BOX_COLS] for key, r in rows.items()}
     sam = box / "sam" / f"{clip.replace('/', '_')}.json"
@@ -759,11 +858,12 @@ def clip_boxes(box: Path, clip: str) -> dict[tuple, list]:
     return out
 
 
-def cvat_export(src: Path, clips: list[str], key_every: int = 50) -> None:
-    """Un task CVAT per clip, immagini dalla cartella condivisa (`src` montata
-    in /home/django/share), box attuali come tracce con un frame chiave ogni
-    `key_every` (piu' primo e ultimo di ogni tratto visibile): CVAT interpola
-    in mezzo, si correggono le chiavi. Salta le clip che hanno gia' un task."""
+def cvat_export(src: Path, clips: list[str], name: str = "box", job_frames: int = 10_000,
+                per_patch: int = 20) -> None:
+    """Un task CVAT `name`, clip una dopo l'altra in job di clip intere da al
+    piu' `job_frames` frame, immagini dalla cartella condivisa (`src` montata
+    in /home/django/share), box attuali come tracce, una per oggetto e clip,
+    con ogni frame chiave: l'interpolazione di CVAT sbagliava sugli elicotteri."""
     import csv
     from cvat_sdk.core.proxies.tasks import ResourceType
     from cvat_sdk.api_client import models
@@ -771,37 +871,44 @@ def cvat_export(src: Path, clips: list[str], key_every: int = 50) -> None:
     frames = defaultdict(list)
     for r in csv.DictReader(open(src / "2_sequenze" / "sequenze.csv")):
         frames[f"{r['video']}/s{r['sequenza']}"].append(int(r["frame"]))
+    jobs, req, start = [], [], 0  # immagini per job, tracce per clip
+    total = sum(len(frames[c]) for c in clips)
+    for clip in clips:
+        v, fr = clip.split("/")[0], sorted(frames[clip])
+        if not jobs or len(jobs[-1]) + len(fr) > job_frames:
+            jobs.append([])
+        jobs[-1] += [f"1_frame/{v}/images/{v}_f{i:05d}.jpg" for i in fr]
+        pos = {f: start + j for j, f in enumerate(fr)}
+        start += len(fr)
+        tracks, req = defaultdict(dict), req + [[]]
+        for (f, k), (c, x, y, w, h) in clip_boxes(src / "4_box", clip).items():
+            tracks[(k, c)][pos[f]] = [x, y, x + w, y + h]
+        for (k, c), shapes in tracks.items():
+            seq, prev = [], None
+            for j in range(min(shapes), max(shapes) + 2):
+                if j in shapes:
+                    seq.append(models.TrackedShapeRequest(type="rectangle", frame=j, points=shapes[j],
+                                                          outside=False, keyframe=True))
+                elif prev is not None and j < total:  # sparito, o clip finita: fuori, se no CVAT la allunga
+                    seq.append(models.TrackedShapeRequest(type="rectangle", frame=j, points=shapes[prev],
+                                                          outside=True, keyframe=True))
+                prev = j if j in shapes else None
+            req[-1].append((NAMES[c], min(shapes), seq))
     with _cvat_client() as client:
-        done = {tk.name for tk in client.tasks.list()}
-        for clip in clips:
-            if clip in done:
-                continue
-            v, fr = clip.split("/")[0], sorted(frames[clip])
-            task = client.tasks.create_from_data(
-                spec={"name": clip, "labels": [{"name": n} for n in NAMES]},
-                resource_type=ResourceType.SHARE,
-                resources=[f"1_frame/{v}/images/{v}_f{i:05d}.jpg" for i in fr],
-                data_params={"sorting_method": "predefined", "image_quality": 95})
-            label = {lb.name: lb.id for lb in task.get_labels()}
-            pos = {f: j for j, f in enumerate(fr)}
-            tracks = defaultdict(dict)
-            for (f, k), (c, x, y, w, h) in clip_boxes(src / "4_box", clip).items():
-                tracks[(k, c)][pos[f]] = [x, y, x + w, y + h]
-            req = []
-            for (k, c), shapes in tracks.items():
-                seq, prev = [], None
-                for j in range(min(shapes), max(shapes) + 2):
-                    edge = j - 1 not in shapes or j + 1 not in shapes
-                    if j in shapes and ((j - min(shapes)) % key_every == 0 or edge):
-                        seq.append(models.TrackedShapeRequest(type="rectangle", frame=j, points=shapes[j],
-                                                              outside=False, keyframe=True))
-                    elif j not in shapes and prev is not None and j < len(fr):  # oggetto sparito: fuori fino al ritorno
-                        seq.append(models.TrackedShapeRequest(type="rectangle", frame=j, points=shapes[prev],
-                                                              outside=True, keyframe=True))
-                    prev = j if j in shapes else None
-                req.append(models.LabeledTrackRequest(frame=min(shapes), label_id=label[NAMES[c]], shapes=seq))
-            task.update_annotations(models.PatchedLabeledDataRequest(tracks=req))
-            print(f"cvat: {clip} task {task.id}, {len(fr)} frame, {len(req)} tracce", flush=True)
+        if any(tk.name == name for tk in client.tasks.list()):
+            raise SystemExit(f"cvat: il task '{name}' esiste gia', cancellarlo a mano per rifarlo")
+        task = client.tasks.create_from_data(
+            spec={"name": name, "labels": [{"name": n} for n in NAMES]},
+            resource_type=ResourceType.SHARE, resources=sum(jobs, []),
+            data_params={"image_quality": 95, "job_file_mapping": jobs})  # ordine = quello dei job
+        label = {lb.name: lb.id for lb in task.get_labels()}
+        # un PATCH ogni `per_patch` clip: uno solo per tutto il task va in timeout (504)
+        for k in range(0, len(req), per_patch):
+            task.update_annotations(models.PatchedLabeledDataRequest(tracks=[
+                models.LabeledTrackRequest(frame=f, label_id=label[c], shapes=seq)
+                for tr in req[k:k + per_patch] for c, f, seq in tr]))
+            print(f"cvat: {name} clip {min(k + per_patch, len(req))}/{len(req)}", flush=True)
+    print(f"cvat: task {name} ({task.id}), {len(clips)} clip in {len(jobs)} job, {start} frame", flush=True)
 
 
 def cvat_import(src: Path) -> None:
@@ -826,6 +933,152 @@ def cvat_import(src: Path) -> None:
                     (d / f"{stem}.txt").write_bytes(zf.read(n))
                     clips[d.name] += 1
         print(f"cvat: {z.name} -> " + ", ".join(f"{c} ({n} frame)" for c, n in clips.items()))
+
+
+# --- quasi-duplicati -------------------------------------------------------------
+
+def dedup_clip(args) -> tuple[str, list[int], int]:
+    """Frame tenuti di una clip, in ordine: un frame resta se nessun frame gia'
+    tenuto della clip ha lo stesso numero di box, dHash del ritaglio sui box
+    entro `hash_thr` bit e posizione/grandezza vicine (`_is_new`). Frame senza
+    box: dHash del frame intero."""
+    import cv2
+
+    frames, man, clip, idx, hash_thr, geo_thr = args
+    v = clip.split("/")[0]
+    kept, keep = [], []
+    for i in idx:
+        gray = cv2.imread(str(frames / v / "images" / f"{v}_f{i:05d}.jpg"), cv2.IMREAD_GRAYSCALE)
+        t = man / f"{v}_f{i:05d}.txt"
+        rows = np.array([ln.split()[1:] for ln in t.read_text().splitlines() if ln.strip()] if t.exists() else [],
+                        float).reshape(-1, 4) * ([gray.shape[1], gray.shape[0]] * 2)
+        boxes = np.c_[rows[:, :2] - rows[:, 2:] / 2, rows[:, 2:]]  # (x, y, w, h) in pixel
+        sig = _signature(gray, boxes) if len(boxes) else (_dhash(gray), None, 0)
+        if _is_new(sig, kept, hash_thr, geo_thr):
+            kept.append(sig)
+            keep.append(i)
+    return clip, keep, len(idx)
+
+
+def dedup(src: Path, hash_thr: int, geo_thr: float, workers: int) -> None:
+    """Passo 7: quasi-duplicati dentro ogni clip sulle label finali
+    (`4_box/manuale/`, meno scie e scartate) -> `6_dedup/tenuti.csv`
+    (clip, frame) e il riepilogo per classe."""
+    import csv
+
+    box = src / "4_box"
+    skip = {ln.strip() for f in ("scie.txt", "scartate.txt") for ln in open(box / f)
+            if ln.strip() and not ln.startswith("#")}
+    idx = defaultdict(list)
+    for r in csv.DictReader(open(src / "2_sequenze" / "sequenze.csv")):
+        idx[f"{r['video']}/s{r['sequenza']}"].append(int(r["frame"]))
+    jobs = [(src / "1_frame", box / "manuale" / c.replace("/", "_"), c, sorted(f), hash_thr, geo_thr)
+            for c, f in sorted(idx.items()) if c not in skip]
+    out = src / "6_dedup"
+    out.mkdir(exist_ok=True)
+    got, tot = Counter(), Counter()
+    with ProcessPoolExecutor(workers) as ex, open(out / "tenuti.csv", "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["clip", "frame"])
+        for clip, keep, n in ex.map(dedup_clip, jobs):
+            w.writerows((clip, i) for i in keep)
+            cls = clip.split("_")[1].lower()
+            got[cls] += len(keep)
+            tot[cls] += n
+    print(f"dedup: hash-thr {hash_thr}, geo-thr {geo_thr}; {len(jobs)} clip, {sum(got.values())} frame tenuti su "
+          f"{sum(tot.values())} ({sum(got.values()) / sum(tot.values()):.0%})")
+    for c in sorted(tot):
+        print(f"  {c:<11}{got[c]:>7} / {tot[c]:<7}{got[c] / tot[c]:.0%}")
+    print(f"-> {out / 'tenuti.csv'}")
+
+
+def dedup_sheets(src: Path, per_class: int = 3, n: int = 24, side: int = 96, seed: int = 0) -> None:
+    """Fogli di controllo della deduplica in `6_dedup/fogli/`: per classe
+    `per_class` clip a caso, `n` frame consecutivi a meta' clip, ritaglio
+    attorno al primo box ingrandito a `side` px; bordo verde = tenuto,
+    rosso = tolto. Un foglio per clip, `clip.txt` con i numeri."""
+    import csv
+
+    import cv2
+
+    kept = defaultdict(set)
+    for r in csv.DictReader(open(src / "6_dedup" / "tenuti.csv")):
+        kept[r["clip"]].add(int(r["frame"]))
+    idx = defaultdict(list)
+    for r in csv.DictReader(open(src / "2_sequenze" / "sequenze.csv")):
+        idx[f"{r['video']}/s{r['sequenza']}"].append(int(r["frame"]))
+    rng = random.Random(seed)
+    by_cls = defaultdict(list)
+    for c in sorted(kept):
+        by_cls[c.split("_")[1]].append(c)
+    clips = [c for k in sorted(by_cls) for c in rng.sample(by_cls[k], min(per_class, len(by_cls[k])))]
+    out = src / "6_dedup" / "fogli"
+    out.mkdir(exist_ok=True)
+    for k, clip in enumerate(clips, 1):
+        v, fr = clip.split("/")[0], sorted(idx[clip])
+        tiles, last = [], None
+        for i in fr[max(0, len(fr) // 2 - n // 2):][:n]:
+            img = cv2.imread(str(src / "1_frame" / v / "images" / f"{v}_f{i:05d}.jpg"))
+            t = src / "4_box" / "manuale" / clip.replace("/", "_") / f"{v}_f{i:05d}.txt"
+            ln = t.read_text().split() if t.exists() else []
+            if ln:
+                last = (float(ln[1]) * img.shape[1], float(ln[2]) * img.shape[0])
+            cx, cy = last or (img.shape[1] / 2, img.shape[0] / 2)
+            x0 = int(min(max(cx - 32, 0), img.shape[1] - 64))
+            y0 = int(min(max(cy - 32, 0), img.shape[0] - 64))
+            tile = cv2.resize(img[y0:y0 + 64, x0:x0 + 64], (side, side), interpolation=cv2.INTER_NEAREST)
+            tile = cv2.copyMakeBorder(tile, 4, 18, 4, 4, cv2.BORDER_CONSTANT,
+                                      value=(0, 200, 0) if i in kept[clip] else (0, 0, 220))
+            cv2.putText(tile, str(i), (6, side + 18), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 1)
+            tiles.append(tile)
+        rows = [np.hstack(tiles[j:j + 12] + [np.zeros_like(tiles[0])] * (12 - len(tiles[j:j + 12])))
+                for j in range(0, len(tiles), 12)]
+        cv2.imwrite(str(out / f"{k:02d}.jpg"), np.vstack(rows))
+    (out / "clip.txt").write_text("".join(f"{k:02d} {c}\n" for k, c in enumerate(clips, 1)))
+    print(f"fogli_dedup: {len(clips)} fogli in {out}")
+
+
+# --- conteggio -------------------------------------------------------------------
+
+BANDS = ["<8", "8-16", "16-32", "32-64", "64-96", ">96"]  # sqrt(w*h) in px, regole.md
+BAND_EDGES = [8, 16, 32, 64, 96]
+
+
+def count_cells(src: Path, W: int = 640, H: int = 512) -> None:
+    """Passo 8: istanze, frame, clip, video e sessioni per cella classe x
+    fascia sui frame tenuti dalla deduplica (`6_dedup/tenuti.csv`, gia' senza
+    scie e scartate) con le label di `4_box/manuale/` ->
+    `7_conteggio/conteggio.csv`. Un frame conta in ogni cella di cui ha un box."""
+    import csv
+
+    ses = {r["clip"]: r["sessione"] for r in csv.DictReader(open(src / "3_sessioni" / "sessioni.csv"))}
+    inst, sets = Counter(), defaultdict(lambda: (set(), set(), set(), set()))
+    labelled, n_frames = Counter(), Counter()
+    for r in csv.DictReader(open(src / "6_dedup" / "tenuti.csv")):
+        clip, v = r["clip"], r["clip"].split("/")[0]
+        n_frames[clip] += 1
+        t = src / "4_box" / "manuale" / clip.replace("/", "_") / f"{v}_f{int(r['frame']):05d}.txt"
+        rows = [ln.split() for ln in t.read_text().splitlines() if ln.strip()] if t.exists() else []
+        labelled[clip] += bool(rows)
+        for c, _, _, w, h in rows:
+            cell = (NAMES[int(c)], BANDS[np.digitize(np.sqrt(float(w) * W * float(h) * H), BAND_EDGES)])
+            inst[cell] += 1
+            for st, x in zip(sets[cell], (t.stem, clip, v, ses[clip])):
+                st.add(x)
+    out = src / "7_conteggio"
+    out.mkdir(exist_ok=True)
+    with open(out / "conteggio.csv", "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["classe", "fascia", "istanze", "frame", "clip", "video", "sessioni"])
+        w.writerows([*cell, inst[cell], *map(len, sets[cell])] for cell in
+                    ((c, b) for c in NAMES for b in BANDS) if inst[cell])
+    print(f"conta: {len(n_frames)} clip, {sum(labelled.values())} frame con box, "
+          f"{sum(n_frames.values()) - sum(labelled.values())} senza box")
+    for key, i in (("istanze", None), ("frame", 0), ("video", 2), ("sessioni", 3)):
+        print(f"\n{key:<11}" + "".join(f"{b:>8}" for b in BANDS))
+        for c in NAMES:
+            print(f"{c:<11}" + "".join(f"{inst[c, b] if i is None else len(sets[c, b][i]):>8}" for b in BANDS))
+    print(f"-> {out / 'conteggio.csv'}")
 
 
 def _yolo(boxes: np.ndarray, W: int, H: int) -> str:
@@ -1037,9 +1290,9 @@ def main(argv=None) -> int:
                    help="dataset finale (local_path in conf/dataset/svanstrom.yaml)")
     p.add_argument("--src", type=Path, default=ROOT / "data" / "svanstrom",
                    help="una cartella per passo (docs/procedura.md): 0_raw, 1_frame, ...")
-    p.add_argument("--step", choices=["frames", "tagli", "sequenze", "sessioni", "unione", "box", "sam", "fogli_sam", "cvat", "cvat_import"],
+    p.add_argument("--step", choices=["frames", "tagli", "sequenze", "sessioni", "unione", "box", "sam", "fogli_sam", "cvat", "cvat_import", "meteo", "meteo_import", "dedup", "fogli_dedup", "conta"],
                    help="solo questo passo della nuova procedura; senza, la pipeline vecchia")
-    p.add_argument("--hash-thr", type=int, default=8,
+    p.add_argument("--hash-thr", type=int, default=16,
                    help="bit di dHash (su 64) sotto cui due frame sono uguali")
     p.add_argument("--geo-thr", type=float, default=0.05,
                    help="spostamento del centro (frazione del frame) sotto cui "
@@ -1053,7 +1306,6 @@ def main(argv=None) -> int:
                    help="punteggio sopra cui una coppia di frame e' candidata taglio")
     p.add_argument("--session-thr", type=float, default=0.95,
                    help="somiglianza media DINOv2 sopra cui due gruppi di video si uniscono")
-    p.add_argument("--clips", type=Path, help="file con le clip, una per riga ('n clip' o 'clip')")
     p.add_argument("--n-calib", type=int, default=512)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) // 2))
@@ -1146,25 +1398,37 @@ def main(argv=None) -> int:
         (box / "fogli_sam" / "clip.txt").write_text("".join(f"{n} {c}\n" for n, c in enumerate(clips, 1)))
         print(f"4_box: {len(clips)} clip SAM nei fogli ({len(scie)} con scia escluse)")
         return 0
+    if a.step == "fogli_dedup":
+        dedup_sheets(a.src)
+        return 0
+    if a.step == "dedup":
+        dedup(a.src, a.hash_thr, a.geo_thr, a.workers)
+        return 0
+    if a.step == "conta":
+        count_cells(a.src)
+        return 0
     if a.step == "cvat_import":
         cvat_import(a.src)
         return 0
     if a.step == "cvat":
-        # senza --clips: tutte le clip tranne le scie, per rivedere tutto il dataset; le clip che
-        # aspettano SAM (difficili e pulite bocciate senza json in sam/) si saltano e si
-        # caricano rilanciando quando SAM ha finito
+        # tutte le clip tranne le scie, in ordine di sessione, in un task con un job solo
         import csv
         box = a.src / "4_box"
-        if a.clips:
-            clips = [ln.split()[-1] for ln in a.clips.read_text().splitlines() if ln.strip() and not ln.startswith("#")]
-        else:
-            scie = set((box / "scie.txt").read_text().split())
-            bad = {ln.split()[1] for ln in open(box / "pulite_sbagliate.txt") if not ln.startswith("#")}
-            kind = {r["clip"]: r["tipo_clip"] for r in csv.DictReader(open(box / "box.csv"))}
-            sam = lambda c: (box / "sam" / f"{c.replace('/', '_')}.json").exists()
-            clips = [c for c in sorted(kind) if c not in scie and (kind[c] == "pulita" and c not in bad or sam(c))]
-            print(f"cvat: {len(clips)} clip pronte, {len(kind) - len(scie) - len(clips)} aspettano SAM", flush=True)
-        cvat_export(a.src, clips)
+        scie = set((box / "scie.txt").read_text().split())
+        ses = {r["clip"]: r["sessione"] for r in csv.DictReader(open(a.src / "3_sessioni" / "sessioni.csv"))}
+        cvat_export(a.src, sorted((c for c in ses if c not in scie), key=lambda c: (ses[c], c)))
+        return 0
+    if a.step == "meteo":
+        # passo 6, non usa i box: uscite in 5_meteo/
+        import csv
+        met = a.src / "5_meteo"
+        met.mkdir(exist_ok=True)
+        strips = strip_frames(a.src / "2_sequenze")
+        session = {r["clip"]: r["sessione"] for r in csv.DictReader(open(a.src / "3_sessioni" / "sessioni.csv"))}
+        cvat_weather(met, weather_proposal(strips, weather_probs(a.src / "1_frame", strips), session))
+        return 0
+    if a.step == "meteo_import":
+        weather_import(a.src / "5_meteo")
         return 0
     if a.step == "unione":
         apply_sessions(a.src / "3_sessioni")

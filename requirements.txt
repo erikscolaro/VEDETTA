@@ -3,3 +3,6 @@ opencv-python
 matplotlib
 scipy
 ultralytics
+open_clip_torch
+transformers
+sentencepiece
