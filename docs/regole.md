@@ -22,11 +22,17 @@ Da `NEW_MASTERPLAN.md` (§2, §5).
 - FBD-SV-2024 (uccelli su campi, alberi, fili) tenuto come **estensione del dominio all'orizzonte** (utente,
   19/10/2026).
 - Celle accettate sotto il margine: elicotteri 16–32 (utente, 19/10/2026).
-- Obiettivo per cella (classe × fascia), decisione dell'utente del 19/10/2026: **2.000 istanze nel train**, cioè
-  10.000 per classe (Ultralytics) divise sulle 5 fasce; con lo split 70/20/10 sono **2.857 in tutto** (val ~571,
-  test ~286, sopra i 150–200 dei Compromessi). Celle senza fonti (uccelli e droni grandi): limite dichiarato.
-  Con i box ancora da rivedere in CVAT si scarica fino a **+10% per cella** (3.143), margine per i box tolti in
-  revisione (utente, 19/10/2026).
+- **Obiettivo: distribuzione continua per classe** (decisione dell'utente del 22/10/2026, sostituisce i 2.857
+  per cella del 19/10/2026): **14.286 box per classe** in tutto (10.000 nel train, Ultralytics, con lo split
+  70/20/10), con densità in log s proporzionale a **s^−α tra 8 e 320 px** (s = √(w·h)): **α = 0,3 per i droni,
+  0,45 per uccelli, aerei ed elicotteri**. Più esempi dove gli oggetti sono piccoli: è lì che la torretta deve
+  vederli e che le classi si confondono. Ragionamento e grafici in [`distribuzioni.md`](distribuzioni.md).
+- **Priorità**: drone e uccello sono le classi principali (distinguere un drone da un uccello); aereo ed
+  elicottero sono secondarie (un aereo o un elicottero che arriva alla base si sa). Il deficit sotto la curva di
+  aerei ed elicotteri piccoli è un **compromesso accettato** (utente, 22/10/2026); per gli uccelli resta da
+  raffinare la distribuzione.
+- Le fasce restano per stratificare val e test e per la mAP per fascia; `tools/buchi.py` conta ancora per cella.
+- Storico (19/10/2026): obiettivo per cella di 2.000 istanze nel train (2.857 in tutto), +10% prima di CVAT.
 - Bilanciamento (utente, 19/10/2026): **val e test piatti** (~571 e ~286 per cella; nelle celle sotto il minimo il
   30% delle istanze); **train con tetto di 4.000 istanze per cella** (sopra si scarta, sotto si tiene tutto). Niente
   copie ridotte per la fascia 8–16: lo scale lo fa Ultralytics in training (`scale: 0.25`, zoom 0,75–1,25). Stima
@@ -60,7 +66,7 @@ Da `NEW_MASTERPLAN.md` (§2, §5).
 | minimo | valore | fonte |
 |---|---|---|
 | train, per classe | ≥ 1500 immagini, ≥ 10.000 istanze | Ultralytics, "Tips for best training results" |
-| train, per cella | ≥ 2.000 istanze (10.000 / 5 fasce), > 100 immagini, ≥ 10 video | Ultralytics diviso per fascia; LVIS, categoria "frequente" |
+| train, per classe e grandezza | curva s^−α con 10.000 istanze per classe (14.286 in tutto); per fascia > 100 immagini, ≥ 10 video | Ultralytics; scenario della torretta (`distribuzioni.md`); LVIS, categoria "frequente" |
 | val e test, per cella | le quote del 70/20/10 (~571 e ~286 con 2.000 nel train); il vecchio 385 (AP entro ±5 punti al 95%: (1,96 · 0,5 / 0,05)²) resta come riferimento | Compromessi: incertezza dal bootstrap per sessione |
 | val, complessivo | rumore della mAP < 1 punto | soglia di scelta del piano |
 
@@ -69,7 +75,7 @@ Da `NEW_MASTERPLAN.md` (§2, §5).
   preaddestrato fino a circa 10k immagini COCO (da verificare sul paper). Controllo vero: curve di training
   (yoloeval T2-03).
 - Val e test si verificano con **bootstrap per sessione** prima del congelamento.
-- Cella sotto il minimo: si riempie con aggiunte, altrimenti è un limite dichiarato.
+- Sotto la curva: si riempie con aggiunte, altrimenti è un limite dichiarato (aerei ed elicotteri piccoli: accettato).
 
 ## Flusso per ogni fonte (deciso dall'utente il 16/10/2026)
 

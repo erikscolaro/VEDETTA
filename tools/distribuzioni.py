@@ -7,7 +7,8 @@ Due figure in docs/figure/ (considerazioni in docs/distribuzioni.md):
 - distribuzioni_scale.png: la stessa con lo scale di Ultralytics (s = 0,5 e 0,75) calcolato in modo
   esatto e la distribuzione ideale a parita' di totale.
 
-    python tools/distribuzioni.py
+    python tools/distribuzioni.py                 # ideale con lo stesso totale della classe
+    python tools/distribuzioni.py --totale 10000  # ideale con 10.000 box per classe -> distribuzioni_ideale_10k.png
 """
 
 from __future__ import annotations
@@ -124,7 +125,8 @@ def fig_attuale(size: dict, plt) -> Path:
     return save(f, OUT / "distribuzioni", pdf=False)
 
 
-def fig_scale(size: dict, plt) -> Path:
+def fig_scale(size: dict, plt, totale: int = 0) -> Path:
+    """totale 0: ideale con lo stesso totale della classe; altrimenti `totale` box per classe."""
     f, axs = plt.subplots(2, 2, figsize=(WIDTH, WIDTH * 0.78), sharex=True)
     curve = [(0, _P[0], "senza scale"), (.5, _P[1], "scale 0,5 (×0,5–1,5)"), (.75, _P[2], "scale 0,75 (×0,25–1,75)")]
     for ax, c in zip(axs.flat, CLASSI):
@@ -134,8 +136,9 @@ def fig_scale(size: dict, plt) -> Path:
             h = attese(x, s, BINS)
             ax.stairs(h, BINS, color=col, lw=1.2, label=lab, fill=s == 0, alpha=.35 if s == 0 else 1)
             ymax = max(ymax, h.max())
-        hi = ideale(len(x), ALPHA[c], BINS)
-        ax.stairs(hi, BINS, color="k", lw=1.4, ls="--", label="ideale, stesso totale")
+        hi = ideale(totale or len(x), ALPHA[c], BINS)
+        lab_i = "ideale, " + f"{totale:,}".replace(",", ".") + " box" if totale else "ideale, stesso totale"
+        ax.stairs(hi, BINS, color="k", lw=1.4, ls="--", label=lab_i)
         ax.text(.98, .95, f"ideale ∝ $s^{{-{ALPHA[c]:g}}}$", transform=ax.transAxes, ha="right", va="top", fontsize=6.5)
         for e in EDGES:
             ax.axvline(e, color="0.8", lw=.5)
@@ -147,19 +150,27 @@ def fig_scale(size: dict, plt) -> Path:
         ax.set_ylabel("istanze attese per epoca")
     hs, ls = axs[0, 0].get_legend_handles_labels()
     f.legend(hs, ls, loc="lower center", ncol=4, fontsize=6.5, frameon=False, bbox_to_anchor=(.5, -.01))
-    f.suptitle("Box >= 8 px: attuale, con scale (uniforme in ±s·px) e distribuzione ideale a parità di totale",
-               fontsize=8.5)
+    quanto = f"con {totale:,} box per classe".replace(",", ".") if totale else "a parità di totale"
+    f.suptitle(f"Box >= 8 px: attuale, con scale (uniforme in ±s·px) e distribuzione ideale {quanto}", fontsize=8.5)
     f.tight_layout(rect=(0, .04, 1, 1))
-    return save(f, OUT / "distribuzioni_scale", pdf=False)
+    return save(f, OUT / (f"distribuzioni_ideale_{totale // 1000}k" if totale else "distribuzioni_scale"), pdf=False)
 
 
 def main() -> int:
+    import argparse
+
     import matplotlib.pyplot as plt
 
+    p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("--totale", type=int, default=0, help="box per classe della curva ideale (0: stesso totale)")
+    a = p.parse_args()
     plt.style.use(STYLE)
     size = sizes()
     print(fig_attuale(size, plt))
-    print(fig_scale(size, plt))
+    print(fig_scale(size, plt, a.totale))
+    if a.totale:
+        print(f"ideale {a.totale} per classe:" + "".join(f"{round(v):>8}" for v in ideale(a.totale, .45, [8, 16, 32, 64, 96, 1e6])),
+              "(alpha 0,45);", "".join(f"{round(v):>8}" for v in ideale(a.totale, .3, [8, 16, 32, 64, 96, 1e6])), "(alpha 0,3)")
     print(f"{'':<11}{'s':>5}" + "".join(f"{a:>8}" for a in ["<8", "8-16", "16-32", "32-64", "64-96", ">96"]))
     for c in CLASSI:
         for s in (0, .5, .75):

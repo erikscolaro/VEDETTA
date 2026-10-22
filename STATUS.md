@@ -47,7 +47,7 @@ clip tenuti apposta. Il rapporto √area originale/corretta non si calcola (deci
    con l'essenziale; la cronaca dei giri in un diario a parte (query in un file di dati, tabella dei giri
    generata da script).
 
-8. Distribuzione ideale delle grandezze (`docs/distribuzioni.md`, 22/10/2026): curva continua s^−α al posto delle fasce con lo stesso minimo; α e totale da decidere.
+8. **Obiettivo nuovo** (22/10/2026, `regole.md`): curva continua s^−α, 14.286 box per classe; drone e uccello principali, deficit di aerei ed elicotteri piccoli accettato. **Da fare**: raffinare la distribuzione (forma e α, soprattutto uccelli) e allineare `tools/buchi.py` alla curva.
 
 ## Note pratiche
 

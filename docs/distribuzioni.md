@@ -68,8 +68,22 @@ Forma scelta: decrescente in modo continuo, densità in scala logaritmica propor
 - **Droni:** α = 0,3, circa −19% per ogni raddoppio di grandezza.
 - **Aerei, elicotteri, uccelli:** α = 0,45, circa −27% per raddoppio.
 
-Nella figura la curva ideale ha lo stesso totale della classe: mostra la forma, non quanto manca. Gli α sono
-una scelta ragionata, da rivedere. Per gli uccelli grandi, se interessano poco, serve un α più alto.
+Nella seconda figura la curva ideale ha lo stesso totale della classe: mostra la forma. Nella terza ha il totale
+deciso, **14.286 box per classe** (10.000 nel train con lo split 70/20/10): mostra quanto manca.
+
+![ideale 14k](figure/distribuzioni_ideale_14k.png)
+
+| | 8–16 | 16–32 | 32–64 | 64–96 | > 96 |
+|---|---|---|---|---|---|
+| ideale, α = 0,45 | 4.727 | 3.460 | 2.533 | 1.154 | 2.412 |
+| ideale droni, α = 0,3 | 4.007 | 3.255 | 2.644 | 1.310 | 3.070 |
+| mancano aerei | 3.862 | 1.073 | – | – | – |
+| mancano uccelli | 2.156 | – | – | 592 | 2.203 |
+| mancano elicotteri | 3.965 | 1.596 | – | – | – |
+
+I droni stanno sopra la curva in ogni fascia. **Decisione dell'utente (22/10/2026)**: questa è la regola nuova
+(`regole.md`). Drone e uccello sono le classi principali, aereo ed elicottero secondarie: il loro deficit sul
+piccolo è un compromesso accettato. Da raffinare: forma e α della curva, soprattutto per gli uccelli.
 
 Rispetto all'ideale:
 - **Aerei ed elicotteri** sono rovesciati: troppi tra 40 e 200 px, troppo pochi sotto i 32.

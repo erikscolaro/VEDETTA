@@ -739,6 +739,8 @@ Su tutte le fonti:
       [`distribuzioni.md`](distribuzioni.md)): istogramma continuo per classe (box >= 8 px in origine), scale di
       Ultralytics a 0,5 e 0,75 calcolato in modo esatto (uniforme in ±s·px) e distribuzione ideale s^−α (droni 0,3,
       altre classi 0,45). Lo scale sposta le istanze tra le fasce ma non chiude i buchi piccoli né gli uccelli grandi.
+      **Regola nuova** (utente, 22/10/2026, in `regole.md`): curva s^−α con 14.286 box per classe al posto dei 2.857
+      per cella; drone e uccello principali, deficit di aerei ed elicotteri piccoli accettato; curva da raffinare.
     - Disco: `fbd_sv` 1_frame 13 GB + zip 1,8 GB (tenuto: niente riscaricamenti), `dvids` 1_frame 3,3 GB; 43 GB
       liberi.
 11. **Split per sessione** (`data/<fonte>/6_dedup + 3_sessioni → data/aggregati/9_split`, su tutte le fonti, fuori da `svanstrom.py`): ogni sessione di clip tutta in uno split, quindi un
