@@ -211,11 +211,12 @@ def select() -> None:
         print(f"{s}: esclusi {len(drop[s])} ({dict(Counter(drop[s].values()))}) -> {f}")
 
 
-def clean_boxes(dup: float = 0.8, inside: float = 0.9) -> None:
+def clean_boxes(dup: float = 0.8, inside: float = 0.9, bordo: float = 4) -> None:
     """DVIDS, dopo il tetto (che non cambia): via le box doppie (IoU >= `dup`, si tiene
     prima la classe del video, poi la piu' grande) e quelle dentro un'altra per almeno
     `inside` della loro area (si tiene la piu' esterna). Utente, 20/10/2026: gli errori
-    piu' comuni in CVAT."""
+    piu' comuni in CVAT. Via anche i residui del crop: box che toccano il bordo con il
+    lato corto <= `bordo` px (utente, 22/10/2026)."""
     vc = {r["id"]: NAMES.index(r["classe"]) for r in csv.DictReader(open(DATA / "dvids" / "0_raw" / "video.csv"))}
 
     def xyxy(b):
@@ -227,10 +228,14 @@ def clean_boxes(dup: float = 0.8, inside: float = 0.9) -> None:
 
     area = lambda a: (a[2] - a[0]) * (a[3] - a[1])  # noqa: E731
     n = Counter()
+    W, H = 640, 512
     for t in (DATA / "dvids" / "5_box" / "preselezione").glob("DVIDS_*/*.txt"):
         bs = [ln.split() for ln in t.read_text().splitlines()]
-        if len(bs) < 2:
-            continue
+        n0 = len(bs)
+        px = [(x[0] * W, x[1] * H, x[2] * W, x[3] * H) for x in map(xyxy, bs)]
+        bs = [b for b, (x0, y0, x1, y1) in zip(bs, px)
+              if not ((x0 <= 1 or y0 <= 1 or x1 >= W - 1 or y1 >= H - 1) and min(x1 - x0, y1 - y0) <= bordo)]
+        n["bordo"] += n0 - len(bs)
         k = str(vc[t.parent.name.split("_")[1]])
         keep = []
         for b in sorted(bs, key=lambda b: (b[0] != k, -area(xyxy(b)))):
@@ -246,9 +251,9 @@ def clean_boxes(dup: float = 0.8, inside: float = 0.9) -> None:
                 n["dentro"] += 1
             else:
                 out.append(b)
-        if len(out) < len(bs):
+        if len(out) < n0:
             t.write_text("".join(" ".join(b) + "\n" for b in out))
-    print(f"dvids: box doppie tolte {n['doppie']}, dentro un'altra {n['dentro']}")
+    print(f"dvids: box doppie tolte {n['doppie']}, dentro un'altra {n['dentro']}, residui sul bordo {n['bordo']}")
 
 
 if __name__ == "__main__":
