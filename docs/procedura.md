@@ -741,6 +741,7 @@ Su tutte le fonti:
       altre classi 0,45). Lo scale sposta le istanze tra le fasce ma non chiude i buchi piccoli né gli uccelli grandi.
       **Regola nuova** (utente, 22/10/2026, in `regole.md`): curva s^−α con 14.286 box per classe al posto dei 2.857
       per cella; drone e uccello principali, deficit di aerei ed elicotteri piccoli accettato; curva da raffinare.
+      Split (utente, 22/10/2026): val segue la curva (la fitness di Ultralytics si calcola lì), test piatto per fascia.
     - Disco: `fbd_sv` 1_frame 13 GB + zip 1,8 GB (tenuto: niente riscaricamenti), `dvids` 1_frame 3,3 GB; 43 GB
       liberi.
 11. **Split per sessione** (`data/<fonte>/6_dedup + 3_sessioni → data/aggregati/9_split`, su tutte le fonti, fuori da `svanstrom.py`): ogni sessione di clip tutta in uno split, quindi un

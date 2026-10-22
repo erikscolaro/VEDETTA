@@ -33,8 +33,12 @@ Da `NEW_MASTERPLAN.md` (§2, §5).
   raffinare la distribuzione.
 - Le fasce restano per stratificare val e test e per la mAP per fascia; `tools/buchi.py` conta ancora per cella.
 - Storico (19/10/2026): obiettivo per cella di 2.000 istanze nel train (2.857 in tutto), +10% prima di CVAT.
-- Bilanciamento (utente, 19/10/2026): **val e test piatti** (~571 e ~286 per cella; nelle celle sotto il minimo il
-  30% delle istanze); **train con tetto di 4.000 istanze per cella** (sopra si scarta, sotto si tiene tutto). Niente
+- Bilanciamento (utente, 22/10/2026, sostituisce "val e test piatti" del 19/10): **val segue la curva** di
+  `distribuzioni.md`, perché la fitness di Ultralytics (scelta di `best.pt`) si calcola sul val e deve pesare le
+  grandezze come in esercizio; **test piatto** per fascia (~286 per cella; nelle celle sotto il minimo il 30% delle
+  istanze), per una precisione per fascia affidabile. In val un minimo per fascia anche dove la curva è bassa
+  (150–200), perché un peggioramento sui grandi resti visibile. **Train con tetto di 4.000 istanze per cella**
+  (sopra si scarta, sotto si tiene tutto). Niente
   copie ridotte per la fascia 8–16: lo scale lo fa Ultralytics in training (`scale: 0.25`, zoom 0,75–1,25). Stima
   sui box proposti: train ~60.900, val + test ~14.900.
 
@@ -67,7 +71,8 @@ Da `NEW_MASTERPLAN.md` (§2, §5).
 |---|---|---|
 | train, per classe | ≥ 1500 immagini, ≥ 10.000 istanze | Ultralytics, "Tips for best training results" |
 | train, per classe e grandezza | curva s^−α con 10.000 istanze per classe (14.286 in tutto); per fascia > 100 immagini, ≥ 10 video | Ultralytics; scenario della torretta (`distribuzioni.md`); LVIS, categoria "frequente" |
-| val e test, per cella | le quote del 70/20/10 (~571 e ~286 con 2.000 nel train); il vecchio 385 (AP entro ±5 punti al 95%: (1,96 · 0,5 / 0,05)²) resta come riferimento | Compromessi: incertezza dal bootstrap per sessione |
+| val, per classe e grandezza | la curva (20% del totale, ~2.857 per classe), almeno 150–200 per fascia | fitness di Ultralytics sul val, pesata come il deploy |
+| test, per cella | piatto, ~286 (10% di 2.857); il vecchio 385 (AP entro ±5 punti al 95%: (1,96 · 0,5 / 0,05)²) resta come riferimento | Compromessi: incertezza dal bootstrap per sessione |
 | val, complessivo | rumore della mAP < 1 punto | soglia di scelta del piano |
 
 - I minimi di Ultralytics sono generici: la guida consiglia il training da zero solo per dataset grandi, senza
