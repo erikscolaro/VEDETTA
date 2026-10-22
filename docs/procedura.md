@@ -728,6 +728,17 @@ Su tutte le fonti:
       Passata Sonnet sul 669 ricostruito (a campione, scelta dell'utente): 202 frame letti su 947, 41 via, 66 classe
       (38 V-22 etichettati airplane → helicopter, 28 caccia etichettati bird/drone → airplane); 1.097 box su 920
       frame, job 1014 in validation per la revisione dell'utente.
+    - **Import da CVAT e conteggio dopo la revisione** (22/10/2026): export "Ultralytics YOLO Detection 1.0" di tutti i
+      task (FRED 10, DVIDS 30, FBD 11, Anti-UAV 5) in `5_box/cvat_zip/`, `--step cvat_import` -> `5_box/manuale/`; una
+      cartella vuota per i 176 video rimasti senza box (CVAT non esporta i frame vuoti: senza cartella si contava la
+      preselezione); nessun video non rivisto resta nel conteggio. Backup JSON di tutti i task in
+      `data/cvat_backup/2026-10-22/`. `buchi.py`: **8 buchi su 20** (prima della revisione, sui box proposti, 4): aerei
+      8–16 865 (mancano 1.992) e 16–32 2.387 (470); uccelli 8–16 2.571 (286), 64–96 562 (2.295), > 96 209 (2.648);
+      elicotteri 8–16 762 (2.095), 16–32 1.864 (993), 64–96 2.596 (261). Droni tutti chiusi.
+    - **Distribuzione delle grandezze** (22/10/2026, `tools/distribuzioni.py` -> `docs/figure/`, considerazioni in
+      [`distribuzioni.md`](distribuzioni.md)): istogramma continuo per classe (box >= 8 px in origine), scale di
+      Ultralytics a 0,5 e 0,75 calcolato in modo esatto (uniforme in ±s·px) e distribuzione ideale s^−α (droni 0,3,
+      altre classi 0,45). Lo scale sposta le istanze tra le fasce ma non chiude i buchi piccoli né gli uccelli grandi.
     - Disco: `fbd_sv` 1_frame 13 GB + zip 1,8 GB (tenuto: niente riscaricamenti), `dvids` 1_frame 3,3 GB; 43 GB
       liberi.
 11. **Split per sessione** (`data/<fonte>/6_dedup + 3_sessioni → data/aggregati/9_split`, su tutte le fonti, fuori da `svanstrom.py`): ogni sessione di clip tutta in uno split, quindi un

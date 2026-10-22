@@ -24,7 +24,7 @@ scritto in `docs/procedura.md` (richiesta dell'utente).
 | 8 conteggio | fatto | `7_conteggio/conteggio.csv` |
 | 9 buchi (tutte le fonti, `tools/buchi.py`) | fatto | `data/aggregati/8_buchi/buchi.csv`: 15 buchi su 16 celle |
 | 10 aggiunte | raccolta finita, preselezione fatta, **task CVAT pronti** | FRED 541–551 (8.996 ritagli); DVIDS 599–628 (28.520); Anti-UAV 629–633 (4.616); FBD 634–644 (10.544). Preselezione in `data/<fonte>/5_box/preselezione/` (`tools/preselezione.py`) |
-| 9 buchi (obiettivo nuovo: 2.857 per cella, 5 fasce da 8–16, +10% prima di CVAT) | 4 buchi su 20 dopo giro 10 e uccelli DVIDS (box proposti) | aereo 8–16 (1.392); elicottero 8–16 (1.665); uccello 64–96 (578), > 96 (215); droni ed elicotteri 16–96 chiusi col margine |
+| 9 buchi dopo la revisione CVAT (22/10/2026, 2.857 per cella) | **8 buchi su 20** (prima, sui box proposti, 4) | aerei 8–16 (865), 16–32 (2.387); uccelli 8–16 (2.571), 64–96 (562), > 96 (209); elicotteri 8–16 (762), 16–32 (1.864), 64–96 (2.596); droni chiusi |
 
 Passo 5: tolte 12 clip con la scia (`scie.txt`) e 6 scartate in CVAT (`scartate.txt`); 1.233 frame senza box in 18
 clip tenuti apposta. Il rapporto √area originale/corretta non si calcola (decisione dell'utente).
@@ -46,6 +46,8 @@ clip tenuti apposta. Il rapporto √area originale/corretta non si calcola (deci
    passi e verifica gli hash di immagini e label; versioni di ffmpeg/OpenCV fissate. `procedura.md` riscritta
    con l'essenziale; la cronaca dei giri in un diario a parte (query in un file di dati, tabella dei giri
    generata da script).
+
+8. Distribuzione ideale delle grandezze (`docs/distribuzioni.md`, 22/10/2026): curva continua s^−α al posto delle fasce con lo stesso minimo; α e totale da decidere.
 
 ## Note pratiche
 
