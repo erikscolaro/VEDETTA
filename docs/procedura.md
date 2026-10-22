@@ -682,6 +682,52 @@ Su tutte le fonti:
       105 classe (sciame di DVIDS_1026196, bird → drone, dubbio dichiarato dall'agente); ~249k token, ~6,5 min.
       Quota per task: 26 punti tutto letto (647), 15 a campione con orchestratore (648), **8 un solo agente (649)**.
       Metodo scelto per i task rimasti.
+    - **Revisione a ondate** (decisione dell'utente, 20/10/2026): i 15 task ancora in annotation, 5 agenti Sonnet
+      in parallelo per ondata (20:10, 01:30, 07:00), un task per agente, stesso schema a campione; giudizi applicati
+      sugli originali e job in **stage validation** (anche 647–649). Ondata 1, box tolti / classi cambiate su box
+      letti: 650 214/43 su 475, 651 84/23 su 277, 652 144/292 su 658 (C-130 etichettati helicopter, Black Hawk
+      etichettati airplane), 653 291/43 su 866, 654 125/16 su 457; 230–410k token per agente, 4–9 min.
+      Su indicazione dell'utente (51% di quota dopo l'ondata 1: al massimo 8 agenti per sessione) 656–658 subito e il
+      resto in un'ondata sola alle 01:30: 656 354/32 su 729, 658 267/96 su 604 (A-10 e C-130 etichettati helicopter;
+      eVTOL Beta Alia lasciato helicopter, da decidere), 657 409/31 su 779 (rifatto: il primo agente si era fermato a
+      fine quota senza scrivere giudizi), 659 97/2 su 277, 660 245/14 su 647, 661 61/186 su 383 (F-16 e V-22
+      etichettati helicopter), 662 106/48 su 386, 663 97/1 su 271. 665 chiuso dall'utente, saltato. 664 fermato
+      dal limite di quota senza giudizi, rifatto il 21/10: il primo agente ha perso le immagini per il limite di
+      immagini per richiesta e le ha rilette (~2,5 volte ciascuna, contesto a 410k token); fermato a 257 frame su 990,
+      giudizi applicati (158/25 su 273), poi un secondo agente sui 733 frame non letti con salvataggio ogni 50 frame e
+      divieto di rilettura (84/5 su 243, 187k token, 4,5 min). Tutti i 16 task in stage validation.
+    - **Controllo delle annotazioni dell'utente** (DVIDS 599, 623–628, 666, 667; sola lettura, 21/10/2026): uno script
+      (`controllo.py`, fuori dal repo) trova i frame sospetti (box quasi uguali o uno dentro l'altro, numero di box
+      diverso dai frame vicini dello stesso video, box minuscoli): 429 su ~7.750; nessun salto di classe sullo stesso
+      oggetto. Un Sonnet li legge tutti: 194 frame con errori, 214 segnalazioni (~130 box doppi, soprattutto nel 628;
+      41 velivoli senza box, quasi tutti in formazione; carichi appesi; aerei a terra incoerenti). Lista in
+      `~/.cache/air-detection-prove/ctrl/esito.csv`. Caricati come task CVAT 672 (job 1017, i 194 frame con i box e una
+      issue per segnalazione); corretti dall'utente e riportati sugli originali il 22/10 (`riporta.py`: box del frame
+      originale = box del controllo): 171 frame cambiati, box da 451 a 332.
+    - **Residui del crop sul bordo** (regola dell'utente, 22/10/2026): via i box che toccano il bordo (entro 1 px) con il
+      lato corto <= 4 px. In `clean_boxes()` di `preselezione.py` per DVIDS e tolti in CVAT su tutte le fonti tranne
+      Svanström: 78 box (DVIDS 63, FBD 11, FRED 4, Anti-UAV 0); verificato che non ne restano, backup cancellati.
+    - **Secondo controllo** (22/10/2026): stesso script sui 21 task DVIDS rimasti (647–654, 656–665, 668, 669, 671),
+      833 frame sospetti (quasi tutti numero di box diverso dai vicini); 3 agenti Sonnet da ~278 frame, esito salvato
+      ogni 50 immagini, ~260k token e 5–7 min ciascuno. 156 frame con errori, 200 segnalazioni (150 velivoli senza
+      box: frame a 0 box tra frame con box, formazioni, velivoli tagliati dal bordo; 23 V-22 etichettati helicopter;
+      21 via; 3 bordi). Caricati come task CVAT 673 (job 1018) per la revisione dell'utente.
+    - **VTOL = helicopter** (regola dell'utente, 22/10/2026: più simili a un elicottero). I prompt degli agenti dicevano
+      V-22 = airplane: dei 714 box passati da helicopter ad airplane (26 video), controllati a vista su fogli, 122 sono
+      V-22 (8 video) e tornano helicopter (650 41, 651 9, 653 10, 654 4, 661 54, 664 4); gli altri sono C-130, F-16,
+      A-10, F-35 e aerei di linea e restano airplane. Le 24 issue "classe airplane" del task 673 sono tutte V-22: da
+      ignorare. Prompt aggiornato.
+    - **Riporto del 673 e incidente sul 669** (22/10/2026): 74 frame riportati sugli originali. Per un frame del 669 senza
+      box nell'originale `remove_annotations(ids=[])` dell'SDK ha cancellato **tutte** le annotazioni del task (con
+      lista vuota chiama `destroy_annotations`); gli altri task contati, intatti. Script corretti (chiamata saltata con
+      lista vuota). 669 ricostruito: box della preselezione (identici al task di allora, 990 frame) + giudizi di Haiku +
+      regola del bordo + 42 V-22 rimessi helicopter (controllati a vista) + gli 8 frame corretti nel 673: 1.138 box su
+      947 frame. Perse le correzioni a mano dell'utente sul 669 dopo Haiku; nuova passata Sonnet e poi revisione
+      dell'utente. Cancellati i task 672, 673 e meteo (333) dopo la verifica (673: 156 frame su 156 uguali agli
+      originali; 672: unica differenza un box tolto dopo con la regola del bordo).
+      Passata Sonnet sul 669 ricostruito (a campione, scelta dell'utente): 202 frame letti su 947, 41 via, 66 classe
+      (38 V-22 etichettati airplane → helicopter, 28 caccia etichettati bird/drone → airplane); 1.097 box su 920
+      frame, job 1014 in validation per la revisione dell'utente.
     - Disco: `fbd_sv` 1_frame 13 GB + zip 1,8 GB (tenuto: niente riscaricamenti), `dvids` 1_frame 3,3 GB; 43 GB
       liberi.
 11. **Split per sessione** (`data/<fonte>/6_dedup + 3_sessioni → data/aggregati/9_split`, su tutte le fonti, fuori da `svanstrom.py`): ogni sessione di clip tutta in uno split, quindi un

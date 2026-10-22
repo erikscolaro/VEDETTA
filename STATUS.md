@@ -49,7 +49,7 @@ clip tenuti apposta. Il rapporto √area originale/corretta non si calcola (deci
 
 ## Note pratiche
 
-- Task CVAT DVIDS da rivedere (20/10/2026): 645–667 (655 → 668 passato da Sonnet, 645 → 669 passato da Haiku, 646 → 671 passato da Sonnet; 647, 648, 649 fatti sugli originali; per gli altri un solo agente Sonnet a campione, 1 frame ogni 10 ±5 intorno agli errori, 10 immagini per turno), rifatti senza stella, visore e box doppie o interne.
+- Task CVAT DVIDS da rivedere (20/10/2026): 645–667 (655 → 668 passato da Sonnet, 645 → 669 passato da Haiku, 646 → 671 passato da Sonnet; 647–654 e 656–664 fatti sugli originali e in stage validation, 665 chiuso dall'utente; controllo dei task chiusi dall'utente fatto (task 672, correzioni riportate sugli originali il 22/10); secondo controllo (task 673) riportato sugli originali e task di controllo cancellati; 669 svuotato per errore e ricostruito il 22/10, passato da Sonnet, in validation per la revisione dell'utente; per gli altri un solo agente Sonnet a campione, 1 frame ogni 10 ±5 intorno agli errori, 10 immagini per turno), rifatti senza stella, visore e box doppie o interne.
 - Python: `air-detection/.venv/bin/python` (torch, ultralytics, cvat-sdk). Pesi SAM in `data/modelli/sam2.1_l.pt`.
 - CVAT dagli script: `NO_PROXY=localhost,127.0.0.1` (c'è un proxy di sistema); credenziali in `~/.config/cvat.env`
   (`CVAT_USER`, `CVAT_PASS`, utente `erikscolaro`). Docker vuole `sudo` (password): se CVAT è spento, l'utente lancia
