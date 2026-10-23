@@ -488,8 +488,8 @@ TARATURA = (0.85, 0.90, 0.92, 0.94, 0.95)  # fasce del massimo per coppia di ses
 
 def threshold_sheets(per: int = 40, seed: int = 0) -> None:
     """Taratura della soglia 0,95 (utente, 23/10/2026): `per` coppie di sessioni a caso per fascia di `TARATURA`
-    (somiglianza massima fra i loro frame), sotto la soglia quindi mai riviste, mescolate fra le fasce perche'
-    l'operatore non sappia la fascia -> `10_doppioni/taratura/coppie.csv` (con la colonna `fascia`) e fogli
+    (somiglianza massima fra i loro frame), sotto la soglia quindi mai riviste, in ordine di somiglianza
+    decrescente (utente, 23/10/2026) -> `10_doppioni/taratura/coppie.csv` (con la colonna `fascia`) e fogli
     `fogli/TNN.jpg` come quelli dei doppioni. L'operatore scrive in `taratura/stessa_sessione.txt` i numeri delle
     coppie che sono la stessa sessione (stesso posto, stesse condizioni, stesso volo o girato); lo stesso posto in
     un altro giorno non conta. Poi `--step stima_soglia`."""
@@ -501,7 +501,7 @@ def threshold_sheets(per: int = 40, seed: int = 0) -> None:
         band = sorted(k for k in best if lo <= best[k][0] < hi)
         pick += [band[i] for i in rng.choice(len(band), min(per, len(band)), replace=False)]
         print(f"taratura {lo:.2f}-{hi:.2f}: {len(band)} coppie di sessioni, {min(per, len(band))} nei fogli")
-    order = [pick[i] for i in rng.permutation(len(pick))]
+    order = sorted(pick, key=lambda k: -best[k][0])  # decrescente: le stranezze in alto si vedono prima (utente)
     _pair_sheets(dst, order, rows, e, sess, by_ses, best, cnt, TARATURA[0], "T", seed=seed)
     print(f"{len(order)} coppie, {-(-len(order) // 12)} fogli -> {dst}; risposte in stessa_sessione.txt")
 
