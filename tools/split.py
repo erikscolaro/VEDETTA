@@ -398,18 +398,12 @@ def pair_preview(edges=(0.6, 0.7, 0.8, 0.9, 1.01), per: int = 6, seed: int = 0, 
     print(f"-> {f}")
 
 
-def duplicate_sheets(thr: float = 0.95, per_sheet: int = 12, seed: int = 0, block: int = 4096) -> None:
-    """Passo 11, doppioni fra sessioni: ogni coppia di sessioni diverse con almeno una coppia di frame >= `thr`
-    -> `intermediate/10_doppioni/coppie.csv` (n, sessioni, fonti, massimo, coppie di frame sopra soglia, frame
-    della coppia migliore) e fogli numerati `fogli/DNN.jpg`, una riga per coppia di sessioni: la coppia di frame
-    piu' simile, poi un frame a caso di A con il frame di B piu' simile a lui (utente, 23/10/2026). L'utente risponde con i numeri da unire, che vanno in
-    `10_doppioni/unire.txt` (un numero per riga, `#` per i commenti), letto dal passo dei gruppi."""
-    import cv2
+def _session_pairs(lo: float, block: int = 4096):
+    """Coppie di sessioni diverse con almeno una coppia di frame >= `lo` (DINOv2, `embedding_s.npy`): per coppia la
+    coppia di frame piu' simile (sim, i, j) e quante coppie di frame superano `lo`."""
     import torch
 
     out = INTERMEDIATE / "9_split"
-    dst = INTERMEDIATE / "10_doppioni"
-    (dst / "fogli").mkdir(parents=True, exist_ok=True)
     rows = list(csv.DictReader(open(out / "frame.csv")))
     e = torch.from_numpy(np.load(out / "embedding_s.npy")).cuda()
     keys = [r["fonte"] + ":" + r["sessione"] for r in rows]
@@ -426,7 +420,7 @@ def duplicate_sheets(thr: float = 0.95, per_sheet: int = 12, seed: int = 0, bloc
         for s in range(0, n, block):
             i = j[s:s + block]
             S = (e[i] @ e.T).float()
-            ii, jj = torch.nonzero((j[None] > i[:, None]) & (sid[i][:, None] != sid[None]) & (S >= thr), as_tuple=True)
+            ii, jj = torch.nonzero((j[None] > i[:, None]) & (sid[i][:, None] != sid[None]) & (S >= lo), as_tuple=True)
             for sv, a, b in zip(S[ii, jj].tolist(), i[ii].tolist(), jj.tolist()):
                 key = tuple(sorted((int(sid[a]), int(sid[b]))))
                 if key[0] != int(sid[a]):
@@ -434,7 +428,17 @@ def duplicate_sheets(thr: float = 0.95, per_sheet: int = 12, seed: int = 0, bloc
                 cnt[key] += 1
                 if sv > best.get(key, (0,))[0]:
                     best[key] = (sv, a, b)
-    order = sorted(best, key=lambda k: (sess[k[0]].split(":")[0], sess[k[1]].split(":")[0], -best[k][0]))
+    return rows, e, sess, by_ses, best, cnt
+
+
+def _pair_sheets(dst: Path, order: list, rows, e, sess, by_ses, best, cnt, thr: float, prefix: str,
+                 per_sheet: int = 12, seed: int = 0) -> None:
+    """`dst/coppie.csv` e fogli numerati `dst/fogli/<prefix>NN.jpg`, una riga per coppia di sessioni: la coppia di
+    frame piu' simile, poi un frame a caso di A con il frame di B piu' simile a lui."""
+    import cv2
+    import torch
+
+    (dst / "fogli").mkdir(parents=True, exist_ok=True)
     with open(dst / "coppie.csv", "w", newline="") as fh:
         w = csv.writer(fh)
         w.writerow(["n", "sessione_a", "sessione_b", "massimo", "coppie_frame", "frame_a", "frame_b"])
@@ -442,7 +446,7 @@ def duplicate_sheets(thr: float = 0.95, per_sheet: int = 12, seed: int = 0, bloc
                      rows[best[a, b][2]]["immagine"]) for k, (a, b) in enumerate(order))
     rng = np.random.default_rng(seed)
     W, H, TH = TILE
-    for f in (dst / "fogli").glob("D*.jpg"):
+    for f in (dst / "fogli").glob(f"{prefix}*.jpg"):
         f.unlink()
     for p0 in range(0, len(order), per_sheet):
         lines = []
@@ -460,11 +464,67 @@ def duplicate_sheets(thr: float = 0.95, per_sheet: int = 12, seed: int = 0, bloc
                    _tile(rows[oa], f"A a caso  {_who(rows[oa])}"), _tile(rows[ob], f"B piu' simile ad A {so:.2f}")]
             lines += [head, np.hstack([np.pad(x, ((0, 0), (0, 8), (0, 0)), constant_values=255) for x in ims]),
                       np.full((10, (W + 8) * 4, 3), 255, np.uint8)]
-        cv2.imwrite(str(dst / "fogli" / f"D{p0 // per_sheet + 1:02d}.jpg"), np.vstack(lines), [cv2.IMWRITE_JPEG_QUALITY, 88])
+        cv2.imwrite(str(dst / "fogli" / f"{prefix}{p0 // per_sheet + 1:02d}.jpg"), np.vstack(lines),
+                    [cv2.IMWRITE_JPEG_QUALITY, 88])
+
+
+def duplicate_sheets(thr: float = 0.95, per_sheet: int = 12, seed: int = 0) -> None:
+    """Passo 11, doppioni fra sessioni: ogni coppia di sessioni diverse con almeno una coppia di frame >= `thr`
+    -> `intermediate/10_doppioni/coppie.csv` (n, sessioni, fonti, massimo, coppie di frame sopra soglia, frame
+    della coppia migliore) e fogli numerati `fogli/DNN.jpg` (utente, 23/10/2026). L'utente risponde con i numeri da
+    unire, che vanno in `10_doppioni/unire.txt` (un numero per riga, `#` per i commenti), letto dal passo dei gruppi."""
+    dst = INTERMEDIATE / "10_doppioni"
+    rows, e, sess, by_ses, best, cnt = _session_pairs(thr)
+    order = sorted(best, key=lambda k: (sess[k[0]].split(":")[0], sess[k[1]].split(":")[0], -best[k][0]))
+    _pair_sheets(dst, order, rows, e, sess, by_ses, best, cnt, thr, "D", per_sheet, seed)
     print(f"doppioni: {len(order)} coppie di sessioni con frame >= {thr} ("
           + ", ".join(f"{k} {v}" for k, v in Counter(sess[a].split(":")[0] + "-" + sess[b].split(":")[0]
                                                     for a, b in order).most_common())
           + f"), {-(-len(order) // per_sheet)} fogli -> {dst}")
+
+
+TARATURA = (0.90, 0.92, 0.94, 0.95)  # fasce del massimo per coppia di sessioni, sotto la soglia dei doppioni
+
+
+def threshold_sheets(per: int = 40, seed: int = 0) -> None:
+    """Taratura della soglia 0,95 (utente, 23/10/2026): `per` coppie di sessioni a caso per fascia di `TARATURA`
+    (somiglianza massima fra i loro frame), sotto la soglia quindi mai riviste, mescolate fra le fasce perche'
+    l'operatore non sappia la fascia -> `10_doppioni/taratura/coppie.csv` (con la colonna `fascia`) e fogli
+    `fogli/TNN.jpg` come quelli dei doppioni. L'operatore scrive in `taratura/stessa_sessione.txt` i numeri delle
+    coppie che sono la stessa sessione (stesso posto, stesse condizioni, stesso volo o girato); lo stesso posto in
+    un altro giorno non conta. Poi `--step stima_soglia`."""
+    dst = INTERMEDIATE / "10_doppioni" / "taratura"
+    rows, e, sess, by_ses, best, cnt = _session_pairs(TARATURA[0])
+    rng = np.random.default_rng(seed)
+    pick = []
+    for lo, hi in zip(TARATURA, TARATURA[1:]):
+        band = sorted(k for k in best if lo <= best[k][0] < hi)
+        pick += [band[i] for i in rng.choice(len(band), min(per, len(band)), replace=False)]
+        print(f"taratura {lo:.2f}-{hi:.2f}: {len(band)} coppie di sessioni, {min(per, len(band))} nei fogli")
+    order = [pick[i] for i in rng.permutation(len(pick))]
+    _pair_sheets(dst, order, rows, e, sess, by_ses, best, cnt, TARATURA[0], "T", seed=seed)
+    print(f"{len(order)} coppie, {-(-len(order) // 12)} fogli -> {dst}; risposte in stessa_sessione.txt")
+
+
+def threshold_estimate() -> None:
+    """Quota di coppie "stessa sessione" per fascia dalla revisione di `threshold_sheets`, con l'intervallo di
+    Wilson al 95% -> `10_doppioni/taratura/stima.csv`. Sopra 0,95 la quota e' 1 (146 coppie su 146, tutte unite)."""
+    dst = INTERMEDIATE / "10_doppioni" / "taratura"
+    same = set(_merges(dst / "stessa_sessione.txt"))
+    rows = list(csv.DictReader(open(dst / "coppie.csv")))
+    out = []
+    for lo, hi in zip(TARATURA, TARATURA[1:]):
+        rs = [r for r in rows if lo <= float(r["massimo"]) < hi]
+        n, k = len(rs), sum(int(r["n"]) in same for r in rs)
+        z = 1.96
+        c, h = (k + z * z / 2) / (n + z * z), z * np.sqrt(k * (n - k) / n + z * z / 4) / (n + z * z)
+        out.append((f"{lo:.2f}-{hi:.2f}", n, k, f"{k / n:.3f}", f"{c - h:.3f}", f"{c + h:.3f}"))
+    with open(dst / "stima.csv", "w", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(["fascia", "coppie", "stessa_sessione", "quota", "ic95_basso", "ic95_alto"])
+        w.writerows(out)
+    for r in out:
+        print(f"{r[0]}: {r[2]}/{r[1]} stessa sessione ({float(r[3]):.0%}, IC 95% {float(r[4]):.0%}-{float(r[5]):.0%})")
 
 
 def _merges(f: Path) -> list[int]:
@@ -1371,7 +1431,7 @@ def export() -> None:
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--fasce", type=float, nargs="+", default=[0.6, 0.7, 0.8, 0.9, 1.01], help="anteprima: soglie")
-    p.add_argument("--step", choices=["frame", "embedding", "somiglianze", "somiglianze_tutte", "anteprima", "doppioni", "gruppi", "somiglianze_gruppi", "split", "controllo", "mosaici", "calib", "export", "figure", "soglia"], required=True)
+    p.add_argument("--step", choices=["frame", "embedding", "somiglianze", "somiglianze_tutte", "anteprima", "doppioni", "gruppi", "somiglianze_gruppi", "split", "controllo", "mosaici", "calib", "export", "figure", "soglia", "taratura", "stima_soglia"], required=True)
     a = p.parse_args(argv)
     if a.step == "frame":
         frame_table()
@@ -1385,6 +1445,10 @@ def main(argv=None) -> int:
         pair_preview(a.fasce)
     elif a.step == "doppioni":
         duplicate_sheets()
+    elif a.step == "taratura":
+        threshold_sheets()
+    elif a.step == "stima_soglia":
+        threshold_estimate()
     elif a.step == "gruppi":
         groups()
     elif a.step == "split":
