@@ -263,47 +263,63 @@ def similarity_all(by_group: bool = False, lo: float = -0.2, bins: int = 240, bl
     mid = (edges[1:] + edges[:-1]) / 2
     med = [mid[np.searchsorted(np.cumsum(x), x.sum() / 2)] for x in h]
 
+    T = {"it": dict(kinds=kinds, block=f"somiglianza media, una riga ogni ~{n // px} frame (ordine fonte, sessione)",
+                    pairs="coppie, mediana", above="sopra 0,95", tail="coda: coppie per bin (log)", x="somiglianza coseno",
+                    y="densità", all=f"tutte le coppie di frame ({n:,})".replace(",", ".") + "; AUC stessa sessione / diverse ",
+                    sup="DINOv2 ViT-S/14, tutti i frame annotati", dec=","),
+         "en": dict(kinds=["same clip", "same session, other clip", "different sessions", "same group, other session",
+                           "different groups"][:len(kinds)],
+                    block=f"mean similarity, one row every ~{n // px} frames (source, session order)",
+                    pairs="pairs, median", above="above 0.95", tail="tail: pairs per bin (log)", x="cosine similarity",
+                    y="density", all=f"all frame pairs ({n:,}); AUC same session / different ",
+                    sup="DINOv2 ViT-S/14, all annotated frames", dec=".")}
     plt.style.use(STYLE)
-    f, (ax, ax2) = plt.subplots(1, 2, figsize=(WIDTH * 1.4, WIDTH * 0.75))
-    im = ax.imshow(Sc, cmap="Blues", vmin=0, vmax=1, interpolation="nearest")
-    first = {}
-    for i, r in enumerate(rows):
-        first.setdefault(r["fonte"], i * px / n)
-    starts = sorted(first.values()) + [px]
-    for b in starts[1:-1]:
-        ax.axhline(b - .5, color=_P[7], lw=.5)
-        ax.axvline(b - .5, color=_P[7], lw=.5)
-    names = sorted(first, key=first.get)
-    ticks = [(a + b) / 2 for a, b in zip(starts, starts[1:])]
-    ax.set_xticks(ticks, names, fontsize=5.5, rotation=30)
-    ax.set_yticks(ticks, names, fontsize=5.5)
-    ax.tick_params(length=0)
-    ax.grid(False)
-    f.colorbar(im, ax=ax, fraction=.046, pad=.02).ax.tick_params(labelsize=6)
-    ax.set_title(f"somiglianza media, una riga ogni ~{n // px} frame (ordine fonte, sessione)", fontsize=7)
-    top = mid >= 0.95
-    for x, k, col, md in zip(h, kinds, _P, med):
-        ax2.stairs(x / x.sum() / (edges[1] - edges[0]), edges, lw=1.2, color=col, ls="--" if k == "gruppi diversi" else "-",
-                   label=f"{k}: " + f"{x.sum():,.0f}".replace(",", ".") + " coppie, mediana " + f"{md:.2f}".replace(".", ",")
-                   + ", sopra 0,95: " + f"{x[top].sum():,.0f}".replace(",", "."))
-    if by_group:  # the tail of different sessions and different groups, in log scale
-        ins = ax2.inset_axes([.06, .28, .42, .32])
-        for x, col, ls in ((h[2], _P[2], "-"), (h[4], _P[4], "--")):
-            ins.stairs(np.maximum(x, .5), edges, color=col, lw=1, ls=ls)
-        ins.set_yscale("log")
-        ins.set_xlim(.85, 1)
-        ins.tick_params(labelsize=5)
-        ins.set_title("coda: coppie per bin (log)", fontsize=5.5)
-    ax2.set_xlabel("somiglianza coseno", fontsize=7)
-    ax2.set_ylabel("densità", fontsize=7)
-    ax2.set_yticks([])
-    ax2.legend(fontsize=5.5, loc="upper left", bbox_to_anchor=(0, -.12), frameon=False)  # below: it covers the curves
-    ax2.set_title(f"tutte le coppie di frame ({n:,})".replace(",", ".") + "; AUC stessa sessione / diverse "
-                  + f"{auc:.3f}".replace(".", ","), fontsize=7)
-    f.suptitle("DINOv2 ViT-S/14, tutti i frame annotati", fontsize=8)
-    print(f"AUC {auc:.4f}, coppie {', '.join(f'{x.sum():,.0f}' for x in h)}, mediane {[round(float(x), 3) for x in med]}",
-          save(f, INTERMEDIATE / "11_gruppi" / "somiglianze_gruppi" if by_group else out / "somiglianze_tutte", pdf=False))
-
+    for lang in ("it", "en") if by_group else ("it",):
+        t = T[lang]
+        num = (lambda v: f"{v:,.0f}".replace(",", ".")) if lang == "it" else (lambda v: f"{v:,.0f}")
+        f, (ax, ax2) = plt.subplots(1, 2, figsize=(WIDTH * 1.4, WIDTH * 0.75))
+        im = ax.imshow(Sc, cmap="Blues", vmin=0, vmax=1, interpolation="nearest")
+        first = {}
+        for i, r in enumerate(rows):
+            first.setdefault(r["fonte"], i * px / n)
+        starts = sorted(first.values()) + [px]
+        for b in starts[1:-1]:
+            ax.axhline(b - .5, color=_P[7], lw=.5)
+            ax.axvline(b - .5, color=_P[7], lw=.5)
+        names = sorted(first, key=first.get)
+        ticks = [(a + b) / 2 for a, b in zip(starts, starts[1:])]
+        ax.set_xticks(ticks, names, fontsize=5.5, rotation=30)
+        ax.set_yticks(ticks, names, fontsize=5.5)
+        ax.tick_params(length=0)
+        ax.grid(False)
+        f.colorbar(im, ax=ax, fraction=.046, pad=.02).ax.tick_params(labelsize=6)
+        ax.set_title(t["block"], fontsize=7)
+        top = mid >= 0.95
+        for x, k, col, md in zip(h, t["kinds"], _P, med):
+            ax2.stairs(x / x.sum() / (edges[1] - edges[0]), edges, lw=1.2, color=col,
+                       ls="--" if k in ("gruppi diversi", "different groups") else "-",
+                       label=f"{k}: {num(x.sum())} {t['pairs']} " + f"{md:.2f}".replace(".", t["dec"])
+                       + f", {t['above']}: {num(x[top].sum())}")
+        if by_group:  # the tail of different sessions and different groups, in log scale
+            ins = ax2.inset_axes([.06, .28, .42, .32])
+            for x, col, ls in ((h[2], _P[2], "-"), (h[4], _P[4], "--")):
+                ins.stairs(np.maximum(x, .5), edges, color=col, lw=1, ls=ls)
+            ins.set_yscale("log")
+            ins.set_xlim(.85, 1)
+            ins.tick_params(labelsize=5)
+            ins.set_title(t["tail"], fontsize=5.5)
+        ax2.set_xlabel(t["x"], fontsize=7)
+        ax2.set_ylabel(t["y"], fontsize=7)
+        ax2.set_yticks([])
+        ax2.legend(fontsize=5.5, loc="upper left", bbox_to_anchor=(0, -.12), frameon=False)  # below: it covers the curves
+        ax2.set_title(t["all"] + f"{auc:.3f}".replace(".", t["dec"]), fontsize=7)
+        f.suptitle(t["sup"], fontsize=8)
+        if lang == "it":
+            save(f, INTERMEDIATE / "11_gruppi" / "somiglianze_gruppi" if by_group else out / "somiglianze_tutte", pdf=False)
+        if by_group:  # summary figure of the README (user, 23/10/2026)
+            save(f, ROOT / "docs" / "figure" / ("somiglianze" if lang == "it" else "similarity_en"))
+        plt.close(f)
+    print(f"AUC {auc:.4f}, coppie {', '.join(f'{x.sum():,.0f}' for x in h)}, mediane {[round(float(x), 3) for x in med]}")
 
 TILE = (256, 205, 16)  # thumbnail 640x512 -> 256x205, text strip on top
 
@@ -589,7 +605,8 @@ def _merges(f: Path) -> list[int]:
 
 def groups() -> None:
     """Step 11, groups -> `intermediate/11_gruppi/`. Union (union-find) of the known sessions of each source with the
-    pairs of `10_doppioni/unire.txt`: `gruppi.csv` (sessione, gruppo, frame). No frame deduplication between
+    pairs of `10_doppioni/unire.txt` and the duplicates confirmed below 0.95
+    (`taratura/` and `fascia_092/stessa_sessione.txt`): `gruppi.csv` (sessione, gruppo, frame). No frame deduplication between
     sessions (23/10/2026): the true duplicates (same boxes in the same place) are 17 pairs above 0.95."""
     out = INTERMEDIATE / "11_gruppi"
     out.mkdir(parents=True, exist_ok=True)
@@ -609,6 +626,13 @@ def groups() -> None:
     for k in _merges(dup / "unire.txt"):
         a, b = pairs[k]
         parent[find(a)] = find(b)
+    # duplicates confirmed by hand below 0.95 (user, 23/10/2026): tuning sample and full review of 0.92-0.95
+    for d in ("taratura", "fascia_092"):
+        if (dup / d / "stessa_sessione.txt").exists():
+            pairs = {int(r["n"]): (r["sessione_a"], r["sessione_b"]) for r in csv.DictReader(open(dup / d / "coppie.csv"))}
+            for k in _merges(dup / d / "stessa_sessione.txt"):
+                a, b = pairs[k]
+                parent[find(a)] = find(b)
     gid = {r: f"G{k:04d}" for k, r in enumerate(dict.fromkeys(find(s) for s in sess))}
     nf = Counter(keys)
     with open(out / "gruppi.csv", "w", newline="") as fh:
@@ -1291,6 +1315,45 @@ def _leakage_plot(out: Path, block: int = 2048, lang: str = "it", table: bool = 
 FIG = ROOT / "docs" / "figure"  # README figures, in Italian and English
 
 
+def _threshold_plot(dst: Path, lang: str = "it") -> None:
+    """Share of true duplicates per similarity band, judged by hand (user, 23/10/2026), with the 95% Wilson interval:
+    tuning sample (`taratura/`) and full review of 0.92-0.95 (`fascia_092/`); above 0.95 the 146 pairs of step 10,
+    all merged -> `soglia_taratura` (`_en`)."""
+    import matplotlib.pyplot as plt
+
+    from tools.plots import STYLE, WIDTH, _P, save
+
+    dup = INTERMEDIATE / "10_doppioni"
+    sim, same = [], []
+    for d in ("taratura", "fascia_092"):
+        yes = set(_merges(dup / d / "stessa_sessione.txt"))
+        for r in csv.DictReader(open(dup / d / "coppie.csv")):
+            sim.append(float(r["massimo"]))
+            same.append(int(r["n"]) in yes)
+    top = sum(1 for _ in csv.DictReader(open(dup / "coppie.csv")))
+    sim, same = np.array(sim + [2.0] * top), np.array(same + [True] * top)  # 2.0: the reviewed pairs of step 10
+    bands = [(0.85, 0.90), (0.90, 0.92), (0.92, 0.93), (0.93, 0.94), (0.94, 0.95), (1.5, 2.5)]
+    it = lang == "it"
+    plt.style.use(STYLE)
+    f, ax = plt.subplots(figsize=(WIDTH, WIDTH * 0.45))
+    for i, (lo, hi) in enumerate(bands):
+        m = (sim >= lo) & ((sim < hi) | ((hi == 0.95) & (sim <= 0.9504)))  # 0.950 rounded in coppie.csv
+        n, k = int(m.sum()), int(same[m].sum())
+        z = 1.96
+        c, h = (k + z * z / 2) / (n + z * z), z * np.sqrt(k * (n - k) / n + z * z / 4) / (n + z * z)
+        ax.bar(i, k / n, color=_P[0], width=.6)
+        ax.errorbar(i, c, yerr=h, color="k", lw=.8, capsize=3)
+        ax.text(i, c + h + .03, f"{k}/{n}", ha="center", fontsize=6)
+    lab = [f"{lo:.2f}–{hi:.2f}" if hi < 1 else "≥ 0.95" for lo, hi in bands]
+    ax.set_xticks(range(len(bands)), [x.replace(".", ",") for x in lab] if it else lab, fontsize=6)
+    ax.axvline(len(bands) - 1.5, color="k", ls="--", lw=.8)
+    ax.set_ylim(0, 1.15)
+    ax.set_ylabel("quota di doppioni" if it else "share of duplicates", fontsize=7)
+    ax.set_xlabel("somiglianza massima fra due sessioni (DINOv2)" if it else
+                  "maximum similarity between two sessions (DINOv2)", fontsize=7)
+    save(f, dst / ("soglia_taratura" if it else "threshold_tuning_en"))
+
+
 def figures() -> None:
     """Figures of the finished dataset for the README, in `docs/figure/`, in Italian and English (`distribuzione`,
     `distribution_en`, `leakage`, `leakage_en`): same functions as the export, but `data/output` (frozen) is only
@@ -1303,6 +1366,7 @@ def figures() -> None:
     for lang in ("it", "en"):
         _output_plot(rows, FIG, lang, src_names=OUT_NAMES, table=False)
         _leakage_plot(FIG, lang=lang, table=False)
+        _threshold_plot(FIG, lang)
     print(f"figure -> {FIG}")
 
 

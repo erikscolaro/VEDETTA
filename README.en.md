@@ -11,7 +11,7 @@ has been **frozen** since October 23, 2026: it is not regenerated or modified.
 |---|---|
 | classes | `0 drone`, `1 airplane`, `2 helicopter`, `3 bird` |
 | images | 640×512, never upscaled |
-| splits | train 30,579, val 9,013, test 5,165, plus 512 int8 calibration images |
+| splits | train 29,772, val 9,763, test 5,367, plus 512 int8 calibration images |
 | instances per class | ≥ 10,000 in train, ≥ 2,000 in val, ≥ 1,000 in test |
 | object size | √(w·h) from 8 to over 256 px, with extra examples where the object is small |
 
@@ -38,17 +38,17 @@ data/output/
 
 | split | images | real | mosaics | background |
 |---|---|---|---|---|
-| train | 30,579 | 26,580 | 949 | 3,050 |
-| val | 9,013 | 8,113 | 0 | 900 |
-| test | 5,165 | 4,649 | 0 | 516 |
+| train | 29,772 | 25,783 | 939 | 3,050 |
+| val | 9,763 | 8,863 | 0 | 900 |
+| test | 5,367 | 4,851 | 0 | 516 |
 | calib | 512 | 461 | 0 | 51 |
 
 | class | train | of which from mosaics | val | test |
 |---|---|---|---|---|
-| drone | 11,304 | 475 | 3,077 | 1,419 |
-| airplane | 12,128 | 4,334 | 2,275 | 1,367 |
-| helicopter | 12,423 | 5,169 | 2,173 | 1,372 |
-| bird | 11,142 | 3,223 | 2,248 | 1,246 |
+| drone | 11,349 | 478 | 3,070 | 1,419 |
+| airplane | 12,211 | 4,415 | 2,300 | 1,362 |
+| helicopter | 12,687 | 5,437 | 2,183 | 1,378 |
+| bird | 11,178 | 3,224 | 2,255 | 1,232 |
 
 File names give the image type:
 - `R_<gruppo>_<clip>_<n>`: **real** image;
@@ -71,9 +71,9 @@ Instances by size and class:
 - **black**: the targets.
 
 Error of each split relative to its target, per half octave (tables in `data/output/distribuzione.md`):
-- **Train**: follows the target within 5–10%.
-- **Test**: follows the target within 7–16%.
-- **Val**: falls below the curve on small objects for airplanes, helicopters and birds (error 35–37%), because real data
+- **Train**: follows the target within 6–9%.
+- **Test**: follows the target within 5–18%.
+- **Val**: falls below the curve on small objects for airplanes, helicopters and birds (error 36–40%), because real data
   is insufficient there and no synthetic images are used in val.
 
 ### Leakage between splits
@@ -82,26 +82,39 @@ Error of each split relative to its target, per half octave (tables in `data/out
 
 For each val and test image, the DINOv2 similarity to the most similar train image. The comparison uses two references
 taken within train:
-- **same group, different clip**: what a true leakage looks like, median 0.954;
-- **different groups**: the baseline, since sky always resembles sky; median 0.819.
+- **same group, different clip**: what a true leakage looks like, median 0.950;
+- **different groups**: the baseline, since sky always resembles sky; median 0.811.
 
-Val (median 0.820) and test (0.818) match the baseline. No val or test image exceeds 0.95.
+Val (median 0.812) and test (0.807) match the baseline. No val or test image exceeds 0.95.
 
-### The 0.95 threshold
+### Similarity between recordings
+
+![similarity](docs/figure/similarity_en.png)
+
+DINOv2 similarity over all pairs of annotated frames: on the left the mean over blocks of consecutive frames, in
+source and session order; on the right the distribution per pair type. DINOv2 separates the same session from
+different sessions well (AUC close to 0.99), and after the merges no frame pair above 0.95 is left between
+different groups.
+
+### The duplicate threshold
+
+![tuning](docs/figure/threshold_tuning_en.png)
+
+Pairs of very similar, different sessions were reviewed by hand **[operator]**. A duplicate means the same recording
+(same moment, same light and sky) or the same footage published twice; the same place on another day is not one.
+- **Above 0.95:** all 146 pairs, all duplicates.
+- **Between 0.92 and 0.95:** all 336 pairs, 92 duplicates (from 17% to 40% going up).
+- **Below 0.92:** a sample of 78 pairs, 1 duplicate.
+
+All confirmed duplicates are merged into the same group. They are the same recordings, so they are not deleted: they
+end up in the same split. Below 0.92 only the same place at different times remains, i.e. the accepted background
+leakage.
 
 ![threshold](docs/figure/soglia_en.png)
 
-Frame pairs from different sessions by cosine-similarity bin (DINOv2), three per bin, chosen at random; at the bottom,
-pairs from the same clip as a reference.
-- Above 0.95 they are the same scene: same place, same camera, often the same footage. The 146 session pairs above the
-  threshold were reviewed by hand and all merged into the same group.
-- Already between 0.90 and 0.95 the same place and camera appear on different days: this is background leakage,
-  accepted.
-- Two frames of the same clip can drop to 0.65 when the object changes a lot: low similarity does not prove that two
-  recordings are different.
-
-The panel therefore justifies 0.95 as the threshold for **duplicates** (same recording), not as the boundary between
-identical and different recordings. The proof that the splits are separate is the leakage figure.
+Example frame pairs from different sessions per similarity band, three per band, picked at random; at the bottom
+same-clip pairs as reference. Two frames of the same clip can drop to 0.65 when the object changes a lot: a low
+similarity does not prove that two recordings are different.
 
 ### Stated limitations
 
@@ -159,7 +172,7 @@ Set before touching the data and updated with the decisions made during construc
 
 **Split by group**
 - The unit is the **recording session**, i.e. same place and same conditions. Sessions that resemble each other
-  (DINOv2 ≥ 0.95, manually reviewed) become a **group**.
+  (duplicates confirmed by hand among the pairs with DINOv2 ≥ 0.92) become a **group**.
 - A group lies entirely in one split: the same recording is never in two splits.
 - Proportions about 70/20/10. The assignment minimizes the distance from the targets, with at least 2,000 instances per
   class in val and 1,000 in test.
@@ -304,8 +317,12 @@ The operations performed, in order. Each step has its own folder and reads only 
 **On all sources**, in `data/intermediate/`:
 
 8. `9_split`: table of the 58,960 annotated frames (71,423 boxes) and DINOv2 ViT-S/14 embedding of every frame.
-9. `10_doppioni`: session pairs with similarity ≥ 0.95, reviewed on the sheets **[operator]**: 146 pairs, all merged.
-10. `11_gruppi`: known sessions + duplicates → **1,010 groups**.
+9. `10_doppioni`: duplicates between sessions, reviewed on the sheets **[operator]**.
+   - Above 0.95: 146 pairs, all duplicates (`unire.txt`).
+   - Tuning: a sample of 160 pairs between 0.85 and 0.95 (`taratura/`); duplicates only from 0.92 up.
+   - Full review of the other 254 pairs between 0.92 and 0.95 (`fascia_092/`).
+   - 93 duplicates below 0.95 in total, almost all FBD (fixed cameras).
+10. `11_gruppi`: known sessions + duplicates → **949 groups**.
 11. `12_split`: groups into train, val and test.
     - First, images with boxes under 8 px are removed.
     - 1,000 random orderings in parallel, the best is kept.
@@ -425,6 +442,10 @@ python tools/split.py --step somiglianze         # plot on a sample
 python tools/split.py --step somiglianze_tutte   # plot on all frames
 python tools/split.py --step anteprima [--fasce 0.95 0.99 1.01]  # pairs from different sessions per bin
 python tools/split.py --step doppioni            # pairs >= 0.95 to review -> 10_doppioni  [operator: unire.txt]
+python tools/split.py --step taratura            # sample per band 0.85-0.95 -> 10_doppioni/taratura  [operator: stessa_sessione.txt]
+python tools/split.py --step esito_taratura      # sheets colored with the operators' judgments
+python tools/split.py --step stima_soglia        # share of duplicates per band -> taratura/stima.csv
+python tools/split.py --step revisione_fascia    # all unjudged pairs 0.92-0.95 -> 10_doppioni/fascia_092  [operator]
 python tools/split.py --step gruppi              # -> 11_gruppi/gruppi.csv
 python tools/split.py --step somiglianze_gruppi  # plot with the group curves
 python tools/split.py --step split               # groups into train, val, test -> 12_split (20 processes)

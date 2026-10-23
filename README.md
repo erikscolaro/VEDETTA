@@ -11,7 +11,7 @@ ripresa e bilanciato per grandezza dell'oggetto. Il dataset finale è in `data/o
 |---|---|
 | classi | `0 drone`, `1 airplane`, `2 helicopter`, `3 bird` |
 | immagini | 640×512, mai ingrandite |
-| split | train 30.579, val 9.013, test 5.165, più 512 immagini di calibrazione int8 |
+| split | train 29.772, val 9.763, test 5.367, più 512 immagini di calibrazione int8 |
 | istanze per classe | ≥ 10.000 in train, ≥ 2.000 in val, ≥ 1.000 in test |
 | grandezza degli oggetti | √(w·h) da 8 a oltre 256 px, più esempi dove l'oggetto è piccolo |
 
@@ -38,17 +38,17 @@ data/output/
 
 | split | immagini | reali | mosaici | background |
 |---|---|---|---|---|
-| train | 30.579 | 26.580 | 949 | 3.050 |
-| val | 9.013 | 8.113 | 0 | 900 |
-| test | 5.165 | 4.649 | 0 | 516 |
+| train | 29.772 | 25.783 | 939 | 3.050 |
+| val | 9.763 | 8.863 | 0 | 900 |
+| test | 5.367 | 4.851 | 0 | 516 |
 | calib | 512 | 461 | 0 | 51 |
 
 | classe | train | di cui da mosaici | val | test |
 |---|---|---|---|---|
-| drone | 11.304 | 475 | 3.077 | 1.419 |
-| airplane | 12.128 | 4.334 | 2.275 | 1.367 |
-| helicopter | 12.423 | 5.169 | 2.173 | 1.372 |
-| bird | 11.142 | 3.223 | 2.248 | 1.246 |
+| drone | 11.349 | 478 | 3.070 | 1.419 |
+| airplane | 12.211 | 4.415 | 2.300 | 1.362 |
+| helicopter | 12.687 | 5.437 | 2.183 | 1.378 |
+| bird | 11.178 | 3.224 | 2.255 | 1.232 |
 
 I nomi dei file dicono il tipo di immagine:
 - `R_<gruppo>_<clip>_<n>`: immagine **reale**;
@@ -71,9 +71,9 @@ Istanze per grandezza e classe:
 - **nero**: gli obiettivi.
 
 Errore di ogni split rispetto al suo obiettivo, per mezza ottava (tabelle in `data/output/distribuzione.md`):
-- **Train**: segue l'obiettivo entro il 5–10%.
-- **Test**: segue l'obiettivo entro il 7–16%.
-- **Val**: è sotto la curva sugli oggetti piccoli di aerei, elicotteri e uccelli (errore 35–37%), perché lì i dati
+- **Train**: segue l'obiettivo entro il 6–9%.
+- **Test**: segue l'obiettivo entro il 5–18%.
+- **Val**: è sotto la curva sugli oggetti piccoli di aerei, elicotteri e uccelli (errore 36–40%), perché lì i dati
   reali non bastano e in val non si usano immagini sintetiche.
 
 ### Leakage fra gli split
@@ -82,26 +82,39 @@ Errore di ogni split rispetto al suo obiettivo, per mezza ottava (tabelle in `da
 
 Per ogni immagine di val e test, la somiglianza DINOv2 con l'immagine più simile del train. Il confronto è con due
 riferimenti presi dentro il train:
-- **stesso gruppo e altra clip**: com'è fatto un leakage vero, mediana 0,954;
-- **gruppi diversi**: il fondo, perché il cielo somiglia sempre al cielo; mediana 0,819.
+- **stesso gruppo e altra clip**: com'è fatto un leakage vero, mediana 0,950;
+- **gruppi diversi**: il fondo, perché il cielo somiglia sempre al cielo; mediana 0,811.
 
-Val (mediana 0,820) e test (0,818) coincidono con il fondo. Nessuna immagine di val o test supera 0,95.
+Val (mediana 0,812) e test (0,807) coincidono con il fondo. Nessuna immagine di val o test supera 0,95.
 
-### La soglia 0,95
+### Somiglianza fra riprese
+
+![somiglianze](docs/figure/somiglianze.png)
+
+Somiglianza DINOv2 fra tutte le coppie di frame annotati: a sinistra la media per blocchi di frame consecutivi, in
+ordine di fonte e sessione; a destra la distribuzione per tipo di coppia. DINOv2 separa bene la stessa sessione dalle
+sessioni diverse (AUC vicina a 0,99), e dopo le unioni fra gruppi diversi non resta nessuna coppia di frame sopra
+0,95.
+
+### La soglia dei doppioni
+
+![taratura](docs/figure/soglia_taratura.png)
+
+Le coppie di sessioni diverse molto simili sono state riviste a mano **[operatore]**. Doppione vuol dire stessa
+ripresa (stesso momento, stessa luce e cielo) o stesso girato pubblicato due volte; lo stesso posto in un altro giorno
+non lo è.
+- **Sopra 0,95:** tutte le 146 coppie, tutte doppioni.
+- **Fra 0,92 e 0,95:** tutte le 336 coppie, 92 doppioni (dal 17% al 40% salendo).
+- **Sotto 0,92:** un campione di 78 coppie, 1 doppione.
+
+Tutti i doppioni confermati sono uniti nello stesso gruppo. Sono le stesse riprese, quindi non si cancellano: finiscono
+nello stesso split. Sotto 0,92 resta solo lo stesso posto in momenti diversi, cioè il leakage dello sfondo accettato.
 
 ![soglia](docs/figure/soglia.png)
 
-Coppie di frame di sessioni diverse per fascia di somiglianza coseno DINOv2, tre per fascia, scelte a caso; in fondo
-coppie della stessa clip come riferimento.
-- Sopra 0,95 sono la stessa scena: stesso posto, stessa camera, spesso lo stesso girato. Le 146 coppie di sessioni
-  sopra soglia sono state riviste a mano e tutte unite nello stesso gruppo.
-- Già fra 0,90 e 0,95 compaiono lo stesso posto e la stessa camera in giorni diversi: è il leakage dello sfondo,
-  accettato.
-- Due frame della stessa clip possono scendere a 0,65 quando l'oggetto cambia molto: una somiglianza bassa non
-  dimostra che due riprese siano diverse.
-
-Il pannello quindi giustifica 0,95 come soglia dei **doppioni** (stessa ripresa), non come confine fra riprese uguali e
-diverse. La prova che gli split sono separati è la figura del leakage.
+Esempi di coppie di frame di sessioni diverse per fascia di somiglianza, tre per fascia, scelte a caso; in fondo
+coppie della stessa clip come riferimento. Due frame della stessa clip possono scendere a 0,65 quando l'oggetto cambia
+molto: una somiglianza bassa non dimostra che due riprese siano diverse.
 
 ### Limiti dichiarati
 
@@ -160,7 +173,7 @@ Fissate prima di toccare i dati e aggiornate con le decisioni prese durante la c
 
 **Split per gruppo**
 - L'unità è la **sessione di ripresa**, cioè stesso posto e stesse condizioni. Le sessioni che si somigliano
-  (DINOv2 ≥ 0,95, riviste a mano) diventano un **gruppo**.
+  (doppioni confermati a mano fra le coppie con DINOv2 ≥ 0,92) diventano un **gruppo**.
 - Un gruppo sta tutto in uno split: la stessa ripresa non è mai in due split.
 - Proporzioni circa 70/20/10. L'assegnazione minimizza la distanza dagli obiettivi, con almeno 2.000 istanze per
   classe in val e 1.000 in test.
@@ -305,9 +318,12 @@ Le operazioni fatte, in ordine. Ogni passo ha la sua cartella e legge solo quell
 **Su tutte le fonti**, in `data/intermediate/`:
 
 8. `9_split`: tabella dei 58.960 frame annotati (71.423 box) ed embedding DINOv2 ViT-S/14 di ogni frame.
-9. `10_doppioni`: coppie di sessioni con somiglianza ≥ 0,95, riviste sui fogli **[operatore]**: 146 coppie, tutte
-   unite.
-10. `11_gruppi`: sessioni note + doppioni → **1.010 gruppi**.
+9. `10_doppioni`: doppioni fra sessioni, rivisti sui fogli **[operatore]**.
+   - Sopra 0,95: 146 coppie, tutte doppioni (`unire.txt`).
+   - Taratura: 160 coppie a campione fra 0,85 e 0,95 (`taratura/`); doppioni solo da 0,92 in su.
+   - Revisione completa delle altre 254 coppie fra 0,92 e 0,95 (`fascia_092/`).
+   - In tutto 93 doppioni sotto 0,95, quasi tutti FBD (camere fisse).
+10. `11_gruppi`: sessioni note + doppioni → **949 gruppi**.
 11. `12_split`: gruppi in train, val e test.
     - Prima si tolgono le immagini con box sotto gli 8 px.
     - 1.000 ordini casuali in parallelo, si tiene il migliore.
@@ -428,6 +444,10 @@ python tools/split.py --step somiglianze         # grafico su un campione
 python tools/split.py --step somiglianze_tutte   # grafico su tutti i frame
 python tools/split.py --step anteprima [--fasce 0.95 0.99 1.01]  # coppie di sessioni diverse per fascia
 python tools/split.py --step doppioni            # coppie >= 0,95 da rivedere -> 10_doppioni  [operatore: unire.txt]
+python tools/split.py --step taratura            # campione per fascia 0,85-0,95 -> 10_doppioni/taratura  [operatore: stessa_sessione.txt]
+python tools/split.py --step esito_taratura      # fogli colorati con i giudizi degli operatori
+python tools/split.py --step stima_soglia        # quota di doppioni per fascia -> taratura/stima.csv
+python tools/split.py --step revisione_fascia    # tutte le coppie 0,92-0,95 non giudicate -> 10_doppioni/fascia_092  [operatore]
 python tools/split.py --step gruppi              # -> 11_gruppi/gruppi.csv
 python tools/split.py --step somiglianze_gruppi  # grafico con le curve dei gruppi
 python tools/split.py --step split               # gruppi in train, val, test -> 12_split (20 processi)
