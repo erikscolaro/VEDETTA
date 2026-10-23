@@ -483,7 +483,7 @@ def duplicate_sheets(thr: float = 0.95, per_sheet: int = 12, seed: int = 0) -> N
           + f"), {-(-len(order) // per_sheet)} fogli -> {dst}")
 
 
-TARATURA = (0.90, 0.92, 0.94, 0.95)  # fasce del massimo per coppia di sessioni, sotto la soglia dei doppioni
+TARATURA = (0.85, 0.90, 0.92, 0.94, 0.95)  # fasce del massimo per coppia di sessioni, sotto la soglia dei doppioni
 
 
 def threshold_sheets(per: int = 40, seed: int = 0) -> None:
