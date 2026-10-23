@@ -506,6 +506,37 @@ def threshold_sheets(per: int = 40, seed: int = 0) -> None:
     print(f"{len(order)} coppie, {-(-len(order) // 12)} fogli -> {dst}; risposte in stessa_sessione.txt")
 
 
+def threshold_marks(per_sheet: int = 12) -> None:
+    """Giudizi degli operatori sui fogli di taratura, a colpo d'occhio (utente, 23/10/2026): legge
+    `taratura/giudizi_*.txt` (righe `N S|D[?] motivo`) e ridisegna i fogli in `taratura/fogli_esito/` con un riquadro
+    per coppia: verde = stessa sessione, rosso = diversa, arancio = incerto (`?`), con la lettera nell'intestazione."""
+    import cv2
+
+    dst = INTERMEDIATE / "10_doppioni" / "taratura"
+    vote = {}
+    for f in sorted(dst.glob("giudizi_*.txt")):
+        for ln in f.read_text().splitlines():
+            t = ln.split()
+            if len(t) >= 2 and t[0].isdigit():
+                vote[int(t[0])] = t[1]
+    W, H, TH = TILE
+    step = 26 + TH + H + 10  # intestazione, striscia di testo, miniatura, spazio (come `_pair_sheets`)
+    (dst / "fogli_esito").mkdir(exist_ok=True)
+    n = Counter()
+    for f in sorted((dst / "fogli").glob("T*.jpg")):
+        im = cv2.imread(str(f))
+        first = (int(f.stem[1:]) - 1) * per_sheet + 1
+        for k in range(im.shape[0] // step):
+            v = vote.get(first + k, "")
+            col = (0, 165, 255) if "?" in v else (0, 170, 0) if v.startswith("S") else (0, 0, 230) if v else (128, 128, 128)
+            n["?" if "?" in v else v[:1] or "-"] += 1
+            y = k * step
+            cv2.rectangle(im, (2, y + 2), (im.shape[1] - 3, y + step - 9), col, 5)
+            cv2.putText(im, v or "-", (im.shape[1] - 70, y + 20), cv2.FONT_HERSHEY_SIMPLEX, .7, col, 2, cv2.LINE_AA)
+        cv2.imwrite(str(dst / "fogli_esito" / f.name), im, [cv2.IMWRITE_JPEG_QUALITY, 88])
+    print(f"esito: stessa {n['S']}, diversa {n['D']}, incerte {n['?']}, senza giudizio {n['-']} -> {dst / 'fogli_esito'}")
+
+
 def threshold_estimate() -> None:
     """Quota di coppie "stessa sessione" per fascia dalla revisione di `threshold_sheets`, con l'intervallo di
     Wilson al 95% -> `10_doppioni/taratura/stima.csv`. Sopra 0,95 la quota e' 1 (146 coppie su 146, tutte unite)."""
@@ -1431,7 +1462,7 @@ def export() -> None:
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--fasce", type=float, nargs="+", default=[0.6, 0.7, 0.8, 0.9, 1.01], help="anteprima: soglie")
-    p.add_argument("--step", choices=["frame", "embedding", "somiglianze", "somiglianze_tutte", "anteprima", "doppioni", "gruppi", "somiglianze_gruppi", "split", "controllo", "mosaici", "calib", "export", "figure", "soglia", "taratura", "stima_soglia"], required=True)
+    p.add_argument("--step", choices=["frame", "embedding", "somiglianze", "somiglianze_tutte", "anteprima", "doppioni", "gruppi", "somiglianze_gruppi", "split", "controllo", "mosaici", "calib", "export", "figure", "soglia", "taratura", "esito_taratura", "stima_soglia"], required=True)
     a = p.parse_args(argv)
     if a.step == "frame":
         frame_table()
@@ -1447,6 +1478,8 @@ def main(argv=None) -> int:
         duplicate_sheets()
     elif a.step == "taratura":
         threshold_sheets()
+    elif a.step == "esito_taratura":
+        threshold_marks()
     elif a.step == "stima_soglia":
         threshold_estimate()
     elif a.step == "gruppi":
