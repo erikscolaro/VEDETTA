@@ -545,7 +545,7 @@ def threshold_estimate() -> None:
     rows = list(csv.DictReader(open(dst / "coppie.csv")))
     out = []
     for lo, hi in zip(TARATURA, TARATURA[1:]):
-        rs = [r for r in rows if lo <= float(r["massimo"]) < hi]
+        rs = [r for r in rows if lo <= float(r["massimo"]) < hi or hi == TARATURA[-1] == float(r["massimo"])]  # 0,950 arrotondato
         n, k = len(rs), sum(int(r["n"]) in same for r in rs)
         z = 1.96
         c, h = (k + z * z / 2) / (n + z * z), z * np.sqrt(k * (n - k) / n + z * z / 4) / (n + z * z)
