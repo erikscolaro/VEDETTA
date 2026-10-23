@@ -7,7 +7,7 @@ come linea continua e lo stesso asse verticale nei 4 grafici:
 - distribuzioni.png: istogramma per classe con le istanze per fascia (rosso: sotto il minimo per cella);
 - distribuzioni_scale.png: la stessa con lo scale di Ultralytics (s = 0,25 e 0,5) calcolato in modo esatto.
 
-    python tools/distribuzioni.py
+    python tools/distributions.py
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.plots import _P, STYLE, WIDTH, save  # noqa: E402
-from tools.svanstrom import NAMES  # noqa: E402
+from tools.common import NAMES  # noqa: E402
 
 DATA, OUT = ROOT / "data", ROOT / "docs" / "figure"
 W, H = 640, 512
@@ -30,15 +30,15 @@ MIN = 8  # box sotto gli 8 px in origine esclusi (utente, 22/10/2026)
 TARGET = round(2000 / 0.7)  # minimo per cella (regole.md)
 EDGES = [8, 16, 32, 64, 96]
 BANDS = [(8, 16), (16, 32), (32, 64), (64, 96), (96, 1e9)]
-CLASSI = ["airplane", "bird", "drone", "helicopter"]
+CLASSES = ["airplane", "bird", "drone", "helicopter"]
 # distribuzione ideale: densita' in log s proporzionale a s^-alpha su [SMIN, SMAX] (docs/distribuzioni.md)
 ALPHA = dict.fromkeys(["airplane", "bird", "drone", "helicopter"], 0.3)  # stessa curva per tutte (utente, 23/10/2026)
 SMIN, SMAX = 8, 320
-TOTALE = round(10_000 / 0.7)  # box per classe della curva ideale: 10.000 nel train, split 70/20/10 (regole.md)
+TOTAL = round(10_000 / 0.7)  # box per classe della curva ideale: 10.000 nel train, split 70/20/10 (regole.md)
 # curva alzata (utente, 23/10/2026): almeno 10.000 istanze per classe nel train, 2.000 in val, 1.000 in test; la stessa
 # curva traslata in alto fa da tetto (sopra) e da obiettivo dei mosaici (sotto), cosi' la forma resta s^-alpha
-SCALA = dict.fromkeys(["airplane", "bird", "drone", "helicopter"], 1.2)
-TOT = {c: TOTALE * k for c, k in SCALA.items()}
+SCALE = dict.fromkeys(["airplane", "bird", "drone", "helicopter"], 1.2)
+TOT = {c: TOTAL * k for c, k in SCALE.items()}
 # fine della curva per classe (utente, 23/10/2026): gli uccelli sopra i 96 px sono troppo pochi, stanno solo nel train
 # e la loro curva si ferma a 96
 CUT = {"airplane": SMAX, "bird": 96, "drone": SMAX, "helicopter": SMAX}
@@ -76,10 +76,10 @@ def sizes() -> dict[str, np.ndarray]:
                 t = man / t.name if man.exists() else src / "5_box" / "preselezione" / d.name / t.name
                 if t.exists():
                     add(t)
-    return {c: np.array([v for v in out[c] if v >= MIN]) for c in CLASSI}
+    return {c: np.array([v for v in out[c] if v >= MIN]) for c in CLASSES}
 
 
-def attese(x: np.ndarray, s: float, edges) -> np.ndarray:
+def expected(x: np.ndarray, s: float, edges) -> np.ndarray:
     """Istanze attese per intervallo con lo scale di Ultralytics: un box di grandezza x diventa uniforme
     in [x(1-s), x(1+s)], quindi P(intervallo) = sovrapposizione / (2 s x). Esatto, senza campionamento."""
     edges = np.asarray(edges, float)
@@ -90,27 +90,27 @@ def attese(x: np.ndarray, s: float, edges) -> np.ndarray:
     return (ov / (hi - lo)).sum(0)
 
 
-def ideale(n: int, alpha: float, edges, smax: float = SMAX) -> np.ndarray:
+def ideal(n: int, alpha: float, edges, smax: float = SMAX) -> np.ndarray:
     """Istanze per intervallo con densita' in log s proporzionale a s^-alpha su [SMIN, smax], totale n."""
     e = np.clip(np.asarray(edges, float), SMIN, smax)
     F = lambda v: -v ** -alpha / alpha  # noqa: E731  primitiva di s^-alpha d(ln s)
     return n * (F(e[1:]) - F(e[:-1])) / (F(smax) - F(SMIN))
 
 
-def uniforme(n: float, edges, smax: float = SMAX) -> np.ndarray:
+def uniform(n: float, edges, smax: float = SMAX) -> np.ndarray:
     """Istanze per intervallo con densita' costante in log s su [SMIN, smax], totale n (obiettivo del test)."""
     e = np.log(np.clip(np.asarray(edges, float), SMIN, smax))
     return n * np.diff(e) / np.log(smax / SMIN)
 
 
-def curva(n: int, alpha: float, smax: float = SMAX) -> tuple[np.ndarray, np.ndarray]:
+def curve(n: int, alpha: float, smax: float = SMAX) -> tuple[np.ndarray, np.ndarray]:
     """La distribuzione ideale come linea continua (s, istanze attese per intervallo di BINS), totale n."""
     s = np.geomspace(SMIN, smax, 400)
     dlog = np.log(BINS[1] / BINS[0])  # BINS a passo costante in log
     return s, n * s ** -alpha * dlog * alpha / (SMIN ** -alpha - smax ** -alpha)
 
 
-def _assi(ax, c: str, n: int) -> None:
+def _axes(ax, c: str, n: int) -> None:
     from matplotlib.ticker import NullLocator
 
     ax.axvspan(2, 8, color="0.92", zorder=0)
@@ -123,23 +123,23 @@ def _assi(ax, c: str, n: int) -> None:
     ax.set_title(f"{c} ({n:,} box)".replace(",", "."), fontsize=8)
 
 
-def fig_attuale(size: dict, plt) -> Path:
+def fig_current(size: dict, plt) -> Path:
     f, axs = plt.subplots(2, 2, figsize=(WIDTH, WIDTH * 0.72), sharex=True, sharey=True)
-    hs = {c: attese(size[c], 0, BINS) for c in CLASSI}
-    top = max(max(hs[c].max(), curva(TOT[c], ALPHA[c], CUT[c])[1].max()) for c in CLASSI) * 1.3  # stesso asse per le 4
-    for ax, c in zip(axs.flat, CLASSI):
+    hs = {c: expected(size[c], 0, BINS) for c in CLASSES}
+    top = max(max(hs[c].max(), curve(TOT[c], ALPHA[c], CUT[c])[1].max()) for c in CLASSES) * 1.3  # stesso asse per le 4
+    for ax, c in zip(axs.flat, CLASSES):
         x = size[c]
         ax.bar(BINS[:-1], hs[c], width=np.diff(BINS), align="edge", color=_P[0], alpha=.85, lw=0)
         for e in EDGES[:-1]:  # senza la linea a 96 px: l'asse va in potenze di 2 (utente)
             ax.axvline(e, color="0.55", lw=.6, ls="--")
-        ax.plot(*curva(TOT[c], ALPHA[c], CUT[c]), color="k", lw=.8)
+        ax.plot(*curve(TOT[c], ALPHA[c], CUT[c]), color="k", lw=.8)
         for j, (a, b) in enumerate(BANDS):
             n = int(((x >= a) & (x < b)).sum())
             ax.text(np.sqrt(a * min(b, 300)), top * (.97 if j % 2 == 0 else .87), f"{n:,}".replace(",", "."),
                     ha="center", va="top", fontsize=6.5, color=_P[7] if n < TARGET else "0.2",
                     weight="bold" if n < TARGET else "normal")
         ax.set_ylim(0, top)
-        _assi(ax, c, len(x))
+        _axes(ax, c, len(x))
     for ax in axs[1]:
         ax.set_xlabel(r"grandezza $\sqrt{w\,h}$ (px)")
     for ax in axs[:, 0]:
@@ -154,19 +154,19 @@ def fig_scale(size: dict, plt) -> Path:
     f, axs = plt.subplots(2, 2, figsize=(WIDTH, WIDTH * 0.78), sharex=True, sharey=True)
     curve = [(0, _P[0], "senza scale"), (.25, _P[1], "scale 0,25 (×0,75–1,25)"), (.5, _P[2], "scale 0,5 (×0,5–1,5)")]
     ymax = 0
-    for ax, c in zip(axs.flat, CLASSI):
+    for ax, c in zip(axs.flat, CLASSES):
         x = size[c]
         for s, col, lab in curve:
-            h = attese(x, s, BINS)
+            h = expected(x, s, BINS)
             ax.stairs(h, BINS, color=col, lw=1.2, label=lab, fill=s == 0, alpha=.35 if s == 0 else 1)
             ymax = max(ymax, h.max())
-        sc, hi = curva(TOT[c], ALPHA[c], CUT[c])
+        sc, hi = curve(TOT[c], ALPHA[c], CUT[c])
         ax.plot(sc, hi, color="k", lw=.8, label="ideale (alzata per classe)")
         ymax = max(ymax, hi.max())
-        ax.text(.98, .95, f"ideale ∝ $s^{{-{ALPHA[c]:g}}}$, ×{SCALA[c]:g}", transform=ax.transAxes, ha="right", va="top", fontsize=6.5)
+        ax.text(.98, .95, f"ideale ∝ $s^{{-{ALPHA[c]:g}}}$, ×{SCALE[c]:g}", transform=ax.transAxes, ha="right", va="top", fontsize=6.5)
         for e in EDGES[:-1]:
             ax.axvline(e, color="0.8", lw=.5)
-        _assi(ax, c, len(x))
+        _axes(ax, c, len(x))
     axs[0, 0].set_ylim(0, ymax * 1.1)  # sharey: stesso asse per le 4
     for ax in axs[1]:
         ax.set_xlabel(r"grandezza $\sqrt{w\,h}$ (px)")
@@ -186,16 +186,16 @@ def main() -> int:
     import matplotlib.pyplot as plt
 
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    a = p.parse_args()
+    p.parse_args()
     plt.style.use(STYLE)
     size = sizes()
-    print(fig_attuale(size, plt))
+    print(fig_current(size, plt))
     print(fig_scale(size, plt))
-    print("ideale droni per fascia:" + "".join(f"{round(v):>8}" for v in ideale(TOT["drone"], ALPHA["drone"], [8, 16, 32, 64, 96, 1e6])))
+    print("ideale droni per fascia:" + "".join(f"{round(v):>8}" for v in ideal(TOT["drone"], ALPHA["drone"], [8, 16, 32, 64, 96, 1e6])))
     print(f"{'':<11}{'s':>5}" + "".join(f"{a:>8}" for a in ["<8", "8-16", "16-32", "32-64", "64-96", ">96"]))
-    for c in CLASSI:
+    for c in CLASSES:
         for s in (0, .25, .5):
-            n = attese(size[c], s, [0, 8, 16, 32, 64, 96, 1e6])
+            n = expected(size[c], s, [0, 8, 16, 32, 64, 96, 1e6])
             print(f"{c:<11}{s:>5}" + "".join(f"{round(v):>8}" for v in n))
     return 0
 

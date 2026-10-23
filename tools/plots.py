@@ -20,13 +20,9 @@ STYLE = Path(__file__).with_name("thesis.mplstyle")
 
 #: \textwidth di una tesi A4 (15 cm); mezza larghezza per figure affiancate
 WIDTH = 15 / 2.54
-HALF = WIDTH / 2 - 0.1
-
 # slot della palette in thesis.mplstyle
 _P = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100",
       "#e87ba4", "#008300", "#4a3aa7", "#e34948"]
-GRAY = "#9e9e9e"  # riferimenti, target, "altro"
-
 COLORS = {
     # split
     "train": _P[0], "val": _P[1], "test": _P[2], "calib": _P[3],

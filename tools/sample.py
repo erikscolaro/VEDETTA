@@ -1,8 +1,8 @@
 """Campioni di ritagli per stimare la qualita' dei box prima di CVAT.
 
-    python tools/campione.py --step fogli --nome revisione --fonti dvids:70 fred:20 fbd_sv:18 anti_uav:12 --seed 0
-    python tools/campione.py --step fogli --nome qualita --fonti fbd_sv:48 anti_uav:48 --seed 1 --zoom --senza-esclusi
-    python tools/campione.py --step stima --nome revisione
+    python tools/sample.py --step fogli --nome revisione --fonti dvids:70 fred:20 fbd_sv:18 anti_uav:12 --seed 0
+    python tools/sample.py --step fogli --nome qualita --fonti fbd_sv:48 anti_uav:48 --seed 1 --zoom --senza-esclusi
+    python tools/sample.py --step stima --nome revisione
 
 `fogli`: ritagli a caso (seed fisso) di `data/<fonte>/4_ritagli/` con le box di
 `5_box/preselezione/` (o `proposte/`) disegnate, numerati, in
@@ -29,7 +29,7 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-import tools.fred as fred  # noqa: E402
+from tools import pipeline  # noqa: E402
 
 DATA = ROOT / "data"
 COL = {0: (0, 165, 255), 1: (255, 0, 255), 2: (0, 0, 255), 3: (255, 255, 0)}
@@ -44,10 +44,10 @@ def sheets(nome: str, fonti: dict[str, int], seed: int, zoom: bool, senza_esclus
     rng = random.Random(seed)
     rows, tiles = [], []
     for src, n in fonti.items():
-        ex = fred.excluded(DATA / src) if senza_esclusi else set()
+        ex = pipeline.excluded(DATA / src) if senza_esclusi else set()
         imgs = [p for p in sorted((DATA / src / "4_ritagli").glob("*/images/*.jpg")) if p.stem not in ex]
         for p in rng.sample(imgs, n):
-            lab = fred.boxes(DATA / src) / p.parent.parent.name / f"{p.stem}.txt"
+            lab = pipeline.boxes(DATA / src) / p.parent.parent.name / f"{p.stem}.txt"
             im = cv2.imread(str(p))
             raw = im.copy()
             bs = [(int(c), *map(float, r)) for c, *r in (ln.split() for ln in lab.read_text().splitlines())] if lab.exists() else []
@@ -90,7 +90,7 @@ def estimate(nome: str) -> None:
         n = sum(v == src for v in idx.values())
         fix = [g[k] for k, v in idx.items() if v == src and k in g and g[k]["giudizio"] == "fix"]
         dub = sum(1 for k, v in idx.items() if v == src and k in g and g[k]["giudizio"] == "dubbio")
-        ex = fred.excluded(DATA / src)
+        ex = pipeline.excluded(DATA / src)
         tot = sum(p.stem not in ex for p in (DATA / src / "4_ritagli").glob("*/images/*.jpg"))
         print(f"{src}: {len(fix)}/{n} da correggere ({len(fix) / n:.0%}), {dub} dubbi; "
               f"per tipo {dict(Counter(r['tipo'] for r in fix))}; in CVAT {tot} ritagli -> ~{round(tot * len(fix) / n)}")

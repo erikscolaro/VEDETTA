@@ -34,7 +34,7 @@ sys.path.insert(0, str(ROOT))
 DATA = ROOT / "data"
 
 
-def scartate() -> set[str]:
+def discarded() -> set[str]:
     """Clip tolte dal dataset in ogni fonte: scie e scartate di Svanstrom,
     scartate di FRED (`*/*_box/scie.txt`, `*/*_box/scartate.txt`)."""
     out = set()
@@ -47,10 +47,10 @@ def frame_table() -> None:
     """Passo 11, tabella dei frame annotati tenuti (con almeno un box) di tutte le fonti ->
     `aggregati/9_split/frame.csv` (fonte, video, clip, sessione, immagine, label, box). Stessi frame dei
     conteggi: Svanstrom da `6_dedup/tenuti.csv` con le label di `4_box/manuale/`, le altre fonti come
-    `fred.count` (label di CVAT per le sequenze riviste, altrimenti preselezione, senza gli esclusi)."""
-    from tools.fred import boxes, excluded
+    `pipeline.count` (label di CVAT per le sequenze riviste, altrimenti preselezione, senza gli esclusi)."""
+    from tools.pipeline import boxes, excluded
 
-    rows, via = [], scartate()
+    rows, via = [], discarded()
     sv = DATA / "svanstrom"
     ses = {r["clip"]: r["sessione"] for r in csv.DictReader(open(sv / "3_sessioni" / "sessioni.csv"))}
     for r in csv.DictReader(open(sv / "6_dedup" / "tenuti.csv")):
@@ -229,11 +229,11 @@ def similarity_all(gruppi: bool = False, lo: float = -0.2, bins: int = 240, bloc
     si = {s: k for k, s in enumerate(sess)}
     cid = torch.tensor([ci[r["clip"]] for r in rows], device="cuda")
     sid = torch.tensor([si[r["fonte"] + ":" + r["sessione"]] for r in rows], device="cuda")
-    grp = {r["sessione"]: r["gruppo"] for r in csv.DictReader(open(DATA / "aggregati" / "11_gruppi" / "gruppi.csv"))} \
+    grp = {r["sessione"]: r["gruppo"] for r in csv.DictReader(open(DATA / "aggregati" / "11_gruppi" / "gruppi.csv"))}\
         if gruppi else {s: s for s in sess}
     gi = {g: k for k, g in enumerate(dict.fromkeys(grp.values()))}
     pid = torch.tensor([gi[grp[r["fonte"] + ":" + r["sessione"]]] for r in rows], device="cuda")
-    kinds = ["stessa clip", "stessa sessione, altra clip", "sessioni diverse"] \
+    kinds = ["stessa clip", "stessa sessione, altra clip", "sessioni diverse"]\
         + ["stesso gruppo, altra sessione", "gruppi diversi"] * gruppi
 
     # righe della matrice: gruppi di frame consecutivi (stesso numero di frame), cosi' l'area e' proporzionale ai frame
@@ -451,7 +451,7 @@ def duplicate_sheets(thr: float = 0.95, per_sheet: int = 12, seed: int = 0, bloc
           + f"), {-(-len(order) // per_sheet)} fogli -> {dst}")
 
 
-def _unire(f: Path) -> list[int]:
+def _merges(f: Path) -> list[int]:
     """Numeri di `unire.txt`: `N`, `N-M`, `N via`; `#` commento."""
     out = []
     for ln in f.read_text().splitlines():
@@ -481,7 +481,7 @@ def groups() -> None:
 
     dop = DATA / "aggregati" / "10_doppioni"
     pairs = {int(r["n"]): (r["sessione_a"], r["sessione_b"]) for r in csv.DictReader(open(dop / "coppie.csv"))}
-    for k in _unire(dop / "unire.txt"):
+    for k in _merges(dop / "unire.txt"):
         a, b = pairs[k]
         parent[find(a)] = find(b)
     gid = {r: f"G{k:04d}" for k, r in enumerate(dict.fromkeys(find(s) for s in sess))}
@@ -499,20 +499,20 @@ def groups() -> None:
 
 
 # intervalli di mezza ottava per seguire la curva dentro le fasce (utente, 23/10/2026); l'ultimo comprende fino a 320 px e oltre
-FINE = [8, 2 ** 3.5, 16, 2 ** 4.5, 32, 2 ** 5.5, 64, 2 ** 6.5, 128, 2 ** 7.5, 256, 1e9]
-QUARTI = [8 * 2 ** (k / 4) for k in range(21)] + [1e9]  # quarti d'ottava per il train, fino a 256 px e oltre
+HALF_OCTAVES = [8, 2 ** 3.5, 16, 2 ** 4.5, 32, 2 ** 5.5, 64, 2 ** 6.5, 128, 2 ** 7.5, 256, 1e9]
+QUARTER_OCTAVES = [8 * 2 ** (k / 4) for k in range(21)] + [1e9]  # quarti d'ottava per il train, fino a 256 px e oltre
 TEST_TOT = 1430  # box per classe nel test, uniformi in log s (286 x 5 fasce di prima)
 
 
 _ST: dict = {}  # stato dello split per i processi figli (fork)
 
 
-W_CLASSE = np.array([1, 1, 4, 1])[:, None]  # airplane, bird, drone, helicopter: droni x4 (utente, 23/10/2026: errore ~5%)
+CLASS_WEIGHT = np.array([1, 1, 4, 1])[:, None]  # airplane, bird, drone, helicopter: droni x4 (utente, 23/10/2026: errore ~5%)
 
 
 def _err(x, t):
     m = t > 0
-    return ((W_CLASSE * ((x - t) / np.where(m, t, 1)) ** 2)[m]).sum()
+    return ((CLASS_WEIGHT * ((x - t) / np.where(m, t, 1)) ** 2)[m]).sum()
 
 
 MIN_SPLIT = {"val": 2000, "test": 1000}  # istanze minime per classe (utente, 23/10/2026; il train ne ha 10.000)
@@ -571,7 +571,7 @@ def split_groups(trials: int = 1000, big: float = 0.02, share: float = 0.75, see
     puo' dare piu' di `share` dell'obiettivo di una cella di val o test (varieta'). Si tiene l'ordine migliore.
     Scrive `split.csv` (gruppo, split), `frame_split.csv` (immagine, split) e `report.csv` (cella, obiettivi e
     istanze per split)."""
-    from tools.distribuzioni import ALPHA, CUT, TOT, ideale, uniforme
+    from tools.distributions import ALPHA, CUT, TOT, ideal, uniform
 
     edges = [8, 16, 32, 64, 96, 1e9]
     out = DATA / "aggregati" / "12_split"
@@ -582,7 +582,7 @@ def split_groups(trials: int = 1000, big: float = 0.02, share: float = 0.75, see
     gids = sorted(set(grp.values()))
     gi = {g: k for k, g in enumerate(gids)}
     C = np.zeros((len(gids), 4, 5))  # fasce, per il test
-    F = np.zeros((len(gids), 4, len(FINE) - 1))  # mezze ottave, per il val
+    F = np.zeros((len(gids), 4, len(HALF_OCTAVES) - 1))  # mezze ottave, per il val
     nf = np.zeros(len(gids), int)
     fg, small = [], 0
     for r in rows:
@@ -597,19 +597,19 @@ def split_groups(trials: int = 1000, big: float = 0.02, share: float = 0.75, see
         nf[g] += 1
         for (c, *_), v in zip(b, s):
             C[g, int(c), np.digitize(v, edges[1:-1])] += 1
-            F[g, int(c), np.digitize(v, FINE[1:-1])] += 1
+            F[g, int(c), np.digitize(v, HALF_OCTAVES[1:-1])] += 1
     tot = C.sum(0)
-    tv = np.minimum(0.2 * np.array([ideale(TOT[c], ALPHA[c], FINE, CUT[c]) for c in names]), 0.2 * F.sum(0))
+    tv = np.minimum(0.2 * np.array([ideal(TOT[c], ALPHA[c], HALF_OCTAVES, CUT[c]) for c in names]), 0.2 * F.sum(0))
     # test uniforme in log s (utente, 23/10/2026: l'ideale del test e' piatto), sulle mezze ottave fino alla fine
     # della curva (uccelli 96 px), 1.430 per classe (prima 286 per fascia x 5), al piu' il 30% di quello che c'e'
-    tt = np.minimum(np.array([uniforme(TEST_TOT, FINE, CUT[c]) for c in names]), 0.3 * F.sum(0))
+    tt = np.minimum(np.array([uniform(TEST_TOT, HALF_OCTAVES, CUT[c]) for c in names]), 0.3 * F.sum(0))
     # almeno 1.000 per classe nel test (utente, 23/10/2026): se le fasce povere non bastano, si alza l'obiettivo
     # delle altre in proporzione, sempre entro il 30% di quello che c'e'
     for c in range(4):
         while tt[c].sum() < 1050 and (room := (tt[c] < 0.3 * F.sum(0)[c]) & (tt[c] > 0)).any():
             tt[c, room] = np.minimum(tt[c, room] * 1.02, 0.3 * F.sum(0)[c, room])
     X = {"val": F, "test": F}
-    ttb = np.array([uniforme(tt[c].sum(), edges, CUT[n]) for c, n in enumerate(names)])  # per fascia, solo report
+    ttb = np.array([uniform(tt[c].sum(), edges, CUT[n]) for c, n in enumerate(names)])  # per fascia, solo report
     big_bird = {g for g in range(len(gids)) if C[g, names.index("bird"), 4]}  # gruppi con uccelli > 96 px: solo train
     N = nf.sum()
 
@@ -623,7 +623,6 @@ def split_groups(trials: int = 1000, big: float = 0.02, share: float = 0.75, see
               and not X[s][g][tg[s] == 0].any()} for s in tg}
     # i tentativi sono indipendenti: in parallelo su tutti i core (utente, 23/10/2026), stato condiviso via fork
     import multiprocessing as mp
-    import os
 
     _ST.update(free=free, tg=tg, ok=ok, X=X)
     with mp.get_context("fork").Pool(20) as pool:  # 20 core su 24: margine per il resto della macchina
@@ -639,7 +638,7 @@ def split_groups(trials: int = 1000, big: float = 0.02, share: float = 0.75, see
         w.writerows((r["immagine"], lab[g] if g >= 0 else "via_sotto_8px") for r, g in zip(rows, fg))
     S = {s: sum(C[g] for g, x in lab.items() if x == s) for s in ("train", "val", "test")}
     SF = {s: sum(F[g] for g, x in lab.items() if x == s) for s in ("train", "val", "test")}
-    tvb = np.minimum(0.2 * np.array([ideale(TOT[c], ALPHA[c], edges, CUT[c]) for c in names]), 0.2 * tot)  # per fascia, solo report
+    tvb = np.minimum(0.2 * np.array([ideal(TOT[c], ALPHA[c], edges, CUT[c]) for c in names]), 0.2 * tot)  # per fascia, solo report
     bands = ["8-16", "16-32", "32-64", "64-96", ">96"]
     with open(out / "report.csv", "w", newline="") as fh:
         w = csv.writer(fh)
@@ -657,12 +656,12 @@ def split_groups(trials: int = 1000, big: float = 0.02, share: float = 0.75, see
         for b in range(5):
             print(f"  {names[c]:<11}{bands[b]:>7}{int(tot[c, b]):>7}{round(tvb[c, b]):>8}{int(S['val'][c, b]):>6}"
                   f"{round(ttb[c, b]):>8}{int(S['test'][c, b]):>6}{int(S['train'][c, b]):>7}")
-    print("  val per mezza ottava (val/obiettivo): " + "".join(f"{FINE[k]:.0f} " for k in range(len(FINE) - 1)))
+    print("  val per mezza ottava (val/obiettivo): " + "".join(f"{HALF_OCTAVES[k]:.0f} " for k in range(len(HALF_OCTAVES) - 1)))
     for c in range(4):
-        print(f"  {names[c]:<11}" + " ".join(f"{int(SF['val'][c, k])}/{round(tv[c, k])}" for k in range(len(FINE) - 1)))
+        print(f"  {names[c]:<11}" + " ".join(f"{int(SF['val'][c, k])}/{round(tv[c, k])}" for k in range(len(HALF_OCTAVES) - 1)))
     print("  test per mezza ottava (test/obiettivo):")
     for c in range(4):
-        print(f"  {names[c]:<11}" + " ".join(f"{int(SF['test'][c, k])}/{round(tt[c, k])}" for k in range(len(FINE) - 1)))
+        print(f"  {names[c]:<11}" + " ".join(f"{int(SF['test'][c, k])}/{round(tt[c, k])}" for k in range(len(HALF_OCTAVES) - 1)))
     print(f"-> {out}")
 
 
@@ -727,9 +726,9 @@ def train_mosaics(seed: int = 0, factors=(0.5, 0.25, 0.125)) -> None:
     piu' mosaici, con la label)."""
     import cv2
 
-    from tools.distribuzioni import ALPHA, CUT, TOT, TOTALE, ideale
+    from tools.distributions import ALPHA, CUT, TOT, ideal
 
-    edges, names = QUARTI, ["airplane", "bird", "drone", "helicopter"]  # quarti d'ottava (utente, 23/10/2026: droni 8-12 px)
+    edges, names = QUARTER_OCTAVES, ["airplane", "bird", "drone", "helicopter"]  # quarti d'ottava (utente, 23/10/2026: droni 8-12 px)
     nb = len(edges) - 1
     bands = [f"{edges[k]:.0f}-{edges[k + 1]:.0f}" if k < nb - 1 else f">{edges[k]:.0f}" for k in range(nb)]
     out = DATA / "aggregati" / "13_train_compensation"
@@ -739,9 +738,9 @@ def train_mosaics(seed: int = 0, factors=(0.5, 0.25, 0.125)) -> None:
             f.unlink()
     rows = list(csv.DictReader(open(DATA / "aggregati" / "9_split" / "frame.csv")))
     fs = [r["split"] for r in csv.DictReader(open(DATA / "aggregati" / "12_split" / "frame_split.csv"))]
-    target = 0.7 * np.array([ideale(TOT[c], ALPHA[c], edges, CUT[c]) for c in names])  # tetto: curva alzata
+    target = 0.7 * np.array([ideal(TOT[c], ALPHA[c], edges, CUT[c]) for c in names])  # tetto: curva alzata
     target[target == 0] = np.inf  # oltre la fine della curva (uccelli > 96 px) nessun tetto
-    fill = 0.7 * np.array([ideale(TOT[c], ALPHA[c], edges, CUT[c]) for c in names])  # mosaici: la stessa curva alzata
+    fill = 0.7 * np.array([ideal(TOT[c], ALPHA[c], edges, CUT[c]) for c in names])  # mosaici: la stessa curva alzata
     rng = np.random.default_rng(seed)
 
     def boxes(r):
@@ -923,7 +922,7 @@ def _output_plot(rows: list, out: Path) -> None:
     sum|osservato - obiettivo| / sum(obiettivo) sulle mezze ottave (`FINE`), in `distribuzione.md`."""
     import matplotlib.pyplot as plt
 
-    from tools.distribuzioni import ALPHA, BINS, CUT, SMIN, TOT, _assi, curva, ideale, uniforme
+    from tools.distributions import ALPHA, BINS, CUT, SMIN, TOT, _axes, curve, ideal, uniform
     from tools.plots import STYLE, WIDTH, _P, save
 
     names = ["airplane", "bird", "drone", "helicopter"]  # id delle label sorgente
@@ -967,27 +966,27 @@ def _output_plot(rows: list, out: Path) -> None:
         ax.stairs(h_tr, BINS, color=_P[0], lw=.6, alpha=.8)
         for sp, col in (("val", _P[1]), ("test", _P[2])):
             ax.stairs(np.histogram(s[sp, c], BINS)[0], BINS, color=col, lw=1.1, label=sp_it[sp])
-        ax.plot(*curva(TOT[c] * .7, ALPHA[c], CUT[c]), color="0.1", lw=.9, label="Obiettivo addestramento")
-        ax.plot(*curva(TOT[c] * .2, ALPHA[c], CUT[c]), color="0.1", lw=.9, ls=(0, (4, 2)), label="Obiettivo validazione")
+        ax.plot(*curve(TOT[c] * .7, ALPHA[c], CUT[c]), color="0.1", lw=.9, label="Obiettivo addestramento")
+        ax.plot(*curve(TOT[c] * .2, ALPHA[c], CUT[c]), color="0.1", lw=.9, ls=(0, (4, 2)), label="Obiettivo validazione")
         n_t = sum(float(r["obiettivo_test"]) for r in rep if r["classe"] == c)  # test: uniforme in log s
         ax.plot([SMIN, CUT[c]], [n_t * dlog / np.log(CUT[c] / SMIN)] * 2, color="0.1", lw=.9, ls=(0, (1, 1.5)),
                 label="Obiettivo test (uniforme)")
-        _assi(ax, c, 0)
+        _axes(ax, c, 0)
         ax.set_title("")  # il titolo centrato di `_assi` (in inglese) non serve
         ax.set_title(f"({'abcd'[k_ax]}) {it[c]}", loc="left", fontsize=9)
         ax.tick_params(labelsize=7.5)
         # errore rispetto all'obiettivo, sulle mezze ottave
         err = {}
         for sp, k in (("train", .7), ("val", .2)):
-            ide = k * ideale(TOT[c], ALPHA[c], FINE, CUT[c])
-            err[sp] = np.abs(np.histogram(s[sp, c], FINE)[0] - ide).sum() / ide.sum()
-        ide = uniforme(n_t, FINE, CUT[c])
-        err["test"] = np.abs(np.histogram(s["test", c], FINE)[0] - ide).sum() / ide.sum()
+            ide = k * ideal(TOT[c], ALPHA[c], HALF_OCTAVES, CUT[c])
+            err[sp] = np.abs(np.histogram(s[sp, c], HALF_OCTAVES)[0] - ide).sum() / ide.sum()
+        ide = uniform(n_t, HALF_OCTAVES, CUT[c])
+        err["test"] = np.abs(np.histogram(s["test", c], HALF_OCTAVES)[0] - ide).sum() / ide.sum()
         ax.tick_params(labelbottom=True)  # numeri dell'asse x anche nei pannelli in alto
         md.append((c, err, {sp: len(s[sp, c]) for sp in ("train", "val", "test")},
-                   {sp: np.histogram(s[sp, c], FINE)[0] for sp in ("train", "val", "test")},
-                   {"train": .7 * ideale(TOT[c], ALPHA[c], FINE, CUT[c]), "val": .2 * ideale(TOT[c], ALPHA[c], FINE, CUT[c]),
-                    "test": uniforme(n_t, FINE, CUT[c])}, len(s["mosaico", c])))
+                   {sp: np.histogram(s[sp, c], HALF_OCTAVES)[0] for sp in ("train", "val", "test")},
+                   {"train": .7 * ideal(TOT[c], ALPHA[c], HALF_OCTAVES, CUT[c]), "val": .2 * ideal(TOT[c], ALPHA[c], HALF_OCTAVES, CUT[c]),
+                    "test": uniform(n_t, HALF_OCTAVES, CUT[c])}, len(s["mosaico", c])))
     top = max(np.histogram(s[k, c], BINS)[0].max() for c in OUT_NAMES for k in ("train", "orig"))
     axs[0, 0].set_yscale("log")  # originali (centinaia), addestramento, val e test (decine) leggibili insieme (utente)
     axs[0, 0].set_ylim(3, top * 1.5)
@@ -1001,7 +1000,7 @@ def _output_plot(rows: list, out: Path) -> None:
     f.legend([hs[k] for k in order], [ls[k] for k in order], loc="outside lower center", ncol=4, fontsize=7, frameon=False)
     save(f, out / "distribuzione", pdf=True)
     # la tabella che accompagna il grafico (utente, 23/10/2026): stessi numeri, fuori dalla figura
-    lab = [f"{FINE[k]:.0f}–{FINE[k + 1]:.0f}" if k < len(FINE) - 2 else f"> {FINE[k]:.0f}" for k in range(len(FINE) - 1)]
+    lab = [f"{HALF_OCTAVES[k]:.0f}–{HALF_OCTAVES[k + 1]:.0f}" if k < len(HALF_OCTAVES) - 2 else f"> {HALF_OCTAVES[k]:.0f}" for k in range(len(HALF_OCTAVES) - 1)]
     L = ["# Distribuzione delle grandezze", "",
          "Generata con `distribuzione.png` da `tools/split.py --step export`. Errore = Σ|osservato − obiettivo| / Σ obiettivo",
          "sulle mezze ottave; obiettivi: addestramento e validazione la curva s^−0,3 alzata ×1,2 (70% e 20%), test uniforme",
@@ -1145,12 +1144,11 @@ def export() -> None:
     import hashlib
     import os
     import re
-    import shutil
 
     agg = DATA / "aggregati"
     out = DATA / "output"
-    if out.exists():
-        shutil.rmtree(out)
+    if out.exists():  # congelato (utente, 23/10/2026): per rifarlo va spostato o cancellato a mano
+        sys.exit(f"{out} esiste ed e' congelato: non lo sovrascrivo")
     grp = {r["sessione"]: r["gruppo"] for r in csv.DictReader(open(agg / "11_gruppi" / "gruppi.csv"))}
     info = {r["immagine"]: r for r in csv.DictReader(open(agg / "9_split" / "frame.csv"))}
     bgi = {r["immagine"]: r for r in csv.DictReader(open(DATA / "background" / "0_raw" / "background.csv"))}

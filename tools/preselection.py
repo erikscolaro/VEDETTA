@@ -32,9 +32,9 @@ toccano) e scrive `data/<fonte>/5_box/preselezione/`: label corrette (1, 5) e
 `esclusi.txt` (stem, motivo) con i ritagli tolti (2, 3, 4, 6), che non si
 cancellano. Conteggio e CVAT leggono da li' (`fred.boxes`, `fred.excluded`).
 Il fumo (4) viene da `data/dvids/0_raw/fumo.txt`, scritto dall'operatore con
-`aggiunte.py --step fogli_fumo` e `--step fumo`. Si rilancia dopo ogni `catena`.
+`extra_sources.py --step fogli_fumo` e `--step fumo`. Si rilancia dopo ogni `catena`.
 
-    python tools/preselezione.py
+    python tools/preselection.py
 """
 
 import csv
@@ -48,10 +48,10 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools.svanstrom import BAND_EDGES, BANDS, NAMES  # noqa: E402
+from tools.common import BAND_EDGES, BANDS, NAMES  # noqa: E402
 
 DATA = ROOT / "data"
-FONTI = ["dvids", "fred", "fbd_sv", "anti_uav"]
+SOURCES = ["dvids", "fred", "fbd_sv", "anti_uav"]
 CAP = round((4000 + 857) * 1.1)
 DARK = 35
 MIN_AREA = 4  # px^2
@@ -63,7 +63,7 @@ def fix_labels() -> None:
     import shutil
 
     vc = {r["id"]: NAMES.index(r["classe"]) for r in csv.DictReader(open(DATA / "dvids" / "0_raw" / "video.csv"))}
-    for s in FONTI:
+    for s in SOURCES:
         out = DATA / s / "5_box" / "preselezione"
         shutil.rmtree(out, ignore_errors=True)
         n = Counter()
@@ -149,10 +149,10 @@ def cells(t: Path) -> list[tuple[str, str]]:
 
 
 def select() -> None:
-    drop = {s: {} for s in FONTI}
+    drop = {s: {} for s in SOURCES}
     fumo = smoke()
     crops = []  # (fonte, video, stem, celle)
-    for s in FONTI:
+    for s in SOURCES:
         for d in sorted((DATA / s / "5_box" / "preselezione").iterdir()):
             for t in sorted(d.glob("*.txt")):
                 if s in ("anti_uav", "dvids") and cv2.imread(str(DATA / s / "4_ritagli" / d.name / "images" / f"{t.stem}.jpg"), 0).mean() < DARK:
@@ -205,7 +205,7 @@ def select() -> None:
     for s, v, stem, _ in crops:
         if v in via:
             drop[s][stem] = via[v]
-    for s in FONTI:
+    for s in SOURCES:
         f = DATA / s / "5_box" / "preselezione" / "esclusi.txt"
         f.write_text("".join(f"{k} {m}\n" for k, m in sorted(drop[s].items())))
         print(f"{s}: esclusi {len(drop[s])} ({dict(Counter(drop[s].values()))}) -> {f}")
@@ -257,6 +257,9 @@ def clean_boxes(dup: float = 0.8, inside: float = 0.9, bordo: float = 4) -> None
 
 
 if __name__ == "__main__":
+    import argparse
+
+    argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter).parse_args()
     fix_labels()
     select()
     clean_boxes()

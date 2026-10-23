@@ -90,13 +90,13 @@ def crops(fonte: str, seed: int = 0) -> None:
           f"{len({r[2] for r in rows})} camere -> {dst.parent}")
 
 
-def detector(fonte: str, conf: float = 0.1) -> None:
-    """2_detector: YOLO delle proposte (`data/modelli/yolo26m-intern.pt`, le 4 classi) su ogni ritaglio, confidenza
+def filter_detector(fonte: str, conf: float = 0.1) -> None:
+    """2_detector: detector delle proposte (`common.detector`) su ogni ritaglio, confidenza
     bassa: un ritaglio con almeno una detection va via (`esclusi.csv`: ritaglio, classe, conf, box), gli altri in
     `tenuti.csv`. Meglio buttare un cielo buono che tenere un uccello senza box."""
-    from ultralytics import YOLO
+    from tools.common import detector
 
-    model = YOLO(str(DATA / "modelli" / "yolo26m-intern.pt"))
+    model = detector()
     src = DATA / fonte / "1_ritagli"
     rows = list(csv.DictReader(open(src / "ritagli.csv")))
     out = DATA / fonte / "2_detector"
@@ -266,7 +266,7 @@ def main(argv=None) -> int:
     elif a.step == "raccolta":
         collect()
     else:
-        {"ritagli": crops, "detector": detector, "dedup": dedup, "fogli": sheets}[a.step](a.fonte)
+        {"ritagli": crops, "detector": filter_detector, "dedup": dedup, "fogli": sheets}[a.step](a.fonte)
     return 0
 
 

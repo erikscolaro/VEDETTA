@@ -1,32 +1,9 @@
 #!/usr/bin/env python3
-"""Costruisce il dataset Svanstrom (Drone-detection-dataset, solo video visibili).
+"""Svanström (Drone-detection-dataset, CC0, solo i video visibili 640x512): un `--step` per passo di
+`docs/procedura.md` (passi 2-8), una cartella per passo in `data/svanstrom/`. Elenco dei comandi nel README.
 
-Copiato da yoloeval il 13/10/2026 come punto di partenza del dataset custom:
-va adattato alle regole in docs/regole.md (fasce, 16 px, box corretti, piu'
-fonti, set di deploy; elenco in docs/procedura.md). Passi attuali:
-
-1. scarica `Data/Video_V/*` e l'xlsx con classe e distance bin da GitHub;
-2. per ogni video legge le label (.mat MATLAB groundTruth) e tiene solo i frame
-   "nuovi" secondo un hash semantico: dHash del ritaglio attorno al bersaglio
-   piu' posizione/dimensione del box. L'hash sul frame intero non funziona qui:
-   il cielo domina e il bersaglio occupa pochi pixel, tutti i frame sembrano
-   uguali. Un frame per cartella video in `<src>/frames/<video>/`; ogni frame
-   ha una fascia small/medium/large (soglie COCO sul box piu' grande);
-3. split 70/20/10 per video (mai per frame: frame dello stesso video in split
-   diversi e' lo stesso leakage di AOD4), stratificato per classe e
-   bilanciato sui frame di ogni fascia;
-4. `<out>/{all,small,medium,large,background}/images/{train,val,test,calib}` e
-   `labels/...` come hardlink ai frame, ognuno col suo `dataset.yaml` e i
-   grafici di controllo in `report/`; `<out>/manifest.json` per tutto.
-
-Le label non si leggono con scipy (oggetti MCOS) e `mcos-decoder` sbaglia i
-frame con piu' oggetti (2 box letti come vuoto, 3-5 scartati, frame
-disallineati): qui c'e' un walker MAT5 minimo. Ogni clip ha la sua verifica:
-numero di label == numero di frame del video, altrimenti la clip e' scartata
-e finisce nel manifest.
-
-    python tools/svanstrom.py                       # tutto, in data/svanstrom
-    python tools/svanstrom.py --hash-thr 6          # selezione piu' fitta
+Le label non si leggono con scipy (oggetti MCOS) e `mcos-decoder` sbaglia i frame con piu' oggetti: qui c'e' un
+lettore MAT5 minimo; clip scartata se il numero di label e' diverso dal numero di frame.
 """
 
 from __future__ import annotations
@@ -48,17 +25,13 @@ from xml.etree import ElementTree
 
 import numpy as np
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # anche lanciato come script
+from tools.common import (BAND_EDGES, BANDS, NAMES, ROOT, cvat_client, dedup_clip, mask_box,  # noqa: E402
+                          propose_sessions)
+
 REPO = "DroneDetectionThesis/Drone-detection-dataset"
 RAW = f"https://raw.githubusercontent.com/{REPO}/master/"
 XLSX = "Data/Video_dataset_description.xlsx"
-
-NAMES = ["airplane", "bird", "drone", "helicopter"]  # stesso ordine di AOD4
-SIZES = ["small", "medium", "large"]
-SIZE_EDGES = [32, 96]  # sqrt(area) in px, soglie COCO
-SPLITS = {"train": 0.7, "val": 0.2, "test": 0.1}
-
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))  # tools.plots anche lanciato come script
 
 
 # --- download -----------------------------------------------------------------
@@ -182,121 +155,6 @@ def read_labels(mat: Path) -> list[np.ndarray] | None:
 
 
 # --- selezione frame -------------------------------------------------------------
-
-def _dhash(gray: np.ndarray) -> np.ndarray:
-    import cv2
-
-    small = cv2.resize(gray, (9, 8), interpolation=cv2.INTER_AREA).astype(np.int16)
-    return (small[:, 1:] > small[:, :-1]).ravel()
-
-
-def _signature(gray: np.ndarray, boxes: np.ndarray):
-    """Hash del ritaglio attorno all'unione dei box + geometria normalizzata."""
-    h, w = gray.shape
-    x0, y0 = boxes[:, 0].min(), boxes[:, 1].min()
-    x1, y1 = (boxes[:, 0] + boxes[:, 2]).max(), (boxes[:, 1] + boxes[:, 3]).max()
-    pad = max(x1 - x0, y1 - y0, 8)  # contesto: lo sfondo vicino conta
-    crop = gray[int(max(0, y0 - pad)):int(min(h, y1 + pad)),
-                int(max(0, x0 - pad)):int(min(w, x1 + pad))]
-    geo = np.array([(x0 + x1) / 2 / w, (y0 + y1) / 2 / h,
-                    np.log(max(x1 - x0, 1)), np.log(max(y1 - y0, 1))])
-    return _dhash(crop), geo, len(boxes)
-
-
-def _is_new(sig, kept, hash_thr: int, geo_thr: float) -> bool:
-    # ponytail: confronto con tutti i frame tenuti, O(n*k) per video; basta
-    # finche' i video restano da ~300 frame
-    hsh, geo, k = sig
-    for h2, g2, k2 in kept:
-        if (k == k2 and np.count_nonzero(hsh != h2) <= hash_thr
-                and (geo is None or (np.hypot(*(geo[:2] - g2[:2])) <= geo_thr
-                                     and np.abs(geo[2:] - g2[2:]).max() <= 0.3))):
-            return False
-    return True
-
-
-def _mask(shape, boxes: np.ndarray, grow: float) -> np.ndarray:
-    """Maschera dei box (x, y, w, h) allargati di `grow` volte il lato, min 4 px."""
-    m = np.zeros(shape, np.uint8)
-    for x, y, w, h in boxes:
-        g = max(4, grow * max(w, h))
-        m[int(max(0, y - g)):int(y + h + g), int(max(0, x - g)):int(x + w + g)] = 255
-    return m
-
-
-def _uniform(gray: np.ndarray, boxes: np.ndarray, std_thr: float) -> bool:
-    """Sfondo attorno ai box uniforme (cielo): l'inpainting non lascia tracce."""
-    ring = (_mask(gray.shape, boxes, 1.0) > 0) & (_mask(gray.shape, boxes, 0.25) == 0)
-    return ring.any() and gray[ring].std() < std_thr
-
-
-def _size(boxes: np.ndarray) -> str | None:
-    """Fascia COCO dell'immagine dal box piu' grande; None senza box.
-
-    Per immagine e non per box: togliere un box dalle label insegnerebbe che
-    li' non c'e' niente."""
-    if not len(boxes):
-        return None
-    return SIZES[np.digitize(np.sqrt(boxes[:, 3] * boxes[:, 4]).max(), SIZE_EDGES)]
-
-
-def process_video(args) -> dict:
-    """Seleziona i frame di un video e li scrive in `frames/<video>/`.
-
-    Background: il dataset ne ha solo 82 frame in 4 video. Per averne una quota
-    fissa per video (e quindi 70/20/10 come il resto) si prendono frame non
-    selezionati con il bersaglio su cielo uniforme e lo si cancella con
-    l'inpainting; label vuota, suffisso `_bg`.
-    """
-    import cv2
-
-    video, mat, dst, hash_thr, geo_thr, bg_frac, bg_std = args
-    labels = read_labels(mat)
-    if labels is None:
-        return {"video": video.stem, "skipped": "celle delle label non multiple di 4"}
-    shutil.rmtree(dst, ignore_errors=True)
-    (dst / "images").mkdir(parents=True)
-    (dst / "labels").mkdir()
-
-    def write(stem, img, text):
-        cv2.imwrite(str(dst / "images" / f"{stem}.jpg"), img, [cv2.IMWRITE_JPEG_QUALITY, 95])
-        (dst / "labels" / f"{stem}.txt").write_text(text)
-
-    cap = cv2.VideoCapture(str(video))
-    kept, selected, sizes, candidates, n = [], [], [], [], 0
-    while (frame := cap.read()[1]) is not None:
-        if n < len(labels):  # oltre si contano solo i frame, per la verifica
-            boxes = labels[n].copy()
-            boxes[:, 1:3] -= 1  # MATLAB 1-based
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            sig = _signature(gray, boxes[:, 1:]) if len(boxes) else (_dhash(gray), None, 0)
-            if _is_new(sig, kept, hash_thr, geo_thr):
-                kept.append(sig)
-                write(f"{video.stem}_f{n:05d}", frame,
-                      _yolo(boxes, frame.shape[1], frame.shape[0]))
-                selected.append(n)
-                sizes.append(_size(boxes))
-            elif len(boxes) and _uniform(gray, boxes[:, 1:], bg_std):
-                candidates.append(n)
-        n += 1
-    if n != len(labels):
-        shutil.rmtree(dst)
-        return {"video": video.stem, "skipped": f"{len(labels)} label per {n} frame"}
-
-    # background distribuito nel tempo tra i candidati
-    k = min(len(candidates), round(bg_frac * len(selected)))
-    background = sorted({candidates[i] for i in np.linspace(0, len(candidates) - 1, k).round().astype(int)}) if k else []
-    cap = cv2.VideoCapture(str(video))
-    for i in range(background[-1] + 1 if background else 0):
-        frame = cap.read()[1]
-        if i in background:
-            boxes = labels[i][:, 1:].copy()
-            boxes[:, :2] -= 1
-            mask = _mask(frame.shape[:2], boxes, 0.25)
-            write(f"{video.stem}_f{i:05d}_bg", cv2.inpaint(frame, mask, 5, cv2.INPAINT_TELEA), "")
-    return {"video": video.stem, "frames": n, "selected": selected, "sizes": sizes,
-            "background": background}
-
 
 def extract_frames(args) -> dict:
     """Passo 2: tutti i frame di un video in `<dst>/images/*.jpg` e le label
@@ -454,22 +312,6 @@ def embed_strips(frames: Path, strips: dict[str, list[int]]) -> dict[str, np.nda
     return out
 
 
-def propose_sessions(emb: dict[str, np.ndarray], thr: float) -> tuple[list[str], np.ndarray, np.ndarray]:
-    """Somiglianza fra clip = massimo fra le coppie dei loro frame; gruppi per
-    legame medio sopra `thr`. Il legame singolo
-    incatena tutto: su cielo uniforme quasi ogni coppia supera 0,9."""
-    from scipy.cluster.hierarchy import fcluster, linkage
-    from scipy.spatial.distance import squareform
-
-    vids = sorted(emb)
-    sim = np.eye(len(vids))
-    for a in range(len(vids)):
-        for b in range(a + 1, len(vids)):
-            sim[a, b] = sim[b, a] = (emb[vids[a]] @ emb[vids[b]].T).max()
-    groups = fcluster(linkage(squareform(1 - sim, checks=False), "average"), 1 - thr, "distance")
-    return vids, sim, groups
-
-
 def session_sheets(frames: Path, out: Path, strips: dict, vids: list[str], sim: np.ndarray,
                    groups: np.ndarray, singles_per_sheet: int = 6) -> None:
     """Un foglio per gruppo (una striscia per clip, in fondo la clip piu'
@@ -622,7 +464,7 @@ def cvat_weather(met: Path, recs: list[dict], name: str = "meteo") -> None:
     from cvat_sdk.core.proxies.tasks import ResourceType
     from cvat_sdk.api_client import models
 
-    with _cvat_client() as client:
+    with cvat_client() as client:
         if any(tk.name == name for tk in client.tasks.list()):
             raise SystemExit(f"meteo: il task '{name}' esiste gia' in CVAT, cancellarlo a mano per rifarlo")
         with open(met / "proposta.csv", "w", newline="") as f:
@@ -648,7 +490,7 @@ def weather_import(met: Path, name: str = "meteo") -> None:
     import csv
 
     recs = {int(r["n"]): r for r in csv.DictReader(open(met / "proposta.csv"))}
-    with _cvat_client() as client:
+    with cvat_client() as client:
         task = next(tk for tk in client.tasks.list() if tk.name == name)
         label = {lb.id: lb.name for lb in task.get_labels()}
         tags = defaultdict(set)
@@ -679,11 +521,6 @@ def _crop(shape, box, ctx: float = 4, min_side: int = 96):
     return x0, y0, x1, y1
 
 
-def _mask_box(m: np.ndarray):
-    ys, xs = np.nonzero(m)
-    return None if not len(xs) else (xs.min(), ys.min(), xs.max() + 1 - xs.min(), ys.max() + 1 - ys.min())
-
-
 def refine_contrast(img: np.ndarray, box, k: float = 4) -> tuple[tuple | None, float]:
     """Box dai pixel che si staccano dallo sfondo locale (mediana e MAD
     dell'anello attorno al box), dentro il box allargato del 20%: controllo
@@ -702,7 +539,7 @@ def refine_contrast(img: np.ndarray, box, k: float = 4) -> tuple[tuple | None, f
         return None, float("nan")
     med, mad = np.median(bg), np.median(np.abs(bg - np.median(bg))) * 1.4826 + 1
     m = np.abs(g[inner[1]:inner[3], inner[0]:inner[2]] - med) > k * mad
-    b = _mask_box(m)
+    b = mask_box(m)
     return (None if b is None else (b[0] + inner[0], b[1] + inner[1], b[2], b[3])), float(mad)
 
 
@@ -818,18 +655,9 @@ def sam_clip(model, frames: Path, clip: str, rows: list[dict]) -> list:
         res = model(img[y0:y1, x0:x1], points=[[px - x0, py - y0]], labels=[1], verbose=False)[0]
         b = None
         if res.masks is not None and len(res.masks.data):
-            b = _mask_box(res.masks.data[0].cpu().numpy() > 0.5)
+            b = mask_box(res.masks.data[0].cpu().numpy() > 0.5)
         out.append(None if b is None else [float(b[0] + x0), float(b[1] + y0), float(b[2]), float(b[3])])
     return out
-
-
-def _cvat_client():
-    """Client CVAT su localhost:8080, credenziali in ~/.config/cvat.env
-    (CVAT_USER, CVAT_PASS)."""
-    from cvat_sdk import make_client
-
-    env = dict(ln.split("=", 1) for ln in (Path.home() / ".config" / "cvat.env").read_text().split())
-    return make_client("http://localhost:8080", credentials=(env["CVAT_USER"], env["CVAT_PASS"]))
 
 
 def clip_boxes(box: Path, clip: str) -> dict[tuple, list]:
@@ -894,7 +722,7 @@ def cvat_export(src: Path, clips: list[str], name: str = "box", job_frames: int 
                                                           outside=True, keyframe=True))
                 prev = j if j in shapes else None
             req[-1].append((NAMES[c], min(shapes), seq))
-    with _cvat_client() as client:
+    with cvat_client() as client:
         if any(tk.name == name for tk in client.tasks.list()):
             raise SystemExit(f"cvat: il task '{name}' esiste gia', cancellarlo a mano per rifarlo")
         task = client.tasks.create_from_data(
@@ -936,29 +764,6 @@ def cvat_import(src: Path) -> None:
 
 
 # --- quasi-duplicati -------------------------------------------------------------
-
-def dedup_clip(args) -> tuple[str, list[int], int]:
-    """Frame tenuti di una clip, in ordine: un frame resta se nessun frame gia'
-    tenuto della clip ha lo stesso numero di box, dHash del ritaglio sui box
-    entro `hash_thr` bit e posizione/grandezza vicine (`_is_new`). Frame senza
-    box: dHash del frame intero."""
-    import cv2
-
-    frames, man, clip, idx, hash_thr, geo_thr = args
-    v = clip.split("/")[0]
-    kept, keep = [], []
-    for i in idx:
-        gray = cv2.imread(str(frames / v / "images" / f"{v}_f{i:05d}.jpg"), cv2.IMREAD_GRAYSCALE)
-        t = man / f"{v}_f{i:05d}.txt"
-        rows = np.array([ln.split()[1:] for ln in t.read_text().splitlines() if ln.strip()] if t.exists() else [],
-                        float).reshape(-1, 4) * ([gray.shape[1], gray.shape[0]] * 2)
-        boxes = np.c_[rows[:, :2] - rows[:, 2:] / 2, rows[:, 2:]]  # (x, y, w, h) in pixel
-        sig = _signature(gray, boxes) if len(boxes) else (_dhash(gray), None, 0)
-        if _is_new(sig, kept, hash_thr, geo_thr):
-            kept.append(sig)
-            keep.append(i)
-    return clip, keep, len(idx)
-
 
 def dedup(src: Path, hash_thr: int, geo_thr: float, workers: int) -> None:
     """Passo 7: quasi-duplicati dentro ogni clip sulle label finali
@@ -1040,10 +845,6 @@ def dedup_sheets(src: Path, per_class: int = 3, n: int = 24, side: int = 96, see
 
 # --- conteggio -------------------------------------------------------------------
 
-BANDS = ["<8", "8-16", "16-32", "32-64", "64-96", ">96"]  # sqrt(w*h) in px, regole.md
-BAND_EDGES = [8, 16, 32, 64, 96]
-
-
 def count_cells(src: Path, W: int = 640, H: int = 512) -> None:
     """Passo 8: istanze, frame, clip, video e sessioni per cella classe x
     fascia sui frame tenuti dalla deduplica (`6_dedup/tenuti.csv`, gia' senza
@@ -1096,218 +897,27 @@ def _yolo(boxes: np.ndarray, W: int, H: int) -> str:
 
 # --- split ---------------------------------------------------------------------
 
-def assign_splits(videos: list[dict], seed: int) -> None:
-    """Split per video, per classe, bilanciato sui frame di ogni fascia.
-
-    Greedy in ordine casuale: ogni video va allo split piu' indietro rispetto
-    al target sul suo mix di fasce (frame small/medium/large, pesati per la
-    loro frazione del totale della classe). Non dal piu' pesante: i video
-    grossi finirebbero tutti in train e a val/test resterebbero solo le clip
-    statiche (pochi frame selezionati).
-    """
-    rng = random.Random(seed)
-    strata = defaultdict(list)
-    for v in videos:
-        strata[v["class"]].append(v)
-    for group in strata.values():
-        rng.shuffle(group)
-        counts = [Counter(v["sizes"]) for v in group]
-        tot = sum(counts, Counter())
-        got = {s: Counter() for s in SPLITS}
-        for v, c in zip(group, counts):
-            v["split"] = max(SPLITS, key=lambda s: sum(
-                k * (SPLITS[s] * tot[b] - got[s][b]) / tot[b] for b, k in c.items()))
-            got[v["split"]].update(c)
-
-
 # --- costruzione ---------------------------------------------------------------
 
-def build(out: Path, frames: Path, videos: list[dict], n_calib: int, seed: int,
-          keep=lambda stem: True) -> None:
-    """Hardlink ai frame dei video nei loro split, solo quelli con keep(stem)."""
-    for d in ("images", "labels"):
-        shutil.rmtree(out / d, ignore_errors=True)
-    files = defaultdict(list)
-    for v in videos:
-        src = frames / v["video"]
-        for img in sorted((src / "images").glob("*.jpg")):
-            if keep(img.stem):
-                files[v["split"]].append((img, src / "labels" / f"{img.stem}.txt"))
-    # ponytail: calib e' un campione delle immagini di train; disgiunto da
-    # val/test, che e' quello che conta per non calibrare sui dati di valutazione
-    files["calib"] = random.Random(seed).sample(files["train"],
-                                                min(n_calib, len(files["train"])))
-    for split, items in files.items():
-        (out / "images" / split).mkdir(parents=True)
-        (out / "labels" / split).mkdir(parents=True)
-        for img, lab in items:
-            os.link(img, out / "images" / split / img.name)
-            os.link(lab, out / "labels" / split / lab.name)
-    (out / "dataset.yaml").write_text(
-        "train: images/train\nval: images/val\ntest: images/test\n"
-        "calib: images/calib    # solo calibrazione INT8, campione di train\n\n"
-        f"nc: {len(NAMES)}\nnames:\n"
-        + "".join(f"    {i}: {n}\n" for i, n in enumerate(NAMES)))
-
-
 # --- report --------------------------------------------------------------------
-
-def report(out: Path, videos: list[dict]) -> None:
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
-    from tools.plots import GRAY, HALF, STYLE, WIDTH, color, save
-
-    plt.style.use(STYLE)
-    splits = ["train", "val", "test", "calib"]
-    rows = []  # (split, classe, x, y, w, h) in pixel, per ogni box
-    images, empty = Counter(), Counter()
-    W, H = 640, 512  # tutti i video visibili
-    for split in splits:
-        for lab in (out / "labels" / split).glob("*.txt"):
-            lines = lab.read_text().split()
-            images[split] += 1
-            empty[split] += not lines
-            for i in range(0, len(lines), 5):
-                c, x, y, w, h = map(float, lines[i:i + 5])
-                rows.append((split, NAMES[int(c)], x * W, y * H, w * W, h * H))
-    rep = out / "report"
-    shutil.rmtree(rep, ignore_errors=True)  # niente grafici di build precedenti
-    cats = NAMES + ["background"]  # background: immagini senza oggetti
-    x = np.arange(len(cats))
-
-    # 1. immagini per split
-    fig, ax = plt.subplots(figsize=(HALF * 1.4, 2.6))
-    pos = [images[s] - empty[s] for s in splits]
-    ax.bar(splits, pos, color=[color(s) for s in splits], width=0.6)
-    ax.bar(splits, [empty[s] for s in splits], bottom=pos, color=GRAY,
-           width=0.6, label="senza oggetti")
-    for i, s in enumerate(splits):
-        ax.text(i, images[s], f"{images[s]}", ha="center", va="bottom")
-    ax.set_ylabel("immagini")
-    ax.set_title("Immagini per split")
-    ax.legend()
-    save(fig, rep / "images_per_split")
-
-    # 2. classi per split: assolute e quota di ogni classe per split
-    fig, (a1, a2) = plt.subplots(1, 2, figsize=(WIDTH, 2.8))
-    cnt = Counter((r[0], r[1]) for r in rows)
-    cnt.update({(s, "background"): empty[s] for s in splits})
-    for i, s in enumerate(splits):
-        a1.bar(x + (i - 1.5) * 0.2, [cnt[s, c] for c in cats], 0.18,
-               color=color(s), label=s)
-    a1.set_xticks(x, cats, rotation=25, ha="right")
-    a1.set_ylabel("istanze (background: immagini)")
-    a1.set_title("Istanze per classe")
-    a1.legend()
-    for i, s in enumerate(splits[:3]):
-        tot = [sum(cnt[t, c] for t in splits[:3]) or 1 for c in cats]
-        a2.bar(x + (i - 1) * 0.25, [100 * cnt[s, c] / t for c, t in zip(cats, tot)],
-               0.23, color=color(s), label=s)
-        a2.axhline(100 * SPLITS[s], color=color(s), ls="--", lw=1)
-    a2.set_xticks(x, cats, rotation=25, ha="right")
-    a2.set_ylabel("% della classe nello split")
-    a2.set_title("Quota per split (- - target)")
-    save(fig, rep / "classes_per_split")
-    print(f"report: {rep}")
-    for s in splits:
-        print(f"  {s:5s} {images[s]:6d} immagini, {empty[s]} senza oggetti")
-    if not rows:  # sottoinsieme di solo background: niente box ne' strati
-        return
-
-    # 3. box per split, come labels.jpg di Ultralytics: un campione di box
-    # centrati, densita' dei centri, densita' di larghezza x altezza (log: i
-    # box sono di poche decine di pixel su 640)
-    from matplotlib.patches import Rectangle
-
-    rng = np.random.default_rng(0)
-    fig, axes = plt.subplots(3, 3, figsize=(WIDTH, 0.85 * WIDTH))
-    wh_bins = np.logspace(np.log10(4), np.log10(W), 40)
-    for (a0, a1, a2), s in zip(axes, SPLITS):
-        b = np.array([r[2:] for r in rows if r[0] == s])
-        for x, y, w, h in b[rng.choice(len(b), min(400, len(b)), replace=False)]:
-            a0.add_patch(Rectangle((W / 2 - w / 2, H / 2 - h / 2), w, h, fill=False,
-                                   lw=0.4, alpha=0.3, color=color(s)))
-        a0.set(xlim=(0, W), ylim=(H, 0), aspect="equal")
-        a0.set_ylabel(f"{s}\n{len(b)} box")
-        a1.hist2d(b[:, 0], b[:, 1], bins=(32, 26), range=((0, W), (0, H)),
-                  cmin=1, norm="log")
-        a1.set(xlim=(0, W), ylim=(H, 0), aspect="equal")
-        a2.hist2d(b[:, 2], b[:, 3], bins=(wh_bins, wh_bins), cmin=1, norm="log")
-        a2.plot([4, W], [4, W], "--", color=GRAY, lw=0.8)  # box quadrati
-        a2.set(xscale="log", yscale="log", aspect="equal")
-        for ax in (a0, a1, a2):
-            ax.grid(False)
-        for ax in (a0, a1):  # bordo intero: e' il frame 640x512
-            ax.spines[:].set_visible(True)
-    axes[0, 0].set_title("box (campione, centrati) [px]")
-    axes[0, 1].set_title("centri [px]")
-    axes[0, 2].set_title("larghezza × altezza [px]")
-    axes[2, 0].set_xlabel("x")
-    axes[2, 1].set_xlabel("x")
-    axes[2, 2].set_xlabel("w")
-    for r in range(3):
-        axes[r, 1].set_ylabel("y")
-        axes[r, 2].set_ylabel("h")
-    save(fig, rep / "bbox_per_split")
-
-    if not videos:  # sottoinsiemi per fascia: la tabella e' quella di `all`
-        return
-
-    # 4. classe x fascia: quota dei frame di ogni cella per split
-    fig, axes = plt.subplots(1, 3, figsize=(WIDTH, 2.4))
-    for ax, s in zip(axes, SPLITS):
-        m = np.zeros((len(NAMES), len(SIZES)))
-        tot = np.zeros_like(m)
-        for v in videos:
-            i = NAMES.index(v["class"])
-            for z in v["sizes"]:
-                if z is not None:
-                    tot[i, SIZES.index(z)] += 1
-                    m[i, SIZES.index(z)] += v["split"] == s
-        pct = 100 * m / np.maximum(tot, 1)
-        ax.imshow(pct, vmin=0, vmax=100)
-        for i in range(len(NAMES)):
-            for j in range(len(SIZES)):
-                ax.text(j, i, f"{pct[i, j]:.0f}%\n{int(m[i, j])}", ha="center",
-                        va="center", fontsize=7,
-                        color="white" if pct[i, j] > 55 else "#222")
-        ax.set_xticks(range(len(SIZES)), SIZES, rotation=30)
-        ax.set_yticks(range(len(NAMES)), NAMES if ax is axes[0] else [])
-        ax.grid(False)
-        ax.set_title(f"{s} (target {SPLITS[s]:.0%})")
-    fig.suptitle("Frame di ogni cella classe × fascia per split (quota e numero)",
-                 fontsize=10)
-    save(fig, rep / "class_size_per_split")
-
 
 # --- main ----------------------------------------------------------------------
 
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    p.add_argument("--out", type=Path, default=ROOT / "data" / "svanstrom",
-                   help="dataset finale (local_path in conf/dataset/svanstrom.yaml)")
     p.add_argument("--src", type=Path, default=ROOT / "data" / "svanstrom",
                    help="una cartella per passo (docs/procedura.md): 0_raw, 1_frame, ...")
     p.add_argument("--step", choices=["frames", "tagli", "sequenze", "sessioni", "unione", "box", "sam", "fogli_sam", "cvat", "cvat_import", "meteo", "meteo_import", "dedup", "fogli_dedup", "conta"],
-                   help="solo questo passo della nuova procedura; senza, la pipeline vecchia")
+                   required=True, help="passo della procedura (docs/procedura.md)")
     p.add_argument("--hash-thr", type=int, default=16,
                    help="bit di dHash (su 64) sotto cui due frame sono uguali")
     p.add_argument("--geo-thr", type=float, default=0.05,
                    help="spostamento del centro (frazione del frame) sotto cui "
                         "il box e' fermo")
-    p.add_argument("--bg-frac", type=float, default=0.1,
-                   help="frame di background per video, in proporzione ai selezionati")
-    p.add_argument("--bg-std", type=float, default=8.0,
-                   help="deviazione standard massima (livelli di grigio) dello "
-                        "sfondo attorno al box per cancellarlo con l'inpainting")
     p.add_argument("--cut-thr", type=float, default=0.07,
                    help="punteggio sopra cui una coppia di frame e' candidata taglio")
     p.add_argument("--session-thr", type=float, default=0.95,
                    help="somiglianza media DINOv2 sopra cui due gruppi di video si uniscono")
-    p.add_argument("--n-calib", type=int, default=512)
-    p.add_argument("--seed", type=int, default=42)
     p.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) // 2))
     a = p.parse_args(argv)
 
@@ -1456,42 +1066,7 @@ def main(argv=None) -> int:
         (a.src / "2_sequenze" / "punteggi.json").write_text(json.dumps(scores))
         cut_sheets(frames, a.src / "2_sequenze" / "candidati", scores, a.cut_thr)
         return 0
-    jobs = [(raw / f"{v}.mp4", raw / f"{v}_LABELS.mat", a.src / "frames" / v,
-             a.hash_thr, a.geo_thr, a.bg_frac, a.bg_std) for v in sorted(dist)]
-    with ProcessPoolExecutor(a.workers) as ex:
-        results = list(ex.map(process_video, jobs))
-
-    skipped = [r for r in results if "skipped" in r]
-    videos = [{**r, "class": r["video"].split("_")[1].lower(), "distance": dist[r["video"]]}
-              for r in results if "skipped" not in r]
-    assign_splits(videos, a.seed)
-    # oltre a `all` (tutto), un dataset per fascia (immagini con oggetti) e uno
-    # di solo background, da aggiungere a mano: lo split bilancia anche le
-    # fasce e il background segue il video, quindi ognuno resta 70/20/10
-    size_of = {f"{v['video']}_f{n:05d}": z
-               for v in videos for n, z in zip(v["selected"], v["sizes"])}
-    subsets = {"all": lambda st: True, "background": lambda st: st.endswith("_bg")} | {
-        z: (lambda st, z=z: size_of.get(st) == z) for z in SIZES}
-    for name, keep in subsets.items():
-        build(a.out / name, a.src / "frames", videos, a.n_calib, a.seed, keep)
-
-    sel = sum(len(v["selected"]) for v in videos)
-    bg = sum(len(v["background"]) for v in videos)
-    tot = sum(v["frames"] for v in videos)
-    (a.out / "manifest.json").write_text(json.dumps({
-        "source": f"https://github.com/{REPO}", "sensor": "visible",
-        "params": {k: (str(v) if isinstance(v, Path) else v) for k, v in vars(a).items()},
-        "selected_frames": sel, "background_frames": bg, "total_frames": tot,
-        "skipped": skipped, "videos": videos}, indent=1))
-    print(f"video: {len(videos)} usati, {len(skipped)} scartati; "
-          f"frame: {sel} selezionati su {tot} ({sel / max(tot, 1):.1%}), "
-          f"{bg} di background con inpainting")
-    for s in skipped:
-        print(f"  scartato {s['video']}: {s['skipped']}")
-    for name in subsets:
-        report(a.out / name, videos if name == "all" else [])
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

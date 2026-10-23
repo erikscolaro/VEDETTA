@@ -1,34 +1,34 @@
 #!/usr/bin/env python3
 """Aggiunte per i buchi di uccelli, aerei ed elicotteri (docs/procedura.md,
 passo 10). Ogni fonte ha il suo passo `frame` (-> `1_frame/<P>_<seq>/`, label
-YOLO sul frame intero); il resto e' la catena di `tools/fred.py` con il prefisso
+YOLO sul frame intero); il resto e' la catena di `tools/pipeline.py` con il prefisso
 della fonte: annotati, dedup, ritaglio, poi le label del ritaglio diventano le
 proposte, sessioni, conteggio, CVAT.
 
 FBD-SV-2024 (uccelli, Kaggle `swjtuziwei/fbd-sv-2024`): box originali, gia'
 aderenti (visti il 19/10/2026), classe 1.
 
-    python tools/aggiunte.py --fonte fbd --step frame        # zip in data/fbd_sv/0_raw -> 1_frame
-    python tools/aggiunte.py --fonte fbd --step catena       # annotati, dedup, ritaglio, proposte
-    python tools/aggiunte.py --fonte fbd --step sessioni     # gruppi DINOv2 delle clip -> 6_sessioni
-    python tools/aggiunte.py --fonte fbd --step conta        # -> 7_conteggio, poi tools/buchi.py
-    python tools/aggiunte.py --fonte fbd --step cvat
+    python tools/extra_sources.py --fonte fbd --step frame        # zip in data/fbd_sv/0_raw -> 1_frame
+    python tools/extra_sources.py --fonte fbd --step catena       # annotati, dedup, ritaglio, proposte
+    python tools/extra_sources.py --fonte fbd --step sessioni     # gruppi DINOv2 delle clip -> 6_sessioni
+    python tools/extra_sources.py --fonte fbd --step conta        # -> 7_conteggio, poi tools/buchi.py
+    python tools/extra_sources.py --fonte fbd --step cvat
 
 DVIDS (aerei ed elicotteri militari, solo video PUBLIC DOMAIN): URL delle
 pagine in `data/dvids/0_raw/candidati.csv` (url, classe, titolo).
 
-    python tools/aggiunte.py --fonte dvids --step cerca      # API DVIDS (chiave in ~/.config/dvids.env) -> candidati.csv
-    python tools/aggiunte.py --fonte dvids --step info       # pagina: licenza, autore, mp4, durata -> video.csv
-    python tools/aggiunte.py --fonte dvids --step anteprima  # un frame ogni 10 s, dai 10 s, letti dal file remoto
-    python tools/aggiunte.py --fonte dvids --step doppioni   # video ripubblicati con un altro id -> doppioni.txt
-    python tools/aggiunte.py --fonte dvids --step scegli     # YOLO sulle anteprime -> tratti.csv
-    python tools/aggiunte.py --fonte dvids --step fogli      # un'anteprima per tratto -> fogli_tratti, poi esclusi.txt
-    python tools/aggiunte.py --fonte dvids --step escludi --fogli fogli_tratti4 --scarti scarti.txt  # revisione -> esclusi.txt
-    python tools/aggiunte.py --fonte dvids --step frame --secondi 600  # tratti a giri fino a 600 s nuovi per classe, 5 fps, + YOLO -> 1_frame
-    python tools/aggiunte.py --fonte dvids --step catena / sessioni / conta / cvat
-    python tools/aggiunte.py --fonte dvids --step fogli_grigi  # tratti poco colorati -> fogli_grigi, poi grigi.txt
-    python tools/aggiunte.py --fonte dvids --step grigi --fogli fogli_grigi --scarti data/dvids/0_raw/scarti_grigi.txt
-    python tools/aggiunte.py --fonte dvids --step fogli_verdi  # visore notturno verde -> fogli_verdi, poi verdi.txt (N)
+    python tools/extra_sources.py --fonte dvids --step cerca      # API DVIDS (chiave in ~/.config/dvids.env) -> candidati.csv
+    python tools/extra_sources.py --fonte dvids --step info       # pagina: licenza, autore, mp4, durata -> video.csv
+    python tools/extra_sources.py --fonte dvids --step anteprima  # un frame ogni 10 s, dai 10 s, letti dal file remoto
+    python tools/extra_sources.py --fonte dvids --step doppioni   # video ripubblicati con un altro id -> doppioni.txt
+    python tools/extra_sources.py --fonte dvids --step scegli     # YOLO sulle anteprime -> tratti.csv
+    python tools/extra_sources.py --fonte dvids --step fogli      # un'anteprima per tratto -> fogli_tratti, poi esclusi.txt
+    python tools/extra_sources.py --fonte dvids --step escludi --fogli fogli_tratti4 --scarti scarti.txt  # revisione -> esclusi.txt
+    python tools/extra_sources.py --fonte dvids --step frame --secondi 600  # tratti a giri fino a 600 s nuovi per classe, 5 fps, + YOLO -> 1_frame
+    python tools/extra_sources.py --fonte dvids --step catena / sessioni / conta / cvat
+    python tools/extra_sources.py --fonte dvids --step fogli_grigi  # tratti poco colorati -> fogli_grigi, poi grigi.txt
+    python tools/extra_sources.py --fonte dvids --step grigi --fogli fogli_grigi --scarti data/dvids/0_raw/scarti_grigi.txt
+    python tools/extra_sources.py --fonte dvids --step fogli_verdi  # visore notturno verde -> fogli_verdi, poi verdi.txt (N)
 """
 
 from __future__ import annotations
@@ -45,24 +45,23 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-import tools.fred as fred  # noqa: E402
+from tools import pipeline  # noqa: E402
+from tools.common import DETECTOR_CLASSES, detector  # noqa: E402
 
-FONTI = {"fbd": ("FBD", ROOT / "data" / "fbd_sv"), "dvids": ("DVIDS", ROOT / "data" / "dvids"),
+SOURCES = {"fbd": ("FBD", ROOT / "data" / "fbd_sv"), "dvids": ("DVIDS", ROOT / "data" / "dvids"),
          "antiuav": ("AUAV", ROOT / "data" / "anti_uav")}
-# classi di yolo26m-intern -> le nostre (0 airplane, 1 bird, 2 drone, 3 helicopter)
-INTERN = {0: 2, 1: 2, 2: 0, 3: 3, 4: 1}
 FPS = 5  # frame estratti al secondo dai video DVIDS (disco: ~50 GB liberi; la dedup ne toglie comunque molti)
 
 
 def seqs(src: Path) -> list[str]:
-    p = fred.PREFIX + "_"
+    p = pipeline.PREFIX + "_"
     return sorted((d.name[len(p):] for d in (src / "1_frame").iterdir() if d.name.startswith(p)), key=lambda x: (len(x), x))
 
 
 # --- FBD-SV-2024 -----------------------------------------------------------------
 
 
-def fbd_frames(src: Path) -> None:
+def xml_video_frames(src: Path) -> None:
     """Video e label VID dello zip -> `1_frame/FBD_<n>/` (frame i = XML i) e
     `0_raw/clip.csv` (sequenza, split, frame, box)."""
     import tempfile
@@ -121,10 +120,10 @@ def fbd_frames(src: Path) -> None:
 
 # --- Anti-UAV300 RGB --------------------------------------------------------------
 
-AUAV_URL = "https://huggingface.co/datasets/DestinyLove/AntiUAV300/resolve/main/yolo_rgb/images/"
+ANTIUAV_URL = "https://huggingface.co/datasets/DestinyLove/AntiUAV300/resolve/main/yolo_rgb/images/"
 
 
-def _auav_get(args) -> bool:
+def _get_image(args) -> bool:
     import time
 
     import requests
@@ -142,7 +141,7 @@ def _auav_get(args) -> bool:
     return False
 
 
-def antiuav_frames(src: Path, ogni: int = 25, workers: int = 16) -> None:
+def download_image_frames(src: Path, ogni: int = 25, workers: int = 16) -> None:
     """Un frame ogni `ogni` di ogni video da `0_raw/all_labels.txt` (mirror Hugging
     Face, licenza MIT) -> `1_frame/AUAV_<video>/{images,labels}`, frame `f<i>`
     con i l'indice nel video, label vere (un drone, classe 2)."""
@@ -163,10 +162,10 @@ def antiuav_frames(src: Path, ogni: int = 25, workers: int = 16) -> None:
         p = lab.split()
         (d / "labels" / f"{stem}.txt").write_text(f"2 {' '.join(p[1:5])}\n" if len(p) >= 5 else "")
         if not (d / "images" / f"{stem}.jpg").exists():
-            jobs.append((AUAV_URL + f.replace(".txt", ".jpg"), d / "images" / f"{stem}.jpg"))
+            jobs.append((ANTIUAV_URL + f.replace(".txt", ".jpg"), d / "images" / f"{stem}.jpg"))
         n += 1
     with ThreadPoolExecutor(workers) as ex:
-        res = list(ex.map(_auav_get, jobs))
+        res = list(ex.map(_get_image, jobs))
     for (_, img), ok in zip(jobs, res):  # mancano sul mirror (404): via anche la label
         if not ok:
             (img.parent.parent / "labels" / f"{img.stem}.txt").unlink()
@@ -270,7 +269,7 @@ NO = re.compile(r"interview|a-roll|cockpit|aerial|air-to-air|ride along|news|upd
                 r"open house", re.I)  # airshow: fumo = scia (utente, 19/10/2026)
 
 
-def dvids_search(src: Path, pages: int = 4, classe: str = "") -> None:
+def search_videos(src: Path, pages: int = 4, classe: str = "") -> None:
     """Candidati dalla API DVIDS (chiave in `~/.config/dvids.env`): per ogni
     query di `QUERY`, `pages` pagine da 50 per pertinenza, solo video HD da 15 s
     a 15 min senza parole da intervista o cabina nel titolo -> righe nuove in
@@ -315,7 +314,7 @@ def dvids_search(src: Path, pages: int = 4, classe: str = "") -> None:
     print(f"dvids: {len(new)} candidati nuovi -> {f}")
 
 
-def dvids_info(src: Path, classe: str = "", workers: int = 12) -> None:
+def video_info(src: Path, classe: str = "", workers: int = 12) -> None:
     """`candidati.csv` (solo `classe`, se data) -> `0_raw/video.csv`; si tengono
     solo le pagine con "PUBLIC DOMAIN" (le altre restano scritte con licenza NO)."""
     raw = src / "0_raw"
@@ -340,13 +339,13 @@ _DUP: set | None = None
 def _ok(r: dict) -> bool:
     global _DUP
     if _DUP is None:
-        f = FONTI["dvids"][1] / "0_raw" / "doppioni.txt"
+        f = SOURCES["dvids"][1] / "0_raw" / "doppioni.txt"
         _DUP = {ln.split()[0] for ln in f.read_text().splitlines() if ln.strip()} if f.exists() else set()
     return (r["licenza"] == "pubblico dominio" and float(r["durata"] or 0) > 15 and int(r["h"] or 0) >= 720
             and r["id"] not in _DUP)
 
 
-def dvids_duplicates(src: Path, bits: int = 6) -> None:
+def video_duplicates(src: Path, bits: int = 6) -> None:
     """Video ripubblicati con un altro id (stesso b-roll caricato da unita'
     diverse): stessa durata (entro 0,5 s) e anteprime allo stesso istante uguali
     (dHash a 64 bit entro `bits`) in almeno meta' degli istanti in comune. Il
@@ -356,7 +355,7 @@ def dvids_duplicates(src: Path, bits: int = 6) -> None:
     istanti in comune); `_ok` li esclude da tutti i passi."""
     import cv2
 
-    from tools.svanstrom import _dhash
+    from tools.common import dhash
 
     dur = {r["id"]: float(r["durata"] or 0) for r in csv.DictReader(open(src / "0_raw" / "video.csv"))}
     hs = {}  # id -> {istante: hash}
@@ -364,7 +363,7 @@ def dvids_duplicates(src: Path, bits: int = 6) -> None:
         for p in d.glob("*.jpg"):
             g = cv2.imread(str(p), cv2.IMREAD_GRAYSCALE)
             if g is not None:
-                hs.setdefault(d.name, {})[int(p.stem)] = int.from_bytes(np.packbits(_dhash(g)).tobytes(), "big")
+                hs.setdefault(d.name, {})[int(p.stem)] = int.from_bytes(np.packbits(dhash(g)).tobytes(), "big")
     vids = sorted((v for v in hs if dur.get(v)), key=lambda v: dur[v])
     got = {d.name.split("_")[1] for d in (src / "1_frame").iterdir()}
     out = []
@@ -398,7 +397,7 @@ def _thumb(args) -> None:
             out.unlink(missing_ok=True)
 
 
-def dvids_previews(src: Path, classe: str = "", step: int = 10, skip: int = 10, per_video: int = 12,
+def video_previews(src: Path, classe: str = "", step: int = 10, skip: int = 10, per_video: int = 12,
                    workers: int = 24) -> None:
     """Un frame ogni `step` s (10: con 5 s e 8 connessioni ~30 al minuto, troppo lento), dai `skip` s alla fine, letto dal file remoto (solo
     i byte vicini) -> `0_raw/anteprima/<id>/<t>.jpg` a piena risoluzione. Al piu'
@@ -427,15 +426,13 @@ def _sky(gray: np.ndarray, x1, y1, x2, y2) -> bool:
     return band.size > 0 and float(np.abs(np.diff(band.astype(np.int16), axis=1)).mean()) < 4
 
 
-def dvids_choose(src: Path, conf: float = 0.3, half: float = 5.0) -> None:
+def choose_segments(src: Path, conf: float = 0.3, half: float = 5.0) -> None:
     """YOLO sulle anteprime: un'anteprima vale se ha un aereo o elicottero (conf
     >= `conf`); tratto = +-`half` s attorno, tratti vicini uniti -> `0_raw/tratti.csv`
     (id, inizio, fine, cielo = anteprime con l'oggetto sul cielo, anteprime valide, grandezza = la piu' piccola
     sqrt(w*h) dei velivoli nelle anteprime del tratto, in pixel del frame: e' la grandezza nel ritaglio)."""
     import cv2
-    from ultralytics import YOLO
-
-    model = YOLO(str(ROOT / "data" / "modelli" / "yolo26m-intern.pt"))
+    model = detector()
     rows = []
     for r in csv.DictReader(open(src / "0_raw" / "video.csv")):
         d = src / "0_raw" / "anteprima" / r["id"]
@@ -475,10 +472,10 @@ def _done(src: Path, r: dict) -> bool:
 
 
 def _cls(c, classe: str) -> int:
-    """Classe nostra di una detection intern su DVIDS: nei video di aerei ed
+    """Classe nostra di una detection del detector su DVIDS: nei video di aerei ed
     elicotteri gli UAV sono quasi sempre aerei o elicotteri scambiati, quindi
     prendono la classe del video (anche in quelli di uccelli); nei video di droni restano droni."""
-    k = INTERN[int(c)]
+    k = DETECTOR_CLASSES[int(c)]
     return {"airplane": 0, "helicopter": 3, "bird": 1}.get(classe, k) if k == 2 else k
 
 
@@ -491,7 +488,7 @@ def _segments(src: Path) -> list[dict]:
             if int(r["cielo"]) > 0 and (r["id"], r["inizio"]) not in out]
 
 
-def dvids_sheets(src: Path, per: int = 20, classe: str = "", grandezza: float = 0, minimo: float = 0) -> None:
+def segment_sheets(src: Path, per: int = 20, classe: str = "", grandezza: float = 0, minimo: float = 0) -> None:
     """Un'anteprima per tratto (la piu' vicina al centro), numerata, a fogli da
     `per` in `0_raw/fogli_tratti/NN.jpg`, con `indice.csv` (n, id, inizio): per
     scegliere a occhio i tratti da mettere in `esclusi.txt`."""
@@ -524,7 +521,7 @@ def dvids_sheets(src: Path, per: int = 20, classe: str = "", grandezza: float = 
     print(f"dvids: {len(segs)} tratti in {-(-len(segs) // per)} fogli -> {out}")
 
 
-def dvids_exclude(src: Path, fogli: str, scarti: Path) -> None:
+def exclude_segments(src: Path, fogli: str, scarti: Path) -> None:
     """Righe `n codice` di una revisione di `0_raw/<fogli>/` (C cabina, A aria-aria
     o dall'alto, P persone, I interni, G a terra, N niente in volo, F scia di fumo
     o condensa) -> righe `id inizio codice` in `0_raw/esclusi.txt`."""
@@ -556,7 +553,7 @@ def _green(p: Path) -> float:
     return float(np.percentile(im[..., 1] - np.maximum(im[..., 0], im[..., 2]), 20))
 
 
-def dvids_smoke_sheets(src: Path, per: int = 16, nome: str = "fumo", grigio: float = 20, verde: float = 5) -> None:
+def smoke_sheets(src: Path, per: int = 16, nome: str = "fumo", grigio: float = 20, verde: float = 5) -> None:
     """Tratti di aerei gia' scaricati, mai visti in un `0_raw/fogli_fumo*/`: due
     ritagli per tratto (a 1/4 e 3/4), fogli numerati in `0_raw/fogli_fumoN/` con
     `indice.csv` (n, id, inizio_k = inizio del tratto in frame, ritagli). L'operatore
@@ -573,7 +570,7 @@ def dvids_smoke_sheets(src: Path, per: int = 16, nome: str = "fumo", grigio: flo
     seen = {(r["id"], float(r["inizio_k"])) for f in raw.glob(f"fogli_{nome}*/indice.csv") for r in csv.DictReader(open(f))}
     tenuti = None
     if nome in ("grigi", "verdi"):
-        ex = fred.excluded(src)
+        ex = pipeline.excluded(src)
         tenuti = {p.stem for p in (src / "5_box" / "preselezione").glob("DVIDS_*/*.txt") if p.stem not in ex}
     info = {r["id"]: r["classe"] for r in csv.DictReader(open(raw / "video.csv"))}
     T = {}
@@ -616,9 +613,9 @@ def dvids_smoke_sheets(src: Path, per: int = 16, nome: str = "fumo", grigio: flo
     print(f"dvids: {len(rows)} tratti in {-(-len(rows) // per)} fogli -> {out}")
 
 
-def dvids_smoke(src: Path, fogli: str, scarti: Path, nome: str = "fumo") -> None:
+def exclude_smoke(src: Path, fogli: str, scarti: Path, nome: str = "fumo") -> None:
     """Righe `n F` dell'operatore su `0_raw/<fogli>/` -> righe `id inizio_k n` in
-    `0_raw/<nome>.txt` (fumo o grigi), letto da tools/preselezione.py."""
+    `0_raw/<nome>.txt` (fumo o grigi), letto da tools/preselection.py."""
     d = src / "0_raw" / fogli
     idx = {r["n"]: r for r in csv.DictReader(open(d / "indice.csv"))}
     sc = [ln.split()[:2] for ln in open(scarti) if ln.strip()]
@@ -628,19 +625,17 @@ def dvids_smoke(src: Path, fogli: str, scarti: Path, nome: str = "fumo") -> None
     print(f"dvids: {len(sc)} tratti {nome} su {len(idx)} di {fogli}")
 
 
-def dvids_frames(src: Path, ids: list[str], secondi: float = 0, grandezza: float = 0, classe: str = "",
+def video_frames(src: Path, ids: list[str], secondi: float = 0, grandezza: float = 0, classe: str = "",
                  conf: float = 0.25, workers: int = 8, minimo: float = 0) -> None:
     """I tratti di `tratti.csv` (con almeno un'anteprima sul cielo) a `FPS` frame
     al secondo -> `1_frame/DVIDS_<id>/images/DVIDS_<id>_f<k>.jpg`, k = round(t*FPS)
-    (stabile: niente riscaricamenti), e label YOLO di yolo26m-intern sul frame
+    (stabile: niente riscaricamenti), e label YOLO del detector delle proposte sul frame
     intero (proposte, da rivedere in CVAT)."""
     import shutil
     import tempfile
 
     import cv2
-    from ultralytics import YOLO
-
-    model = YOLO(str(ROOT / "data" / "modelli" / "yolo26m-intern.pt"))
+    model = detector()
     info = {r["id"]: r for r in csv.DictReader(open(src / "0_raw" / "video.csv"))}
     by = {}
     for r in _segments(src):
@@ -702,18 +697,18 @@ def dvids_frames(src: Path, ids: list[str], secondi: float = 0, grandezza: float
 # --- comune ------------------------------------------------------------------------
 
 
-def chain(src: Path, ss: list[str]) -> None:
-    """annotati, dedup, ritaglio di fred.py; le label dei ritagli diventano le
+def run_pipeline(src: Path, ss: list[str]) -> None:
+    """annotati, dedup, ritaglio di pipeline.py; le label dei ritagli diventano le
     proposte (`5_box/proposte/`) per conteggio e CVAT."""
     import shutil
 
     # tratti con il download fallito: cartella senza frame
-    ss = [s for s in ss if any((src / "1_frame" / f"{fred.PREFIX}_{s}" / "images").glob("*.jpg"))]
-    fred.annotated(src, ss)
-    fred.dedup(src, ss)
-    fred.crop(src, ss)
+    ss = [s for s in ss if any((src / "1_frame" / f"{pipeline.PREFIX}_{s}" / "images").glob("*.jpg"))]
+    pipeline.annotated(src, ss)
+    pipeline.dedup(src, ss)
+    pipeline.crop(src, ss)
     for s in ss:
-        v = f"{fred.PREFIX}_{s}"
+        v = f"{pipeline.PREFIX}_{s}"
         shutil.copytree(src / "4_ritagli" / v / "labels", src / "5_box" / "proposte" / v, dirs_exist_ok=True)
 
 
@@ -722,7 +717,7 @@ def sessions(src: Path, thr: float = 0.9) -> None:
     FBD: gruppi per legame medio (soglia `thr`) dell'embedding DINOv2 del frame a
     meta' clip, come le sessioni automatiche di FRED (camere fisse: stesso posto)."""
     ss = seqs(src)
-    P = fred.PREFIX
+    P = pipeline.PREFIX
     if P == "DVIDS":
         ses = {s: f"{P}_{s}" for s in ss}
     elif P == "AUAV":  # <data>_<ora>_<camera>_<pezzo>: i pezzi della stessa registrazione insieme
@@ -731,7 +726,7 @@ def sessions(src: Path, thr: float = 0.9) -> None:
         import cv2
         import torch
 
-        from tools.svanstrom import propose_sessions
+        from tools.common import propose_sessions
 
         dev = "cuda" if torch.cuda.is_available() else "cpu"
         m = torch.hub.load("facebookresearch/dinov2", "dinov2_vits14", trust_repo=True).to(dev).eval()
@@ -757,7 +752,7 @@ def sessions(src: Path, thr: float = 0.9) -> None:
 
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--fonte", choices=list(FONTI), required=True)
+    p.add_argument("--fonte", choices=list(SOURCES), required=True)
     p.add_argument("--step", required=True, choices=["frame", "escludi", "fogli_fumo", "fumo", "fogli_grigi", "grigi", "fogli_verdi", "verdi", "cerca", "info", "anteprima", "doppioni", "scegli", "fogli", "catena", "sessioni",
                                                      "conta", "cvat", "cvat_import"])
     p.add_argument("--seq", nargs="+", default=[], help="sequenze (vuoto: tutte quelle in 1_frame)")
@@ -768,50 +763,50 @@ def main(argv=None) -> int:
     p.add_argument("--grandezza", type=float, default=0, help="DVIDS fogli e frame: solo i tratti con un velivolo di grandezza sqrt(w*h) sotto questa (px)")
     p.add_argument("--minimo", type=float, default=0, help="DVIDS fogli e frame: solo i tratti con il velivolo piu' piccolo almeno di questa grandezza (px)")
     a = p.parse_args(argv)
-    fred.PREFIX, src = FONTI[a.fonte]
+    pipeline.PREFIX, src = SOURCES[a.fonte]
     if a.step == "frame":
         if a.fonte == "fbd":
-            fbd_frames(src)
+            xml_video_frames(src)
         elif a.fonte == "antiuav":
-            antiuav_frames(src)
+            download_image_frames(src)
         else:
-            dvids_frames(src, a.seq, a.secondi, a.grandezza, a.classe, minimo=a.minimo)
+            video_frames(src, a.seq, a.secondi, a.grandezza, a.classe, minimo=a.minimo)
     if a.step == "cerca":
-        dvids_search(src, classe=a.classe)
+        search_videos(src, classe=a.classe)
     if a.step == "escludi":
-        dvids_exclude(src, a.fogli, a.scarti)
+        exclude_segments(src, a.fogli, a.scarti)
     if a.step == "fogli_fumo":
-        dvids_smoke_sheets(src)
+        smoke_sheets(src)
     if a.step == "fumo":
-        dvids_smoke(src, a.fogli, a.scarti)
+        exclude_smoke(src, a.fogli, a.scarti)
     if a.step == "fogli_grigi":
-        dvids_smoke_sheets(src, nome="grigi")
+        smoke_sheets(src, nome="grigi")
     if a.step == "grigi":
-        dvids_smoke(src, a.fogli, a.scarti, nome="grigi")
+        exclude_smoke(src, a.fogli, a.scarti, nome="grigi")
     if a.step == "fogli_verdi":
-        dvids_smoke_sheets(src, nome="verdi")
+        smoke_sheets(src, nome="verdi")
     if a.step == "verdi":
-        dvids_smoke(src, a.fogli, a.scarti, nome="verdi")
+        exclude_smoke(src, a.fogli, a.scarti, nome="verdi")
     if a.step == "doppioni":
-        dvids_duplicates(src)
+        video_duplicates(src)
     if a.step == "info":
-        dvids_info(src, a.classe)
+        video_info(src, a.classe)
     if a.step == "anteprima":
-        dvids_previews(src, a.classe)
+        video_previews(src, a.classe)
     if a.step == "scegli":
-        dvids_choose(src)
+        choose_segments(src)
     if a.step == "fogli":
-        dvids_sheets(src, classe=a.classe, grandezza=a.grandezza, minimo=a.minimo)
+        segment_sheets(src, classe=a.classe, grandezza=a.grandezza, minimo=a.minimo)
     if a.step == "catena":
-        chain(src, a.seq or seqs(src))
+        run_pipeline(src, a.seq or seqs(src))
     if a.step == "sessioni":
         sessions(src)
     if a.step == "conta":
-        fred.count(src)
+        pipeline.count(src)
     if a.step == "cvat":
-        fred.cvat_export(src, per_task=1000)
+        pipeline.cvat_export(src, per_task=1000)
     if a.step == "cvat_import":
-        fred.cvat_import(src)
+        pipeline.cvat_import(src)
     return 0
 
 
