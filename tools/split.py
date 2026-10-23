@@ -507,6 +507,23 @@ def threshold_sheets(per: int = 40, seed: int = 0) -> None:
     print(f"{len(order)} coppie, {-(-len(order) // 12)} fogli -> {dst}; risposte in stessa_sessione.txt")
 
 
+def band_review_sheets(lo: float = 0.92, hi: float = 0.95) -> None:
+    """Full review of the session pairs whose maximum similarity is in [lo, hi) (user, 23/10/2026): the tuning showed
+    ~36% true duplicates there and almost none below 0.92. Pairs already judged in `taratura/` are left out (their
+    answers are reused). Sheets in descending similarity -> `10_doppioni/fascia_092/` (`coppie.csv`, `fogli/RNN.jpg`);
+    the operator writes the numbers of the duplicates in `fascia_092/stessa_sessione.txt` (same recording or same
+    footage; same place on another day, or different light or saturation, is not a duplicate)."""
+    dst = INTERMEDIATE / "10_doppioni" / "fascia_092"
+    rows, e, sess, by_ses, best, cnt = _session_pairs(lo)
+    done = {tuple(sorted((r["sessione_a"], r["sessione_b"])))
+            for r in csv.DictReader(open(INTERMEDIATE / "10_doppioni" / "taratura" / "coppie.csv"))}
+    order = sorted((k for k in best if best[k][0] < hi and tuple(sorted((sess[k[0]], sess[k[1]]))) not in done),
+                   key=lambda k: -best[k][0])
+    _pair_sheets(dst, order, rows, e, sess, by_ses, best, cnt, lo, "R")
+    print(f"{lo}-{hi}: {len(order)} session pairs to review ({len(done)} already judged in taratura), "
+          f"{-(-len(order) // 12)} sheets -> {dst}")
+
+
 def threshold_marks(per_sheet: int = 12) -> None:
     """Operators' judgements on the tuning sheets, at a glance (user, 23/10/2026): reads
     `taratura/giudizi_*.txt` (lines `N S|D[?] reason`) and redraws the sheets in `taratura/fogli_esito/` with a frame
@@ -1465,7 +1482,7 @@ def export() -> None:
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--fasce", type=float, nargs="+", default=[0.6, 0.7, 0.8, 0.9, 1.01], help="anteprima: soglie")
-    p.add_argument("--step", choices=["frame", "embedding", "somiglianze", "somiglianze_tutte", "anteprima", "doppioni", "gruppi", "somiglianze_gruppi", "split", "controllo", "mosaici", "calib", "export", "figure", "soglia", "taratura", "esito_taratura", "stima_soglia"], required=True)
+    p.add_argument("--step", choices=["frame", "embedding", "somiglianze", "somiglianze_tutte", "anteprima", "doppioni", "gruppi", "somiglianze_gruppi", "split", "controllo", "mosaici", "calib", "export", "figure", "soglia", "taratura", "esito_taratura", "stima_soglia", "revisione_fascia"], required=True)
     a = p.parse_args(argv)
     if a.step == "frame":
         frame_table()
@@ -1483,6 +1500,8 @@ def main(argv=None) -> int:
         threshold_sheets()
     elif a.step == "esito_taratura":
         threshold_marks()
+    elif a.step == "revisione_fascia":
+        band_review_sheets()
     elif a.step == "stima_soglia":
         threshold_estimate()
     elif a.step == "gruppi":
