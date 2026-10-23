@@ -249,12 +249,13 @@ Le operazioni fatte, in ordine. Ogni passo ha la sua cartella e legge solo quell
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-export DETECTOR_PESI=/percorso/pesi.pt   # detector delle proposte (privato, non in repo): fred yolo, DVIDS, background
-export NO_PROXY=localhost,127.0.0.1      # CVAT locale; credenziali in ~/.config/cvat.env (CVAT_USER, CVAT_PASS)
+cp .env.example .env                     # poi compilare: pesi del detector e di SAM, credenziali CVAT
+export NO_PROXY=localhost,127.0.0.1      # CVAT locale, se c'è un proxy di sistema
 ```
 
-I pesi di SAM 2.1 (`data/input/modelli/sam2.1_l.pt`) si scaricano da soli al primo uso. Gli script si lanciano dalla
-radice della repo con `.venv/bin/python`. I parametri di ogni passo sono in `--help`.
+`.env` dice quali modelli usare: `DETECTOR_PESI` (detector delle proposte, pesi privati, mai in repo) e `SAM_PESI`
+(SAM 2.1, scaricato da Ultralytics al primo uso). Gli script si lanciano dalla radice della repo con
+`.venv/bin/python`. I parametri di ogni passo sono in `--help`.
 
 ```
 data/
@@ -370,3 +371,5 @@ python tools/distributions.py                    # grandezze disponibili e scale
 | `tools/preselection.py`, `sample.py` | preselezione prima di CVAT, campioni per stimare la revisione |
 | `tools/split.py` | gruppi, split, mosaici, calibrazione, export, figure |
 | `tools/distributions.py`, `plots.py` | curva obiettivo e stile dei grafici |
+| `templates/dataset_readme.md` | modello del README di `data/output` (scritto dall'export) |
+| `.env.example` | quali modelli usare e credenziali CVAT, da copiare in `.env` |

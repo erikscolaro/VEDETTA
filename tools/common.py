@@ -16,15 +16,40 @@ OUTPUT = DATA / "output"  # dataset finale, congelato
 DETECTOR_CLASSES = {0: 2, 1: 2, 2: 0, 3: 3, 4: 1}
 
 
+def _load_env(f: Path = ROOT / ".env") -> None:
+    """Impostazioni locali da `.env` (modello in `.env.example`): righe `CHIAVE=valore`, `#` per i commenti. Le
+    variabili gia' nell'ambiente vincono."""
+    if f.exists():
+        for ln in f.read_text().splitlines():
+            k, sep, v = ln.split("#", 1)[0].partition("=")
+            if sep and k.strip() and v.strip():  # vuoto = non impostato
+                os.environ.setdefault(k.strip(), v.strip())
+
+
+_load_env()
+
+
+def _weights(var: str) -> str:
+    """Percorso dei pesi da `$<var>`, relativo alla radice della repo se non assoluto."""
+    p = os.environ.get(var)
+    if not p:
+        raise SystemExit(f"serve {var} in .env (vedi .env.example)")
+    return str(ROOT / p)  # ROOT / assoluto = assoluto
+
+
 def detector():
-    """YOLO delle proposte e del filtro del background: pesi privati, fuori dalla repo, dal percorso in
-    `$DETECTOR_PESI`. Le classi sono mappate con `DETECTOR_CLASSI`."""
+    """YOLO delle proposte e del filtro del background: pesi privati, fuori dalla repo, da `DETECTOR_PESI`. Le classi
+    sono mappate con `DETECTOR_CLASSES`."""
     from ultralytics import YOLO
 
-    pesi = os.environ.get("DETECTOR_PESI")
-    if not pesi:
-        raise SystemExit("serve DETECTOR_PESI=<percorso dei pesi del detector delle proposte>")
-    return YOLO(pesi)
+    return YOLO(_weights("DETECTOR_PESI"))
+
+
+def sam():
+    """SAM 2 per i box (Svanström, FRED), pesi da `SAM_PESI`; Ultralytics li scarica se mancano."""
+    from ultralytics import SAM
+
+    return SAM(_weights("SAM_PESI"))
 
 
 NAMES = ["airplane", "bird", "drone", "helicopter"]  # stesso ordine di AOD4
@@ -113,9 +138,10 @@ def propose_sessions(emb: dict[str, np.ndarray], thr: float) -> tuple[list[str],
 
 
 def cvat_client():
-    """Client CVAT su localhost:8080, credenziali in ~/.config/cvat.env
-    (CVAT_USER, CVAT_PASS)."""
+    """Client CVAT da `.env` (`CVAT_URL`, `CVAT_USER`, `CVAT_PASS`); in mancanza le credenziali da ~/.config/cvat.env."""
     from cvat_sdk import make_client
 
-    env = dict(ln.split("=", 1) for ln in (Path.home() / ".config" / "cvat.env").read_text().split())
-    return make_client("http://localhost:8080", credentials=(env["CVAT_USER"], env["CVAT_PASS"]))
+    env = os.environ
+    if "CVAT_USER" not in env:
+        env = dict(ln.split("=", 1) for ln in (Path.home() / ".config" / "cvat.env").read_text().split())
+    return make_client(os.environ.get("CVAT_URL", "http://localhost:8080"), credentials=(env["CVAT_USER"], env["CVAT_PASS"]))

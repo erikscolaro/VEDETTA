@@ -1359,7 +1359,7 @@ def export() -> None:
         f"| {s} | {sum(v for (x, _), v in c.items() if x == s):,} | {c[s, 'reale']:,} | {c[s, 'mosaico']:,} | "
         f"{c[s, 'background']:,} |\n".replace(",", ".") for s in ("train", "val", "test", "calib"))
     import datetime
-    (out / "README.md").write_text((ROOT / "tools" / "output_readme.md").read_text()
+    (out / "README.md").write_text((ROOT / "templates" / "dataset_readme.md").read_text()
                                    .replace("{conteggi}", tab.strip()).replace("{data}", f"{datetime.date.today():%d/%m/%Y}"))
     c = Counter((r["split"], r["tipo"]) for r in rows)
     for s in ("train", "val", "test", "calib"):

@@ -966,7 +966,7 @@ def main(argv=None) -> int:
         # clip difficili + pulite segnate sbagliate in revisione; un json per clip,
         # cosi' si riprende da dove si era fermi
         import csv
-        from ultralytics import SAM
+        from tools.common import sam
         box = a.src / "4_box"
         bad = {ln.split()[1] for ln in open(box / "pulite_sbagliate.txt") if not ln.startswith("#")}
         clips = defaultdict(list)
@@ -974,7 +974,7 @@ def main(argv=None) -> int:
             if r["tipo_clip"] == "difficile" or r["clip"] in bad:
                 clips[r["clip"]].append(r)
         (box / "sam").mkdir(exist_ok=True)
-        model = SAM(str(INPUT / "modelli" / "sam2.1_l.pt"))
+        model = sam()
         t0 = time.time()
         for n, (clip, rows) in enumerate(sorted(clips.items()), 1):
             dst = box / "sam" / f"{clip.replace('/', '_')}.json"

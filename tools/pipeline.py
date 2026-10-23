@@ -14,7 +14,7 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # anche lanciato come script
-from tools.common import INPUT, BAND_EDGES, BANDS  # noqa: E402
+from tools.common import BAND_EDGES, BANDS  # noqa: E402
 
 PREFIX = ""  # nome dei video (`<PREFIX>_<seq>`), deciso dalla fonte
 
@@ -152,11 +152,11 @@ def sam(src: Path, seqs: list[str]) -> None:
     import json
 
     import cv2
-    from ultralytics import SAM
+    from tools.common import sam
 
     from tools.common import mask_box
 
-    model = SAM(str(INPUT / "modelli" / "sam2.1_l.pt"))
+    model = sam()
     out = src / "5_box" / "sam"
     out.mkdir(parents=True, exist_ok=True)
     for s in seqs:
@@ -236,8 +236,8 @@ def motion(src: Path, seqs: list[str], grow: float = 1.5, n_bg: int = 60, use_sa
 
     model = None
     if use_sam:
-        from ultralytics import SAM
-        model = SAM(str(INPUT / "modelli" / "sam2.1_l.pt"))
+        from tools.common import sam
+        model = sam()
     off = {(r["clip"], int(r["frame"])): (int(r["x0"]), int(r["y0"]))
            for r in csv.DictReader(open(src / "4_ritagli" / "ritagli.csv"))}
     out = src / "5_box" / "movimento"

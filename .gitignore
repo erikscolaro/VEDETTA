@@ -15,6 +15,7 @@ data/intermediate/*
 data/output/*
 !data/output/.gitkeep
 
-# appunti di lavoro locali
+# impostazioni e appunti locali
+.env
 STATUS.md
 docs/procedura.md
