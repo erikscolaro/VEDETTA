@@ -2,7 +2,7 @@
 """Distribuzione continua della grandezza sqrt(w*h) per classe sulle label finali (stessi frame di
 tools/buchi.py: Svanström sui frame tenuti, aggiunte da 5_box/manuale), box >= 8 px in origine.
 
-Due figure in docs/figure/ (considerazioni in docs/distribuzioni.md), con la curva ideale (TOTALE alzato per classe con SCALA)
+Due figure in docs/figure/ (motivazioni nel README, Regole), con la curva ideale (TOTALE alzato per classe con SCALA)
 come linea continua e lo stesso asse verticale nei 4 grafici:
 - distribuzioni.png: istogramma per classe con le istanze per fascia (rosso: sotto il minimo per cella);
 - distribuzioni_scale.png: la stessa con lo scale di Ultralytics (s = 0,25 e 0,5) calcolato in modo esatto.
@@ -21,20 +21,20 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from tools.common import INPUT, NAMES  # noqa: E402
 from tools.plots import _P, STYLE, WIDTH, save  # noqa: E402
-from tools.common import NAMES  # noqa: E402
 
-DATA, OUT = ROOT / "data", ROOT / "docs" / "figure"
+OUT = ROOT / "docs" / "figure"
 W, H = 640, 512
 MIN = 8  # box sotto gli 8 px in origine esclusi (utente, 22/10/2026)
-TARGET = round(2000 / 0.7)  # minimo per cella (regole.md)
+TARGET = round(2000 / 0.7)  # minimo per cella (README.md (Regole))
 EDGES = [8, 16, 32, 64, 96]
 BANDS = [(8, 16), (16, 32), (32, 64), (64, 96), (96, 1e9)]
 CLASSES = ["airplane", "bird", "drone", "helicopter"]
-# distribuzione ideale: densita' in log s proporzionale a s^-alpha su [SMIN, SMAX] (docs/distribuzioni.md)
+# distribuzione ideale: densita' in log s proporzionale a s^-alpha su [SMIN, SMAX] (README.md, Regole)
 ALPHA = dict.fromkeys(["airplane", "bird", "drone", "helicopter"], 0.3)  # stessa curva per tutte (utente, 23/10/2026)
 SMIN, SMAX = 8, 320
-TOTAL = round(10_000 / 0.7)  # box per classe della curva ideale: 10.000 nel train, split 70/20/10 (regole.md)
+TOTAL = round(10_000 / 0.7)  # box per classe della curva ideale: 10.000 nel train, split 70/20/10 (README.md (Regole))
 # curva alzata (utente, 23/10/2026): almeno 10.000 istanze per classe nel train, 2.000 in val, 1.000 in test; la stessa
 # curva traslata in alto fa da tetto (sopra) e da obiettivo dei mosaici (sotto), cosi' la forma resta s^-alpha
 SCALE = dict.fromkeys(["airplane", "bird", "drone", "helicopter"], 1.2)
@@ -55,14 +55,14 @@ def sizes() -> dict[str, np.ndarray]:
                 c, _, _, w, h = ln.split()
                 out[NAMES[int(c)]].append(np.sqrt(float(w) * W * float(h) * H))
 
-    sv = DATA / "svanstrom"  # frame tenuti dalla deduplica, label di 4_box/manuale (come svanstrom.count_cells)
+    sv = INPUT / "svanstrom"  # frame tenuti dalla deduplica, label di 4_box/manuale (come svanstrom.count_cells)
     for r in csv.DictReader(open(sv / "6_dedup" / "tenuti.csv")):
         clip, v = r["clip"], r["clip"].split("/")[0]
         t = sv / "4_box" / "manuale" / clip.replace("/", "_") / f"{v}_f{int(r['frame']):05d}.txt"
         if t.exists():
             add(t)
     for s in ["fred", "dvids", "fbd_sv", "anti_uav"]:  # come fred.count
-        src = DATA / s
+        src = INPUT / s
         ses = {r["clip"] for r in csv.DictReader(open(src / "6_sessioni" / "sessioni.csv"))}
         f = src / "5_box" / "preselezione" / "esclusi.txt"
         esclusi = {ln.split()[0] for ln in open(f) if ln.strip()} if f.exists() else set()

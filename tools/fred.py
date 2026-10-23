@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """FRED (Florence RGB-Event Drone dataset, ACM MM 2025, Apache 2.0) come
-aggiunta per i buchi dei droni (docs/procedura.md, passo 10). Uno zip per
+aggiunta per i buchi dei droni (README.md (Procedura), passo 10). Uno zip per
 sequenza su Hugging Face; dentro, prima i dati a eventi e in fondo label e
 frame RGB: si leggono solo questi, con richieste HTTP a intervalli.
 
@@ -39,8 +39,8 @@ import requests
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from tools.common import INPUT, BAND_EDGES, BANDS  # noqa: E402
 from tools import pipeline  # noqa: E402
-from tools.common import BAND_EDGES, BANDS  # noqa: E402
 from tools.pipeline import (annotated, count, crop, cvat_export, cvat_import, dedup, motion,  # noqa: E402
                           proposals, sam, sam_sheets, yolo)
 
@@ -217,7 +217,7 @@ def _sec(name: str) -> float:
 
 
 def _split(seq: str) -> str:
-    return next(r["split"] for r in csv.DictReader(open(ROOT / "data" / "fred" / "0_raw" / "sequenze.csv"))
+    return next(r["split"] for r in csv.DictReader(open(INPUT / "fred" / "0_raw" / "sequenze.csv"))
                 if r["sequenza"] == seq)
 
 
@@ -402,7 +402,7 @@ def session_sheets(src: Path, gap: float = 3600, thr: float = 0.9) -> None:
 
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--src", type=Path, default=ROOT / "data" / "fred", help="una cartella per passo")
+    p.add_argument("--src", type=Path, default=INPUT / "fred", help="una cartella per passo")
     p.add_argument("--step", choices=["label", "anteprima", "frame", "annotati", "dedup", "ritaglio", "sam", "yolo", "movimento", "fogli_sam", "fogli_yolo", "fogli_movimento", "sessioni", "proposte", "conta", "cvat", "cvat_import"], required=True)
     p.add_argument("--seq", nargs="+", default=[], help="sequenze (numeri) per frame, dedup, ritaglio")
     a = p.parse_args(argv)

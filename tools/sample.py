@@ -4,9 +4,9 @@
     python tools/sample.py --step fogli --nome qualita --fonti fbd_sv:48 anti_uav:48 --seed 1 --zoom --senza-esclusi
     python tools/sample.py --step stima --nome revisione
 
-`fogli`: ritagli a caso (seed fisso) di `data/<fonte>/4_ritagli/` con le box di
+`fogli`: ritagli a caso (seed fisso) di `data/input/<fonte>/4_ritagli/` con le box di
 `5_box/preselezione/` (o `proposte/`) disegnate, numerati, in
-`data/aggregati/campioni/<nome>/` con `indice.csv` (n, fonte, frame, box). Con
+`data/intermediate/campioni/<nome>/` con `indice.csv` (n, fonte, frame, box). Con
 `--zoom` accanto a ogni ritaglio uno zoom 4x sulla box piu' grande; con
 `--senza-esclusi` solo i ritagli non tolti dalla preselezione.
 
@@ -29,9 +29,9 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from tools.common import INPUT, INTERMEDIATE  # noqa: E402
 from tools import pipeline  # noqa: E402
 
-DATA = ROOT / "data"
 COL = {0: (0, 165, 255), 1: (255, 0, 255), 2: (0, 0, 255), 3: (255, 255, 0)}
 LET = "AUDE"  # aereo, uccello, drone, elicottero
 
@@ -39,15 +39,15 @@ LET = "AUDE"  # aereo, uccello, drone, elicottero
 def sheets(nome: str, fonti: dict[str, int], seed: int, zoom: bool, senza_esclusi: bool) -> None:
     import cv2
 
-    out = DATA / "aggregati" / "campioni" / nome
+    out = INTERMEDIATE / "campioni" / nome
     out.mkdir(parents=True, exist_ok=True)
     rng = random.Random(seed)
     rows, tiles = [], []
     for src, n in fonti.items():
-        ex = pipeline.excluded(DATA / src) if senza_esclusi else set()
-        imgs = [p for p in sorted((DATA / src / "4_ritagli").glob("*/images/*.jpg")) if p.stem not in ex]
+        ex = pipeline.excluded(INPUT / src) if senza_esclusi else set()
+        imgs = [p for p in sorted((INPUT / src / "4_ritagli").glob("*/images/*.jpg")) if p.stem not in ex]
         for p in rng.sample(imgs, n):
-            lab = pipeline.boxes(DATA / src) / p.parent.parent.name / f"{p.stem}.txt"
+            lab = pipeline.boxes(INPUT / src) / p.parent.parent.name / f"{p.stem}.txt"
             im = cv2.imread(str(p))
             raw = im.copy()
             bs = [(int(c), *map(float, r)) for c, *r in (ln.split() for ln in lab.read_text().splitlines())] if lab.exists() else []
@@ -83,15 +83,15 @@ def sheets(nome: str, fonti: dict[str, int], seed: int, zoom: bool, senza_esclus
 
 
 def estimate(nome: str) -> None:
-    d = DATA / "aggregati" / "campioni" / nome
+    d = INTERMEDIATE / "campioni" / nome
     idx = {r["n"]: r["fonte"] for r in csv.DictReader(open(d / "indice.csv"))}
     g = {r["n"]: r for r in csv.DictReader(open(d / "giudizi.csv"))}
     for src in dict.fromkeys(idx.values()):
         n = sum(v == src for v in idx.values())
         fix = [g[k] for k, v in idx.items() if v == src and k in g and g[k]["giudizio"] == "fix"]
         dub = sum(1 for k, v in idx.items() if v == src and k in g and g[k]["giudizio"] == "dubbio")
-        ex = pipeline.excluded(DATA / src)
-        tot = sum(p.stem not in ex for p in (DATA / src / "4_ritagli").glob("*/images/*.jpg"))
+        ex = pipeline.excluded(INPUT / src)
+        tot = sum(p.stem not in ex for p in (INPUT / src / "4_ritagli").glob("*/images/*.jpg"))
         print(f"{src}: {len(fix)}/{n} da correggere ({len(fix) / n:.0%}), {dub} dubbi; "
               f"per tipo {dict(Counter(r['tipo'] for r in fix))}; in CVAT {tot} ritagli -> ~{round(tot * len(fix) / n)}")
 

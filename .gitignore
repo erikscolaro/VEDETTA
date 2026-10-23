@@ -1,5 +1,20 @@
-data/
 __pycache__/
 *.pyc
 .venv/
-immagini/
+
+# dati: solo la struttura; input e intermediate restano fuori da git
+data/*
+!data/input/
+!data/intermediate/
+!data/output/
+data/input/*
+!data/input/.gitkeep
+data/intermediate/*
+!data/intermediate/.gitkeep
+# output: per ora solo la cartella, finche' non si decide come versionare il dataset (GitHub o Hugging Face)
+data/output/*
+!data/output/.gitkeep
+
+# appunti di lavoro locali
+STATUS.md
+docs/procedura.md

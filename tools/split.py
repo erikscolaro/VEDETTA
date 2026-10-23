@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Passi 11-14 della procedura, su tutte le fonti insieme (`data/aggregati/`).
+"""Passi 11-14 della procedura, su tutte le fonti insieme (`data/intermediate/`).
 
 Passo 11, gruppi (23/10/2026): embedding DINOv2 di ogni frame annotato di tutte le fonti; il video o la
-registrazione resta l'unita' minima, gli embedding servono solo a unire. Un file per cosa, in `aggregati/9_split/`.
+registrazione resta l'unita' minima, gli embedding servono solo a unire. Un file per cosa, in `intermediate/9_split/`.
 
     python tools/split.py --step frame        # frame.csv: frame annotati tenuti, tutte le fonti
     python tools/split.py --step embedding    # embedding_s.npy: DINOv2 ViT-S per frame
@@ -31,27 +31,27 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-DATA = ROOT / "data"
+from tools.common import DATA, INPUT, INTERMEDIATE, OUTPUT  # noqa: E402
 
 
 def discarded() -> set[str]:
     """Clip tolte dal dataset in ogni fonte: scie e scartate di Svanstrom,
     scartate di FRED (`*/*_box/scie.txt`, `*/*_box/scartate.txt`)."""
     out = set()
-    for f in list(DATA.glob("*/*_box/scie.txt")) + list(DATA.glob("*/*_box/scartate.txt")):
+    for f in list(INPUT.glob("*/*_box/scie.txt")) + list(INPUT.glob("*/*_box/scartate.txt")):
         out |= {ln.split("#")[0].strip() for ln in open(f) if ln.split("#")[0].strip()}
     return out
 
 
 def frame_table() -> None:
     """Passo 11, tabella dei frame annotati tenuti (con almeno un box) di tutte le fonti ->
-    `aggregati/9_split/frame.csv` (fonte, video, clip, sessione, immagine, label, box). Stessi frame dei
+    `intermediate/9_split/frame.csv` (fonte, video, clip, sessione, immagine, label, box). Stessi frame dei
     conteggi: Svanstrom da `6_dedup/tenuti.csv` con le label di `4_box/manuale/`, le altre fonti come
     `pipeline.count` (label di CVAT per le sequenze riviste, altrimenti preselezione, senza gli esclusi)."""
     from tools.pipeline import boxes, excluded
 
     rows, via = [], discarded()
-    sv = DATA / "svanstrom"
+    sv = INPUT / "svanstrom"
     ses = {r["clip"]: r["sessione"] for r in csv.DictReader(open(sv / "3_sessioni" / "sessioni.csv"))}
     for r in csv.DictReader(open(sv / "6_dedup" / "tenuti.csv")):
         clip, v = r["clip"], r["clip"].split("/")[0]
@@ -59,7 +59,7 @@ def frame_table() -> None:
         rows.append(("svanstrom", v, clip, ses[clip], sv / "1_frame" / v / "images" / f"{stem}.jpg",
                      sv / "4_box" / "manuale" / clip.replace("/", "_") / f"{stem}.txt"))
     for s in ("fred", "dvids", "anti_uav", "fbd_sv"):
-        src = DATA / s
+        src = INPUT / s
         ses = {r["clip"]: r["sessione"] for r in csv.DictReader(open(src / "6_sessioni" / "sessioni.csv"))}
         esclusi = excluded(src)
         for d in sorted((src / "5_box" / "proposte").iterdir()):
@@ -71,7 +71,7 @@ def frame_table() -> None:
                 if t.stem not in esclusi:
                     rows.append((s, d.name, clip, ses[clip], src / "4_ritagli" / d.name / "images" / f"{t.stem}.jpg",
                                  (man if man.exists() else boxes(src) / d.name) / t.name))
-    out = DATA / "aggregati" / "9_split"
+    out = INTERMEDIATE / "9_split"
     out.mkdir(parents=True, exist_ok=True)
     n, kept = Counter(), []
     for s, v, clip, se, img, lab in rows:
@@ -125,8 +125,8 @@ def embed(paths: list, batch: int = 512, workers: int = 16) -> np.ndarray:
 
 
 def frame_embedding() -> None:
-    """Passo 11, `embed` di ogni riga di `frame.csv` -> `aggregati/9_split/embedding_s.npy` (stesso ordine)."""
-    out = DATA / "aggregati" / "9_split"
+    """Passo 11, `embed` di ogni riga di `frame.csv` -> `intermediate/9_split/embedding_s.npy` (stesso ordine)."""
+    out = INTERMEDIATE / "9_split"
     e = embed([str(DATA / r["immagine"]) for r in csv.DictReader(open(out / "frame.csv"))])
     np.save(out / "embedding_s.npy", e)
     print(f"embedding: {e.shape} -> {out / 'embedding_s.npy'}")
@@ -137,12 +137,12 @@ def similarity_plot(per_clip: int = 10, n_pairs: int = 100_000, seed: int = 0) -
     frame: per ogni fonte due sessioni con due clip ciascuna (DVIDS: quattro video), `per_clip` frame a passo
     regolare per clip. A sinistra la matrice, a destra la distribuzione su `n_pairs` coppie a caso per tipo
     (stessa clip, stessa sessione e altra clip, sessioni diverse) con l'AUC stessa sessione contro sessioni
-    diverse -> `aggregati/9_split/somiglianze_s.png`."""
+    diverse -> `intermediate/9_split/somiglianze_s.png`."""
     import matplotlib.pyplot as plt
 
     from tools.plots import STYLE, WIDTH, _P, save
 
-    out = DATA / "aggregati" / "9_split"
+    out = INTERMEDIATE / "9_split"
     rows = list(csv.DictReader(open(out / "frame.csv")))
     rng = np.random.default_rng(seed)
     by_clip = defaultdict(list)
@@ -210,15 +210,15 @@ def similarity_all(gruppi: bool = False, lo: float = -0.2, bins: int = 240, bloc
     fra gruppi di N/px frame consecutivi (esatta: la media dei coseni fra due gruppi e' il prodotto delle medie
     degli embedding), quindi l'area di ogni fonte e' proporzionale ai suoi frame.
     A destra gli istogrammi esatti di tutte le coppie di frame (i < j) per tipo, a blocchi sulla GPU, con l'AUC
-    stessa sessione contro sessioni diverse -> `aggregati/9_split/somiglianze_tutte.png`. Con `gruppi`
+    stessa sessione contro sessioni diverse -> `intermediate/9_split/somiglianze_tutte.png`. Con `gruppi`
     (`11_gruppi/gruppi.csv`) altre due curve, stesso gruppo e altra sessione (le coppie unite a mano) e gruppi
-    diversi, e un riquadro sulla coda in scala log -> `aggregati/11_gruppi/somiglianze_gruppi.png`."""
+    diversi, e un riquadro sulla coda in scala log -> `intermediate/11_gruppi/somiglianze_gruppi.png`."""
     import matplotlib.pyplot as plt
     import torch
 
     from tools.plots import STYLE, WIDTH, _P, save
 
-    out = DATA / "aggregati" / "9_split"
+    out = INTERMEDIATE / "9_split"
     rows = list(csv.DictReader(open(out / "frame.csv")))
     order = sorted(range(len(rows)), key=lambda i: (rows[i]["fonte"], rows[i]["sessione"], rows[i]["clip"]))
     rows = [rows[i] for i in order]
@@ -229,7 +229,7 @@ def similarity_all(gruppi: bool = False, lo: float = -0.2, bins: int = 240, bloc
     si = {s: k for k, s in enumerate(sess)}
     cid = torch.tensor([ci[r["clip"]] for r in rows], device="cuda")
     sid = torch.tensor([si[r["fonte"] + ":" + r["sessione"]] for r in rows], device="cuda")
-    grp = {r["sessione"]: r["gruppo"] for r in csv.DictReader(open(DATA / "aggregati" / "11_gruppi" / "gruppi.csv"))}\
+    grp = {r["sessione"]: r["gruppo"] for r in csv.DictReader(open(INTERMEDIATE / "11_gruppi" / "gruppi.csv"))}\
         if gruppi else {s: s for s in sess}
     gi = {g: k for k, g in enumerate(dict.fromkeys(grp.values()))}
     pid = torch.tensor([gi[grp[r["fonte"] + ":" + r["sessione"]]] for r in rows], device="cuda")
@@ -302,7 +302,7 @@ def similarity_all(gruppi: bool = False, lo: float = -0.2, bins: int = 240, bloc
                   + f"{auc:.3f}".replace(".", ","), fontsize=7)
     f.suptitle("DINOv2 ViT-S/14, tutti i frame annotati", fontsize=8)
     print(f"AUC {auc:.4f}, coppie {', '.join(f'{x.sum():,.0f}' for x in h)}, mediane {[round(float(x), 3) for x in med]}",
-          save(f, DATA / "aggregati" / "11_gruppi" / "somiglianze_gruppi" if gruppi else out / "somiglianze_tutte", pdf=False))
+          save(f, INTERMEDIATE / "11_gruppi" / "somiglianze_gruppi" if gruppi else out / "somiglianze_tutte", pdf=False))
 
 
 TILE = (256, 205, 16)  # miniatura 640x512 -> 256x205, striscia di testo sopra
@@ -312,8 +312,9 @@ def _who(r: dict) -> str:
     return f"{r['fonte']} {r['sessione'].split('_')[-1]} {r['video'].split('_')[-1]}"
 
 
-def _tile(r: dict, text: str) -> np.ndarray:
-    """Miniatura di un frame di `frame.csv` con i box in rosso e `text` sopra."""
+def _tile(r: dict, text: str | None, lw: int = 2) -> np.ndarray:
+    """Miniatura di un frame di `frame.csv` con i box in rosso (spessore `lw` a 640x512) e `text` sopra (None: senza
+    striscia)."""
     import cv2
 
     W, H, TH = TILE
@@ -322,25 +323,28 @@ def _tile(r: dict, text: str) -> np.ndarray:
         if ln.strip():
             _, x, y, w, h = map(float, ln.split())
             cv2.rectangle(im, (int((x - w / 2) * 640) - 3, int((y - h / 2) * 512) - 3),
-                          (int((x + w / 2) * 640) + 3, int((y + h / 2) * 512) + 3), (0, 0, 255), 2)
+                          (int((x + w / 2) * 640) + 3, int((y + h / 2) * 512) + 3), (0, 0, 255), lw)
     im = cv2.resize(im, (W, H), interpolation=cv2.INTER_AREA)
+    if text is None:
+        return im
     bar = np.full((TH, W, 3), 255, np.uint8)
     cv2.putText(bar, text, (3, 12), cv2.FONT_HERSHEY_SIMPLEX, .38, (0, 0, 0), 1, cv2.LINE_AA)
     return np.vstack([bar, im])
 
 
-def pair_preview(edges=(0.6, 0.7, 0.8, 0.9, 1.01), per: int = 6, seed: int = 0, block: int = 4096) -> None:
-    """Anteprima di coppie di frame di sessioni diverse, una riga per fascia di somiglianza (0,6-0,7, 0,7-0,8, ...):
-    `per` coppie a caso per fascia, box disegnati, somiglianza e fonte/sessione/video sopra ogni immagine. Stampa per
-    fascia le coppie di frame e le coppie di sessioni coinvolte -> `aggregati/9_split/anteprima_sessioni_diverse_<prima soglia>.jpg`."""
-    import cv2
+def _pairs_by_band(edges, seed: int = 0, block: int = 4096, same_clip: bool = False):
+    """Coppie di frame di `frame.csv` per fascia di somiglianza DINOv2 (coseno, `embedding_s.npy`): di sessioni
+    diverse, o della stessa clip con `same_clip`. Per fascia fino a 50 candidati a caso per blocco (sim, i, j), il
+    numero di coppie di frame e l'insieme delle coppie di sessioni -> (rows, cand, n_pairs, ses_pairs)."""
     import torch
 
-    out = DATA / "aggregati" / "9_split"
+    out = INTERMEDIATE / "9_split"
     rows = list(csv.DictReader(open(out / "frame.csv")))
     e = torch.from_numpy(np.load(out / "embedding_s.npy")).cuda()
     si = {s: k for k, s in enumerate(dict.fromkeys(r["fonte"] + ":" + r["sessione"] for r in rows))}
     sid = torch.tensor([si[r["fonte"] + ":" + r["sessione"]] for r in rows], device="cuda")
+    ci = {c: k for k, c in enumerate(dict.fromkeys(r["clip"] for r in rows))}
+    cid = torch.tensor([ci[r["clip"]] for r in rows], device="cuda")
     n, nb = len(rows), len(edges) - 1
     g = torch.Generator(device="cuda").manual_seed(seed)
     cand = [[] for _ in range(nb)]  # (sim, i, j) a caso, fino a 50 per blocco e fascia
@@ -350,7 +354,7 @@ def pair_preview(edges=(0.6, 0.7, 0.8, 0.9, 1.01), per: int = 6, seed: int = 0, 
         for s in range(0, n, block):
             i = j[s:s + block]
             S = (e[i] @ e.T).float()
-            ok = (j[None] > i[:, None]) & (sid[i][:, None] != sid[None])
+            ok = (j[None] > i[:, None]) & ((cid[i][:, None] == cid[None]) if same_clip else (sid[i][:, None] != sid[None]))
             for b in range(nb):
                 ii, jj = torch.nonzero(ok & (S >= edges[b]) & (S < edges[b + 1]), as_tuple=True)
                 n_pairs[b] += len(ii)
@@ -359,6 +363,18 @@ def pair_preview(edges=(0.6, 0.7, 0.8, 0.9, 1.01), per: int = 6, seed: int = 0, 
                     ses_pairs[b] |= set(zip(torch.minimum(a, c).tolist(), torch.maximum(a, c).tolist()))
                     k = torch.randperm(len(ii), generator=g, device="cuda")[:50]
                     cand[b] += zip(S[ii[k], jj[k]].tolist(), i[ii[k]].tolist(), jj[k].tolist())
+    return rows, cand, n_pairs, ses_pairs
+
+
+def pair_preview(edges=(0.6, 0.7, 0.8, 0.9, 1.01), per: int = 6, seed: int = 0, block: int = 4096) -> None:
+    """Anteprima di coppie di frame di sessioni diverse, una riga per fascia di somiglianza (0,6-0,7, 0,7-0,8, ...):
+    `per` coppie a caso per fascia, box disegnati, somiglianza e fonte/sessione/video sopra ogni immagine. Stampa per
+    fascia le coppie di frame e le coppie di sessioni coinvolte -> `intermediate/9_split/anteprima_sessioni_diverse_<prima soglia>.jpg`."""
+    import cv2
+
+    out = INTERMEDIATE / "9_split"
+    rows, cand, n_pairs, ses_pairs = _pairs_by_band(edges, seed, block)
+    nb = len(edges) - 1
     rng = np.random.default_rng(seed)
     W, H, TH = TILE
 
@@ -384,15 +400,15 @@ def pair_preview(edges=(0.6, 0.7, 0.8, 0.9, 1.01), per: int = 6, seed: int = 0, 
 
 def duplicate_sheets(thr: float = 0.95, per_sheet: int = 12, seed: int = 0, block: int = 4096) -> None:
     """Passo 11, doppioni fra sessioni: ogni coppia di sessioni diverse con almeno una coppia di frame >= `thr`
-    -> `aggregati/10_doppioni/coppie.csv` (n, sessioni, fonti, massimo, coppie di frame sopra soglia, frame
+    -> `intermediate/10_doppioni/coppie.csv` (n, sessioni, fonti, massimo, coppie di frame sopra soglia, frame
     della coppia migliore) e fogli numerati `fogli/DNN.jpg`, una riga per coppia di sessioni: la coppia di frame
     piu' simile, poi un frame a caso di A con il frame di B piu' simile a lui (utente, 23/10/2026). L'utente risponde con i numeri da unire, che vanno in
     `10_doppioni/unire.txt` (un numero per riga, `#` per i commenti), letto dal passo dei gruppi."""
     import cv2
     import torch
 
-    out = DATA / "aggregati" / "9_split"
-    dst = DATA / "aggregati" / "10_doppioni"
+    out = INTERMEDIATE / "9_split"
+    dst = INTERMEDIATE / "10_doppioni"
     (dst / "fogli").mkdir(parents=True, exist_ok=True)
     rows = list(csv.DictReader(open(out / "frame.csv")))
     e = torch.from_numpy(np.load(out / "embedding_s.npy")).cuda()
@@ -463,12 +479,12 @@ def _merges(f: Path) -> list[int]:
 
 
 def groups() -> None:
-    """Passo 11, gruppi -> `aggregati/11_gruppi/`. Unione (union-find) delle sessioni note di ogni fonte con le
+    """Passo 11, gruppi -> `intermediate/11_gruppi/`. Unione (union-find) delle sessioni note di ogni fonte con le
     coppie di `10_doppioni/unire.txt`: `gruppi.csv` (sessione, gruppo, frame). Niente deduplica dei frame fra
     sessioni (23/10/2026): i doppioni veri (stessi box nello stesso punto) sono 17 coppie sopra 0,95."""
-    out = DATA / "aggregati" / "11_gruppi"
+    out = INTERMEDIATE / "11_gruppi"
     out.mkdir(parents=True, exist_ok=True)
-    rows = list(csv.DictReader(open(DATA / "aggregati" / "9_split" / "frame.csv")))
+    rows = list(csv.DictReader(open(INTERMEDIATE / "9_split" / "frame.csv")))
     keys = [r["fonte"] + ":" + r["sessione"] for r in rows]
     sess = list(dict.fromkeys(keys))
     parent = {s: s for s in sess}
@@ -479,7 +495,7 @@ def groups() -> None:
             s = parent[s]
         return s
 
-    dop = DATA / "aggregati" / "10_doppioni"
+    dop = INTERMEDIATE / "10_doppioni"
     pairs = {int(r["n"]): (r["sessione_a"], r["sessione_b"]) for r in csv.DictReader(open(dop / "coppie.csv"))}
     for k in _merges(dop / "unire.txt"):
         a, b = pairs[k]
@@ -561,7 +577,7 @@ def _split_trial(seed: int) -> tuple:
 
 
 def split_groups(trials: int = 1000, big: float = 0.02, share: float = 0.75, seed: int = 0) -> None:
-    """Passo 11, split per gruppi -> `aggregati/12_split/`. Via le immagini con un box sotto gli 8 px (utente,
+    """Passo 11, split per gruppi -> `intermediate/12_split/`. Via le immagini con un box sotto gli 8 px (utente,
     23/10/2026: in nessuno split). Ogni gruppo di `11_gruppi/gruppi.csv` va tutto in uno split. Obiettivi per
     classe: val = 20% della curva (`distribuzioni.ideale`, `TOT` per classe, curva alzata) su intervalli di mezza ottava (`FINE`,
     utente 23/10/2026: con le 5 fasce la forma dentro la fascia era libera), al piu' il 20% di quello che c'e';
@@ -574,10 +590,10 @@ def split_groups(trials: int = 1000, big: float = 0.02, share: float = 0.75, see
     from tools.distributions import ALPHA, CUT, TOT, ideal, uniform
 
     edges = [8, 16, 32, 64, 96, 1e9]
-    out = DATA / "aggregati" / "12_split"
+    out = INTERMEDIATE / "12_split"
     out.mkdir(parents=True, exist_ok=True)
-    rows = list(csv.DictReader(open(DATA / "aggregati" / "9_split" / "frame.csv")))
-    grp = {r["sessione"]: r["gruppo"] for r in csv.DictReader(open(DATA / "aggregati" / "11_gruppi" / "gruppi.csv"))}
+    rows = list(csv.DictReader(open(INTERMEDIATE / "9_split" / "frame.csv")))
+    grp = {r["sessione"]: r["gruppo"] for r in csv.DictReader(open(INTERMEDIATE / "11_gruppi" / "gruppi.csv"))}
     names = ["airplane", "bird", "drone", "helicopter"]
     gids = sorted(set(grp.values()))
     gi = {g: k for k, g in enumerate(gids)}
@@ -674,10 +690,10 @@ def split_check(block: int = 4096) -> None:
 
     from tools.plots import STYLE, WIDTH, _P, save
 
-    out = DATA / "aggregati" / "12_split"
-    rows = list(csv.DictReader(open(DATA / "aggregati" / "9_split" / "frame.csv")))
+    out = INTERMEDIATE / "12_split"
+    rows = list(csv.DictReader(open(INTERMEDIATE / "9_split" / "frame.csv")))
     fs = [r["split"] for r in csv.DictReader(open(out / "frame_split.csv"))]
-    grp = {r["sessione"]: r["gruppo"] for r in csv.DictReader(open(DATA / "aggregati" / "11_gruppi" / "gruppi.csv"))}
+    grp = {r["sessione"]: r["gruppo"] for r in csv.DictReader(open(INTERMEDIATE / "11_gruppi" / "gruppi.csv"))}
     names, edges = ["airplane", "bird", "drone", "helicopter"], [16, 32, 64, 96]
     bands = ["8-16", "16-32", "32-64", "64-96", ">96"]
     cell = defaultdict(lambda: (set(), set()))
@@ -693,7 +709,7 @@ def split_check(block: int = 4096) -> None:
         for b in bands:
             v, te = cell["val", c, b], cell["test", c, b]
             print(f"  {c:<11}{b:>7}   {len(v[0]):>6} ({len(v[1])}){'':>10}{len(te[0]):>6} ({len(te[1])})")
-    e = torch.from_numpy(np.load(DATA / "aggregati" / "9_split" / "embedding_s.npy")).cuda()
+    e = torch.from_numpy(np.load(INTERMEDIATE / "9_split" / "embedding_s.npy")).cuda()
     tr = torch.tensor([i for i, s in enumerate(fs) if s == "train"], device="cuda")
     near = {}
     for s in ("val", "test"):
@@ -714,7 +730,7 @@ def split_check(block: int = 4096) -> None:
 
 
 def train_mosaics(seed: int = 0, factors=(0.5, 0.25, 0.125)) -> None:
-    """Passo 12, tetto del train e mosaici ridotti -> `aggregati/13_train_compensation/` (utente, 23/10/2026, regole.md).
+    """Passo 12, tetto del train e mosaici ridotti -> `intermediate/13_train_compensation/` (utente, 23/10/2026, README.md (Regole)).
     Tetto = curva: obiettivo del train per classe e mezza ottava (`FINE`) = 70% della curva (10.000 per classe); via, a turno fra i video,
     le immagini del train con tutti i box in celle sopra l'obiettivo (`tetto.csv`). Con quelle immagini, mosaici
     640x512 per le celle sotto l'obiettivo: per ogni immagine il fattore (0,5, 0,25, 0,125 -> griglia 2x2, 4x4,
@@ -731,13 +747,13 @@ def train_mosaics(seed: int = 0, factors=(0.5, 0.25, 0.125)) -> None:
     edges, names = QUARTER_OCTAVES, ["airplane", "bird", "drone", "helicopter"]  # quarti d'ottava (utente, 23/10/2026: droni 8-12 px)
     nb = len(edges) - 1
     bands = [f"{edges[k]:.0f}-{edges[k + 1]:.0f}" if k < nb - 1 else f">{edges[k]:.0f}" for k in range(nb)]
-    out = DATA / "aggregati" / "13_train_compensation"
+    out = INTERMEDIATE / "13_train_compensation"
     for d in ("images", "labels"):
         (out / d).mkdir(parents=True, exist_ok=True)
         for f in (out / d).iterdir():
             f.unlink()
-    rows = list(csv.DictReader(open(DATA / "aggregati" / "9_split" / "frame.csv")))
-    fs = [r["split"] for r in csv.DictReader(open(DATA / "aggregati" / "12_split" / "frame_split.csv"))]
+    rows = list(csv.DictReader(open(INTERMEDIATE / "9_split" / "frame.csv")))
+    fs = [r["split"] for r in csv.DictReader(open(INTERMEDIATE / "12_split" / "frame_split.csv"))]
     target = 0.7 * np.array([ideal(TOT[c], ALPHA[c], edges, CUT[c]) for c in names])  # tetto: curva alzata
     target[target == 0] = np.inf  # oltre la fine della curva (uccelli > 96 px) nessun tetto
     fill = 0.7 * np.array([ideal(TOT[c], ALPHA[c], edges, CUT[c]) for c in names])  # mosaici: la stessa curva alzata
@@ -850,7 +866,7 @@ def train_mosaics(seed: int = 0, factors=(0.5, 0.25, 0.125)) -> None:
         w = csv.writer(fh)
         w.writerow(["immagine", "label", "tipo"])
         w.writerows((rows[i]["immagine"], rows[i]["label"], "reale") for i in sorted(kept))
-        w.writerows((f"aggregati/13_train_compensation/images/{p.stem}.jpg", f"aggregati/13_train_compensation/labels/{p.stem}.txt", "mosaico")
+        w.writerows((f"intermediate/13_train_compensation/images/{p.stem}.jpg", f"intermediate/13_train_compensation/labels/{p.stem}.txt", "mosaico")
                     for p in sorted((out / "images").glob("*.jpg")))
     print(f"mosaici: {n_m} ({', '.join(f'x{round(1 / f)} {-(-len(v) // round(1 / f) ** 2)}' for f, v in sorted(tiles.items(), reverse=True))}), "
           f"{len(recs)} caselle da {sum(len(v) for v in tiles.values())} immagini; train {len(kept)} reali + {n_m} mosaici")
@@ -862,16 +878,16 @@ def train_mosaics(seed: int = 0, factors=(0.5, 0.25, 0.125)) -> None:
 
 
 def calib(n: int = 512, bg: float = 0.1, seed: int = 0) -> None:
-    """Passo 14, immagini di calibrazione int8 -> `aggregati/15_calib/calib.csv` (immagine, label, tipo, cella).
+    """Passo 14, immagini di calibrazione int8 -> `intermediate/15_calib/calib.csv` (immagine, label, tipo, cella).
     Solo dal train e solo immagini vere (niente mosaici): `bg` di background, il resto in parti uguali fra le 20
     celle classe x fascia; per ogni cella a turno fra i video, un'immagine conta per la cella per cui e' scelta."""
     edges, names = [16, 32, 64, 96], ["airplane", "bird", "drone", "helicopter"]
     bands = ["8-16", "16-32", "32-64", "64-96", ">96"]
     rng = np.random.default_rng(seed)
-    out = DATA / "aggregati" / "15_calib"
+    out = INTERMEDIATE / "15_calib"
     out.mkdir(parents=True, exist_ok=True)
-    train = [r for r in csv.DictReader(open(DATA / "aggregati" / "13_train_compensation" / "train.csv")) if r["tipo"] == "reale"]
-    video = {r["immagine"]: r["video"] for r in csv.DictReader(open(DATA / "aggregati" / "9_split" / "frame.csv"))}
+    train = [r for r in csv.DictReader(open(INTERMEDIATE / "13_train_compensation" / "train.csv")) if r["tipo"] == "reale"]
+    video = {r["immagine"]: r["video"] for r in csv.DictReader(open(INTERMEDIATE / "9_split" / "frame.csv"))}
     by_cell = defaultdict(lambda: defaultdict(list))  # cella -> video -> immagini
     for r in train:
         for ln in (DATA / r["label"]).read_text().splitlines():
@@ -896,7 +912,7 @@ def calib(n: int = 512, bg: float = 0.1, seed: int = 0) -> None:
                     chosen.add(r["immagine"])
                     rows.append((r["immagine"], r["label"], "reale", f"{cell[0]} {cell[1]}"))
                     got += 1
-    bgs = [r for r in csv.DictReader(open(DATA / "background" / "0_raw" / "background.csv"))
+    bgs = [r for r in csv.DictReader(open(INPUT / "background" / "0_raw" / "background.csv"))
            if r["split"] == "train" and (DATA / r["immagine"]).exists()]
     rows += [(r["immagine"], "", "background", "") for r in rng.choice(bgs, n_bg, replace=False)]
     with open(out / "calib.csv", "w", newline="") as fh:
@@ -914,36 +930,61 @@ OUT_NAMES = ["drone", "airplane", "helicopter", "bird"]
 OUT_ID = [OUT_NAMES.index(c) for c in ("airplane", "bird", "drone", "helicopter")]
 
 
-def _output_plot(rows: list, out: Path) -> None:
+# testi delle figure per lingua (utente, 23/10/2026: anche in inglese, pubblico USA)
+_TXT = {
+    "it": {"classi": {"drone": "Drone", "airplane": "Aereo", "helicopter": "Elicottero", "bird": "Uccello"},
+           "orig": "Dati originali (prima della selezione)", "reali": "Addestramento, immagini reali",
+           "mosaici": "Addestramento, mosaici sintetici", "val": "Validazione", "test": "Test",
+           "ob_train": "Obiettivo addestramento", "ob_val": "Obiettivo validazione", "ob_test": "Obiettivo test (uniforme)",
+           "xsize": r"Dimensione del box $\sqrt{w\,h}$ [px]", "ysize": "Istanze per intervallo",
+           "short": ["Stesso gruppo,\naltra clip (leakage)", "Gruppi diversi\n(fondo)", "Validazione", "Test"],
+           "xsim": "Somiglianza con l'immagine\npiù vicina dell'addestramento", "a": "(a) Distribuzioni", "b": "(b) Coda",
+           "fondo": "Fondo", "leak": "Leakage", "xthr": "Soglia di somiglianza\n", "ythr": "Quota di immagini sopra la soglia",
+           "dec": ","},
+    "en": {"classi": {"drone": "Drone", "airplane": "Airplane", "helicopter": "Helicopter", "bird": "Bird"},
+           "orig": "Original data (before selection)", "reali": "Training, real images",
+           "mosaici": "Training, synthetic mosaics", "val": "Validation", "test": "Test",
+           "ob_train": "Training target", "ob_val": "Validation target", "ob_test": "Test target (uniform)",
+           "xsize": r"Box size $\sqrt{w\,h}$ [px]", "ysize": "Instances per bin",
+           "short": ["Same group,\nother clip (leakage)", "Different groups\n(baseline)", "Validation", "Test"],
+           "xsim": "Similarity to the nearest\ntraining image", "a": "(a) Distributions", "b": "(b) Tail",
+           "fondo": "Baseline", "leak": "Leakage", "xthr": "Similarity threshold\n", "ythr": "Share of images above threshold",
+           "dec": "."},
+}
+
+
+def _output_plot(rows: list, out: Path, lang: str = "it", src_names=("airplane", "bird", "drone", "helicopter"),
+                 table: bool = True) -> None:
     """`distribuzione.{png,pdf}` dell'export, per la tesi (testi in italiano, senza titolo: va nella didascalia):
     istanze per grandezza sqrt(w*h) e classe in addestramento (reali in blu, mosaici in giallo), validazione e test,
     l'ombra grigia dei dati originali (tutte le immagini annotate, prima di ogni selezione), con gli obiettivi
     (curva alzata al 70% e al 20%, test uniforme in log s). Istanze ed errore rispetto all'obiettivo,
-    sum|osservato - obiettivo| / sum(obiettivo) sulle mezze ottave (`FINE`), in `distribuzione.md`."""
+    sum|osservato - obiettivo| / sum(obiettivo) sulle mezze ottave (`FINE`), in `distribuzione.md` (se `table`).
+    `lang` it o en (`_TXT`; in inglese il file e' `distribution_en`); `src_names`: ordine delle classi nelle label
+    di `rows` (sorgenti nell'export, `OUT_NAMES` se le label vengono da `data/output`)."""
     import matplotlib.pyplot as plt
 
     from tools.distributions import ALPHA, BINS, CUT, SMIN, TOT, _axes, curve, ideal, uniform
     from tools.plots import STYLE, WIDTH, _P, save
 
-    names = ["airplane", "bird", "drone", "helicopter"]  # id delle label sorgente
-    it = {"drone": "Drone", "airplane": "Aereo", "helicopter": "Elicottero", "bird": "Uccello"}
-    sp_it = {"train": "Addestramento", "val": "Validazione", "test": "Test"}
+    T = _TXT[lang]
+    it = T["classi"]
     s = defaultdict(list)
-    rep = list(csv.DictReader(open(DATA / "aggregati" / "12_split" / "report.csv")))
+    rep = list(csv.DictReader(open(INTERMEDIATE / "12_split" / "report.csv")))
 
-    def sizes(lab):
+    def sizes(lab, names=("airplane", "bird", "drone", "helicopter")):  # id delle label sorgente
         for ln in (DATA / lab).read_text().splitlines():
             c, _, _, w, h = ln.split()
             yield names[int(c)], np.sqrt(float(w) * 640 * float(h) * 512)
 
     for r in rows:
         if r["lab"] and r["split"] in ("train", "val", "test"):
-            for c, v in sizes(r["lab"]):
+            for c, v in sizes(r["lab"], src_names):
                 s[r["split"], c].append(v)
                 if r["tipo"] == "mosaico":
                     s["mosaico", c].append(v)
     # dati originali: tutte le immagini annotate, prima di filtro < 8 px, split, tetto e mosaici
-    for r in csv.DictReader(open(DATA / "aggregati" / "9_split" / "frame.csv")):
+    for r in csv.DictReader(open(INTERMEDIATE / "9_split" / "frame.csv")):
         for c, v in sizes(r["label"]):
             s["orig", c].append(v)
 
@@ -958,19 +999,19 @@ def _output_plot(rows: list, out: Path) -> None:
         h_or = np.histogram(s["orig", c], BINS)[0]
         h_tr = np.histogram(s["train", c], BINS)[0]
         h_mo = np.histogram(s["mosaico", c], BINS)[0]
-        ax.stairs(h_or, BINS, fill=True, color="0.6", alpha=.22, lw=0, zorder=0, label="Dati originali (prima della selezione)")
+        ax.stairs(h_or, BINS, fill=True, color="0.6", alpha=.22, lw=0, zorder=0, label=T["orig"])
         ax.stairs(h_or, BINS, color="0.5", lw=.5, zorder=1.5)  # davanti alla zona < 8 px: si vede anche cosa e' stato tolto
-        ax.stairs(h_tr - h_mo, BINS, fill=True, color=_P[0], alpha=.35, lw=0, label="Addestramento, immagini reali")
+        ax.stairs(h_tr - h_mo, BINS, fill=True, color=_P[0], alpha=.35, lw=0, label=T["reali"])
         ax.stairs(h_tr, BINS, baseline=h_tr - h_mo, fill=True, color=_P[3], alpha=.75, lw=0,
-                  label="Addestramento, mosaici sintetici")
+                  label=T["mosaici"])
         ax.stairs(h_tr, BINS, color=_P[0], lw=.6, alpha=.8)
         for sp, col in (("val", _P[1]), ("test", _P[2])):
-            ax.stairs(np.histogram(s[sp, c], BINS)[0], BINS, color=col, lw=1.1, label=sp_it[sp])
-        ax.plot(*curve(TOT[c] * .7, ALPHA[c], CUT[c]), color="0.1", lw=.9, label="Obiettivo addestramento")
-        ax.plot(*curve(TOT[c] * .2, ALPHA[c], CUT[c]), color="0.1", lw=.9, ls=(0, (4, 2)), label="Obiettivo validazione")
+            ax.stairs(np.histogram(s[sp, c], BINS)[0], BINS, color=col, lw=1.1, label=T[sp])
+        ax.plot(*curve(TOT[c] * .7, ALPHA[c], CUT[c]), color="0.1", lw=.9, label=T["ob_train"])
+        ax.plot(*curve(TOT[c] * .2, ALPHA[c], CUT[c]), color="0.1", lw=.9, ls=(0, (4, 2)), label=T["ob_val"])
         n_t = sum(float(r["obiettivo_test"]) for r in rep if r["classe"] == c)  # test: uniforme in log s
         ax.plot([SMIN, CUT[c]], [n_t * dlog / np.log(CUT[c] / SMIN)] * 2, color="0.1", lw=.9, ls=(0, (1, 1.5)),
-                label="Obiettivo test (uniforme)")
+                label=T["ob_test"])
         _axes(ax, c, 0)
         ax.set_title("")  # il titolo centrato di `_assi` (in inglese) non serve
         ax.set_title(f"({'abcd'[k_ax]}) {it[c]}", loc="left", fontsize=9)
@@ -991,14 +1032,16 @@ def _output_plot(rows: list, out: Path) -> None:
     axs[0, 0].set_yscale("log")  # originali (centinaia), addestramento, val e test (decine) leggibili insieme (utente)
     axs[0, 0].set_ylim(3, top * 1.5)
     for ax in axs[1]:
-        ax.set_xlabel(r"Dimensione del box $\sqrt{w\,h}$ [px]")
+        ax.set_xlabel(T["xsize"])
     for ax in axs[:, 0]:
-        ax.set_ylabel("Istanze per intervallo")
+        ax.set_ylabel(T["ysize"])
     hs, ls = axs[0, 0].get_legend_handles_labels()
     # handle: 0 originali, 1 reali, 2 mosaici, 3 validazione, 4 test, 5 ob. addestramento, 6 ob. validazione, 7 ob. test
     order = [0, 5, 1, 6, 2, 7, 3, 4]  # quattro colonne di due: i dati sopra, gli obiettivi sotto
     f.legend([hs[k] for k in order], [ls[k] for k in order], loc="outside lower center", ncol=4, fontsize=7, frameon=False)
-    save(f, out / "distribuzione", pdf=True)
+    save(f, out / ("distribuzione" if lang == "it" else "distribution_en"), pdf=True)
+    if not table:
+        return
     # la tabella che accompagna il grafico (utente, 23/10/2026): stessi numeri, fuori dalla figura
     lab = [f"{HALF_OCTAVES[k]:.0f}–{HALF_OCTAVES[k + 1]:.0f}" if k < len(HALF_OCTAVES) - 2 else f"> {HALF_OCTAVES[k]:.0f}" for k in range(len(HALF_OCTAVES) - 1)]
     L = ["# Distribuzione delle grandezze", "",
@@ -1015,21 +1058,22 @@ def _output_plot(rows: list, out: Path) -> None:
               f"{num(round(ide['val'][k]))} | {num(int(h['test'][k]))} | {num(round(ide['test'][k]))} |" for k in range(len(lab))]
     (out / "distribuzione.md").write_text("\n".join(L).replace("%", " %") + "\n")
 
-def _leakage_plot(out: Path, block: int = 2048) -> None:
+def _leakage_plot(out: Path, block: int = 2048, lang: str = "it", table: bool = True) -> None:
     """`leakage.{png,pdf,md}` dell'export, per la tesi: per ogni immagine reale di validazione e test la somiglianza
     DINOv2 (ViT-S, coseno) con l'immagine reale piu' vicina dell'addestramento, contro due riferimenti dentro
     l'addestramento: stesso gruppo e altra clip (com'e' fatto un leakage vero) e gruppi diversi (il fondo: il cielo
     somiglia al cielo). (a) densita', (b) quota di immagini sopra ogni soglia, in scala logaritmica; 0,95 e' la
-    soglia dei doppioni rivisti a mano. La tabella con mediana, percentili e quote in `leakage.md`."""
+    soglia dei doppioni rivisti a mano. La tabella con mediana, percentili e quote in `leakage.md` (se `table`).
+    Legge solo `intermediate/` (frame, split, gruppi, embedding), scrive in `out`; `lang` it o en (`leakage_en`)."""
     import matplotlib.pyplot as plt
     import torch
 
     from tools.plots import STYLE, WIDTH, _P, save
 
-    rows = list(csv.DictReader(open(DATA / "aggregati" / "9_split" / "frame.csv")))
-    sp = [r["split"] for r in csv.DictReader(open(DATA / "aggregati" / "12_split" / "frame_split.csv"))]
-    grp = {r["sessione"]: r["gruppo"] for r in csv.DictReader(open(DATA / "aggregati" / "11_gruppi" / "gruppi.csv"))}
-    e = torch.from_numpy(np.load(DATA / "aggregati" / "9_split" / "embedding_s.npy")).cuda()
+    rows = list(csv.DictReader(open(INTERMEDIATE / "9_split" / "frame.csv")))
+    sp = [r["split"] for r in csv.DictReader(open(INTERMEDIATE / "12_split" / "frame_split.csv"))]
+    grp = {r["sessione"]: r["gruppo"] for r in csv.DictReader(open(INTERMEDIATE / "11_gruppi" / "gruppi.csv"))}
+    e = torch.from_numpy(np.load(INTERMEDIATE / "9_split" / "embedding_s.npy")).cuda()
     gi = {g: k for k, g in enumerate(sorted(set(grp.values())))}
     ci = {c: k for k, c in enumerate(sorted({r["clip"] for r in rows}))}
     g = torch.tensor([gi[grp[r["fonte"] + ":" + r["sessione"]]] for r in rows], device="cuda")
@@ -1059,7 +1103,8 @@ def _leakage_plot(out: Path, block: int = 2048) -> None:
     # (a) un violino orizzontale per confronto, dall'alto: leakage, fondo, validazione, test
     keys = ["Addestramento, stesso gruppo e altra clip (leakage)", "Addestramento, gruppi diversi (fondo)",
             "Validazione → addestramento", "Test → addestramento"]
-    short = ["Stesso gruppo,\naltra clip (leakage)", "Gruppi diversi\n(fondo)", "Validazione", "Test"]
+    T = _TXT[lang]
+    short = T["short"]
     cols = ["0.2", "0.6", _P[1], _P[2]]
     plt.style.use(STYLE)
     f, (a1, a2) = plt.subplots(1, 2, figsize=(WIDTH, WIDTH * 0.45))  # stessa larghezza per i due pannelli
@@ -1073,30 +1118,30 @@ def _leakage_plot(out: Path, block: int = 2048) -> None:
         q1, med, q3 = np.percentile(res[k], [25, 50, 75])
         a1.plot([q1, q3], [y, y], color=col, lw=3, solid_capstyle="butt")
         a1.plot([med], [y], marker="o", ms=4.5, color="white", mec=col, mew=1.2, zorder=5)
-        a1.text(1.01, y, f"{med:.2f}".replace(".", ","), va="center", ha="left", fontsize=7, color="0.2",
+        a1.text(1.01, y, f"{med:.2f}".replace(".", T["dec"]), va="center", ha="left", fontsize=7, color="0.2",
                 transform=a1.get_yaxis_transform())
     a1.set_yticks(pos, short, fontsize=7.5)
     a1.set_xlim(.3, .999)
     a1.axvline(.95, color="0.4", lw=.7)
-    a1.text(.95, pos[-1] - .5, " 0,95", ha="left", va="center", fontsize=7, color="0.3")
-    a1.set_xlabel("Somiglianza con l'immagine\npiù vicina dell'addestramento", fontsize=8)
-    a1.set_title("(a) Distribuzioni", loc="left", fontsize=9)
+    a1.text(.95, pos[-1] - .5, f" 0{T['dec']}95", ha="left", va="center", fontsize=7, color="0.3")
+    a1.set_xlabel(T["xsim"], fontsize=8)
+    a1.set_title(T["a"], loc="left", fontsize=9)
     a1.grid(axis="y", visible=False)
     # (b) coda: quota di immagini sopra ogni soglia
     x = 1 - np.geomspace(.5, .002, 600)  # fitto vicino a 1, dove l'asse si allarga
     tail = {k: np.array([(res[k] >= s).mean() for s in x]) for k in keys}
-    a2.fill_between(x, 1e-5, np.maximum(tail[keys[1]], 1e-5), color="0.6", alpha=.3, lw=0, label="Fondo")
-    a2.plot(x, tail[keys[0]], color=cols[0], lw=1.6, ls=(0, (4, 2)), label="Leakage")
+    a2.fill_between(x, 1e-5, np.maximum(tail[keys[1]], 1e-5), color="0.6", alpha=.3, lw=0, label=T["fondo"])
+    a2.plot(x, tail[keys[0]], color=cols[0], lw=1.6, ls=(0, (4, 2)), label=T["leak"])
     for k, col, lab in zip(keys[2:], cols[2:], short[2:]):
         a2.plot(x, tail[k], color=col, lw=1.6, label=lab)
     a2.axvline(.95, color="0.4", lw=.7)
     a2.set_yscale("log")
     a2.set_xlim(.5, .999)
     a2.set_ylim(1e-4, 1.3)
-    a2.set_xlabel("Soglia di somiglianza\n", fontsize=8)  # due righe come (a), assi allineati
-    a2.set_ylabel("Quota di immagini sopra la soglia", fontsize=8)
-    a2.set_title("(b) Coda", loc="left", fontsize=9)
-    a2.text(.95, 1.5e-4, " 0,95", ha="left", va="bottom", fontsize=7, color="0.3")
+    a2.set_xlabel(T["xthr"], fontsize=8)  # due righe come (a), assi allineati
+    a2.set_ylabel(T["ythr"], fontsize=8)
+    a2.set_title(T["b"], loc="left", fontsize=9)
+    a2.text(.95, 1.5e-4, f" 0{T['dec']}95", ha="left", va="bottom", fontsize=7, color="0.3")
     f.legend(*a2.get_legend_handles_labels(), loc="outside lower center", ncol=4, fontsize=7, frameon=False)
     # asse x che allarga la zona vicino a 1 (utente, 23/10/2026): -log10(1 - s), tacche in somiglianza
     for a in (a1, a2):
@@ -1105,8 +1150,10 @@ def _leakage_plot(out: Path, block: int = 2048) -> None:
         a.set_xticks([.5, .9, .99, .999])
         a.xaxis.set_minor_locator(plt.NullLocator())
         a.tick_params(labelsize=7.5)
-        a.xaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"{v:g}".replace(".", ",")))
-    save(f, out / "leakage", pdf=True)
+        a.xaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"{v:g}".replace(".", T["dec"])))
+    save(f, out / ("leakage" if lang == "it" else "leakage_en"), pdf=True)
+    if not table:
+        return
 
     def fmt(v):
         return f"{v:.3f}".replace(".", ",")
@@ -1130,13 +1177,92 @@ def _leakage_plot(out: Path, block: int = 2048) -> None:
     (out / "leakage.md").write_text("\n".join(L) + "\n")
 
 
+FIG = ROOT / "docs" / "figure"  # figure del README, in italiano e in inglese
+
+
+def figures() -> None:
+    """Figure del dataset finito per il README, in `docs/figure/`, in italiano e in inglese (`distribuzione`,
+    `distribution_en`, `leakage`, `leakage_en`): stesse funzioni dell'export, ma `data/output` (congelato) si legge
+    soltanto (manifest e label, con gli id di `OUT_NAMES`); niente tabelle .md."""
+    out = OUTPUT
+    rows = [dict(split=r["split"], tipo=r["tipo"],
+                 lab=None if r["tipo"] == "background" else
+                 str(Path("output") / "labels" / r["split"] / (Path(r["immagine"]).stem + ".txt")))
+            for r in csv.DictReader(open(out / "manifest.csv"))]
+    for lang in ("it", "en"):
+        _output_plot(rows, FIG, lang, src_names=OUT_NAMES, table=False)
+        _leakage_plot(FIG, lang=lang, table=False)
+    print(f"figure -> {FIG}")
+
+
+def threshold_panel(edges=(0.80, 0.85, 0.90, 0.95, 0.98, 1.01), per: int = 3, seed: int = 0) -> None:
+    """Pannello per la tesi sulla soglia 0,95 dei doppioni fra sessioni (`docs/figure/soglia.{png,pdf}` e
+    `soglia_en`): una riga per fascia di somiglianza DINOv2 con `per` coppie a caso (seed fisso) di frame di
+    sessioni diverse, box in rosso, e in fondo coppie della stessa clip come riferimento. Sotto 0,95 riprese diverse
+    con lo stesso tipo di cielo; sopra, la stessa ripresa o lo stesso girato ripubblicato (le 146 coppie di sessioni
+    sopra 0,95 rivisti a mano e unite, passo 10). Riferimento: le coppie della stessa clip al 25°, 50° e 75°
+    percentile della loro somiglianza (a caso sarebbero troppo disperse: una clip DVIDS cambia inquadratura)."""
+    import matplotlib.pyplot as plt
+
+    from tools.plots import STYLE, WIDTH, save
+
+    rows, cand, n_pairs, ses_pairs = _pairs_by_band(edges, seed)
+    _, ref, n_ref, _ = _pairs_by_band((-1, 1.01), seed, same_clip=True)
+    rng = np.random.default_rng(seed)
+    picks = [[c[x] for x in rng.choice(len(c), min(per, len(c)), replace=False)] for c in cand]
+    r0 = sorted(ref[0])
+    picks.append([r0[int(q * (len(r0) - 1))] for q in np.linspace(.25, .75, per)])
+    tiles = [[(sv, _tile(rows[i], None, lw=6)[:, :, ::-1], _tile(rows[j], None, lw=6)[:, :, ::-1]) for sv, i, j in pk]
+             for pk in picks]
+    nb = len(edges) - 1
+    txt = {"it": dict(dec=",", band="Sessioni diverse", ref="Stessa clip\n(riferimento)", thr="soglia 0,95",
+                      pairs="coppie di sessioni"),
+           "en": dict(dec=".", band="Different sessions", ref="Same clip\n(reference)", thr="threshold 0.95",
+                      pairs="session pairs")}
+    plt.style.use(STYLE)
+    for lang, T in txt.items():
+        def num(v, d=2):
+            return f"{v:.{d}f}".replace(".", T["dec"])
+
+        wr = sum(([1, 1, .12] for _ in range(per)), [])[:-1]
+        left, top, row = .2, .25, (1 - .2) * WIDTH / sum(wr) * .8 + .28  # in pollici: immagine 5:4 + titolo
+        H = (nb + 1) * row + top
+        f, axs = plt.subplots(nb + 1, len(wr), figsize=(WIDTH, H), gridspec_kw=dict(width_ratios=wr, wspace=.03))
+        f.set_layout_engine("none")  # posizioni fisse: servono per le linee fra le righe
+        f.subplots_adjust(left=left, right=1, top=1 - top / H, bottom=.005, hspace=.28 / (row - .28))
+        for r in range(nb + 1):
+            for k in range(len(wr)):
+                axs[r, k].axis("off")
+            for k, (sv, a, b) in enumerate(tiles[r]):
+                axs[r, 3 * k].imshow(a)
+                axs[r, 3 * k + 1].imshow(b)
+                axs[r, 3 * k].set_title(f"s = {num(sv, 3)}", fontsize=6.5, loc="left", pad=2)
+            if r < nb:
+                lab = (f"{T['band']}\n{num(edges[r])}–{num(min(edges[r + 1], 1))}\n"
+                       + f"{len(ses_pairs[r]):,}".replace(",", "." if T["dec"] == "," else ",") + f" {T['pairs']}")
+            else:
+                lab = T["ref"]
+            axs[r, 0].text(-.08, .5, lab, transform=axs[r, 0].transAxes, ha="right", va="center", fontsize=6.5)
+        # linea della soglia fra la riga 0,90-0,95 e quella 0,95-0,98
+        gap = .03 / H  # appena sotto la riga sopra, prima dei titoli della riga sotto
+        y = axs[list(edges).index(0.95) - 1, 0].get_position().y0 - gap
+        f.add_artist(plt.Line2D([.02, 1], [y, y], transform=f.transFigure, color="0.2", lw=.8, ls=(0, (4, 2))))
+        f.text(1, y - .004, T["thr"], ha="right", va="top", fontsize=6.5, color="0.2")
+        y = axs[nb - 1, 0].get_position().y0 - gap
+        f.add_artist(plt.Line2D([.02, 1], [y, y], transform=f.transFigure, color="0.6", lw=.5))
+        print(save(f, FIG / ("soglia" if lang == "it" else "soglia_en"), pdf=True))
+    for b in range(nb):
+        print(f"{edges[b]:g}-{min(edges[b + 1], 1):g}: {n_pairs[b]:,} coppie di frame, {len(ses_pairs[b])} coppie di sessioni")
+    print(f"stessa clip: {n_ref[0]:,} coppie di frame")
+
+
 def export() -> None:
     """Passo 14, il dataset per Ultralytics in `data/output/` (cancellato e rifatto ogni volta), immagini in hardlink,
     label riscritte con gli id di `OUT_NAMES` (0 drone, 1 airplane, 2 helicopter, 3 bird):
     `images/{train,val,test,calib}/` e `labels/...` con lo stesso nome, e `raw/{images,labels}/` con train, val e test
     insieme (senza calib), per chi vuole rifare gli split; train = reali tenuti dal tetto e mosaici
     (`13_train_compensation/train.csv`), val e test da `12_split/frame_split.csv`, piu' il background di
-    `data/background/0_raw/background.csv` (senza label: per Ultralytics e' un'immagine di solo sfondo), calib da
+    `data/input/background/0_raw/background.csv` (senza label: per Ultralytics e' un'immagine di solo sfondo), calib da
     `15_calib/calib.csv` (stesso nome dell'immagine del train). Nomi (utente, 23/10/2026):
     reale `R_<gruppo>_<hash8 di fonte:clip>_<n>`, mosaico `M_x<griglia>_<n>`, background `B_<hash8 di
     fonte:camera>_<n>`; n a 6 cifre, in ordine di frame dentro la clip o la camera. `dataset.yaml`, `calib.yaml` e
@@ -1145,13 +1271,13 @@ def export() -> None:
     import os
     import re
 
-    agg = DATA / "aggregati"
-    out = DATA / "output"
+    agg = INTERMEDIATE
+    out = OUTPUT
     if out.exists():  # congelato (utente, 23/10/2026): per rifarlo va spostato o cancellato a mano
         sys.exit(f"{out} esiste ed e' congelato: non lo sovrascrivo")
     grp = {r["sessione"]: r["gruppo"] for r in csv.DictReader(open(agg / "11_gruppi" / "gruppi.csv"))}
     info = {r["immagine"]: r for r in csv.DictReader(open(agg / "9_split" / "frame.csv"))}
-    bgi = {r["immagine"]: r for r in csv.DictReader(open(DATA / "background" / "0_raw" / "background.csv"))}
+    bgi = {r["immagine"]: r for r in csv.DictReader(open(INPUT / "background" / "0_raw" / "background.csv"))}
     rows = []  # dict: split, img, lab, tipo, gruppo, fonte, clip, frame
 
     def real(s, img, lab):
@@ -1212,7 +1338,7 @@ def export() -> None:
         f"# air-detection, tools/split.py --step export\npath: {out}\ntrain: images/train\nval: images/val\n"
         "test: images/test\nnames:\n" + "".join(f"  {k}: {c}\n" for k, c in enumerate(OUT_NAMES)))
     (out / "calib.yaml").write_text(  # per l'export int8 di Ultralytics, che calibra sullo split val
-        f"# calibrazione int8 (aggregati/15_calib), tools/split.py --step export\npath: {out}\ntrain: images/calib\n"
+        f"# calibrazione int8 (intermediate/15_calib), tools/split.py --step export\npath: {out}\ntrain: images/calib\n"
         "val: images/calib\nnames:\n" + "".join(f"  {k}: {c}\n" for k, c in enumerate(OUT_NAMES)))
     with open(out / "manifest.csv", "w", newline="") as fh:
         w = csv.writer(fh)
@@ -1225,7 +1351,7 @@ def export() -> None:
         w = csv.writer(fh)
         w.writerow(["id", "titolo", "autore", "licenza", "url"])
         w.writerows((v["id"], v["titolo"], v["autore"], v["licenza"], v["url"])
-                    for v in csv.DictReader(open(DATA / "dvids" / "0_raw" / "video.csv")) if v["id"] in used)
+                    for v in csv.DictReader(open(INPUT / "dvids" / "0_raw" / "video.csv")) if v["id"] in used)
     _output_plot(rows, out)
     _leakage_plot(out)
     c = Counter((r["split"], r["tipo"]) for r in rows)
@@ -1233,7 +1359,7 @@ def export() -> None:
         f"| {s} | {sum(v for (x, _), v in c.items() if x == s):,} | {c[s, 'reale']:,} | {c[s, 'mosaico']:,} | "
         f"{c[s, 'background']:,} |\n".replace(",", ".") for s in ("train", "val", "test", "calib"))
     import datetime
-    (out / "README.md").write_text((ROOT / "docs" / "output_readme.md").read_text()
+    (out / "README.md").write_text((ROOT / "tools" / "output_readme.md").read_text()
                                    .replace("{conteggi}", tab.strip()).replace("{data}", f"{datetime.date.today():%d/%m/%Y}"))
     c = Counter((r["split"], r["tipo"]) for r in rows)
     for s in ("train", "val", "test", "calib"):
@@ -1245,7 +1371,7 @@ def export() -> None:
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--fasce", type=float, nargs="+", default=[0.6, 0.7, 0.8, 0.9, 1.01], help="anteprima: soglie")
-    p.add_argument("--step", choices=["frame", "embedding", "somiglianze", "somiglianze_tutte", "anteprima", "doppioni", "gruppi", "somiglianze_gruppi", "split", "controllo", "mosaici", "calib", "export"], required=True)
+    p.add_argument("--step", choices=["frame", "embedding", "somiglianze", "somiglianze_tutte", "anteprima", "doppioni", "gruppi", "somiglianze_gruppi", "split", "controllo", "mosaici", "calib", "export", "figure", "soglia"], required=True)
     a = p.parse_args(argv)
     if a.step == "frame":
         frame_table()
@@ -1269,6 +1395,10 @@ def main(argv=None) -> int:
         train_mosaics()
     elif a.step == "calib":
         calib()
+    elif a.step == "figure":
+        figures()
+    elif a.step == "soglia":
+        threshold_panel()
     else:
         export()
     return 0

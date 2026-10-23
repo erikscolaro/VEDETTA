@@ -27,8 +27,8 @@
    tutte le fonti (Svanstrom, gia' rivisto, conta ma non si tocca); via i
    ritagli con tutte le box in celle sopra il tetto, a turno fra i video.
 
-Legge `data/<fonte>/5_box/proposte/` (le label della YOLO o delle fonti, non si
-toccano) e scrive `data/<fonte>/5_box/preselezione/`: label corrette (1, 5) e
+Legge `data/input/<fonte>/5_box/proposte/` (le label della YOLO o delle fonti, non si
+toccano) e scrive `data/input/<fonte>/5_box/preselezione/`: label corrette (1, 5) e
 `esclusi.txt` (stem, motivo) con i ritagli tolti (2, 3, 4, 6), che non si
 cancellano. Conteggio e CVAT leggono da li' (`fred.boxes`, `fred.excluded`).
 Il fumo (4) viene da `data/dvids/0_raw/fumo.txt`, scritto dall'operatore con
@@ -48,9 +48,8 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools.common import BAND_EDGES, BANDS, NAMES  # noqa: E402
+from tools.common import INPUT, BAND_EDGES, BANDS, NAMES  # noqa: E402
 
-DATA = ROOT / "data"
 SOURCES = ["dvids", "fred", "fbd_sv", "anti_uav"]
 CAP = round((4000 + 857) * 1.1)
 DARK = 35
@@ -62,12 +61,12 @@ def fix_labels() -> None:
     su DVIDS (1) e via le box sotto `MIN_AREA` (5)."""
     import shutil
 
-    vc = {r["id"]: NAMES.index(r["classe"]) for r in csv.DictReader(open(DATA / "dvids" / "0_raw" / "video.csv"))}
+    vc = {r["id"]: NAMES.index(r["classe"]) for r in csv.DictReader(open(INPUT / "dvids" / "0_raw" / "video.csv"))}
     for s in SOURCES:
-        out = DATA / s / "5_box" / "preselezione"
+        out = INPUT / s / "5_box" / "preselezione"
         shutil.rmtree(out, ignore_errors=True)
         n = Counter()
-        for d in sorted((DATA / s / "5_box" / "proposte").iterdir()):
+        for d in sorted((INPUT / s / "5_box" / "proposte").iterdir()):
             (out / d.name).mkdir(parents=True)
             k = vc[d.name.split("_")[1]] if s == "dvids" else None
             for t in d.glob("*.txt"):
@@ -88,15 +87,15 @@ def fix_labels() -> None:
 def smoke(nome: str = "fumo") -> dict[str, str]:
     """Ritagli dei tratti in `0_raw/<nome>.txt` (fumo o grigi; id, inizio del tratto in frame; tratti.csv, +-1 frame)
     -> lettera dell'operatore (quarta colonna, se c'e')."""
-    f = DATA / "dvids" / "0_raw" / f"{nome}.txt"
+    f = INPUT / "dvids" / "0_raw" / f"{nome}.txt"
     if not f.exists():
         return {}
     want = {(x[0], float(x[1])): (x[3] if len(x) > 3 else "") for x in (ln.split() for ln in open(f) if ln.strip() and not ln.startswith("#"))}
     T = defaultdict(list)
-    for r in csv.DictReader(open(DATA / "dvids" / "0_raw" / "tratti.csv")):
+    for r in csv.DictReader(open(INPUT / "dvids" / "0_raw" / "tratti.csv")):
         T[r["id"]].append((float(r["inizio"]) * 5, float(r["fine"]) * 5))
     out = {}
-    for d in (DATA / "dvids" / "4_ritagli").glob("DVIDS_*"):
+    for d in (INPUT / "dvids" / "4_ritagli").glob("DVIDS_*"):
         i = d.name.split("_")[1]
         for p in (d / "images").glob("*.jpg"):
             k = int(p.stem.rsplit("_f", 1)[1])
@@ -106,7 +105,7 @@ def smoke(nome: str = "fumo") -> dict[str, str]:
     return out
 
 
-STAR_REF = DATA / "dvids" / "4_ritagli" / "DVIDS_1002305" / "images" / "DVIDS_1002305_f00283.jpg"  # stella a (5-100, 190-280)
+STAR_REF = INPUT / "dvids" / "4_ritagli" / "DVIDS_1002305" / "images" / "DVIDS_1002305_f00283.jpg"  # stella a (5-100, 190-280)
 
 
 def _yellow(im: np.ndarray) -> np.ndarray:
@@ -129,7 +128,7 @@ def stars() -> set[str]:
         return any(cv2.contourArea(c) >= 60 and 0.75 <= cv2.boundingRect(c)[2] / cv2.boundingRect(c)[3] <= 1.35
                    and cv2.matchShapes(c, ref, cv2.CONTOURS_MATCH_I1, 0) <= 0.2 for c in cs)
 
-    ps = sorted((DATA / "dvids" / "4_ritagli").glob("DVIDS_*/images/*.jpg"))
+    ps = sorted((INPUT / "dvids" / "4_ritagli").glob("DVIDS_*/images/*.jpg"))
     with ThreadPoolExecutor(16) as ex:
         return {p.stem for p, y in zip(ps, ex.map(one, ps)) if y}
 
@@ -153,9 +152,9 @@ def select() -> None:
     fumo = smoke()
     crops = []  # (fonte, video, stem, celle)
     for s in SOURCES:
-        for d in sorted((DATA / s / "5_box" / "preselezione").iterdir()):
+        for d in sorted((INPUT / s / "5_box" / "preselezione").iterdir()):
             for t in sorted(d.glob("*.txt")):
-                if s in ("anti_uav", "dvids") and cv2.imread(str(DATA / s / "4_ritagli" / d.name / "images" / f"{t.stem}.jpg"), 0).mean() < DARK:
+                if s in ("anti_uav", "dvids") and cv2.imread(str(INPUT / s / "4_ritagli" / d.name / "images" / f"{t.stem}.jpg"), 0).mean() < DARK:
                     drop[s][t.stem] = "notte"
                     continue
                 if t.stem in fumo:
@@ -166,7 +165,7 @@ def select() -> None:
                     continue
                 crops.append((s, d.name, t.stem, [c for c in cells(t) if c[1] != "<8"]))
     cnt = Counter(c for *_, cs in crops for c in cs)
-    for r in csv.DictReader(open(next((DATA / "svanstrom").glob("*_conteggio/conteggio.csv")))):
+    for r in csv.DictReader(open(next((INPUT / "svanstrom").glob("*_conteggio/conteggio.csv")))):
         cnt[r["classe"], r["fascia"]] += int(r["istanze"])
     print("sopra il tetto", CAP, ":", ", ".join(f"{c} {b} {cnt[c, b]}" for c, b in sorted(cnt) if cnt[c, b] > CAP))
     random.Random(0).shuffle(crops)
@@ -200,13 +199,13 @@ def select() -> None:
         if s == "dvids" and stem in st:
             drop[s][stem] = "stella"
     # sequenze FRED tolte dall'operatore (`fred/0_raw/esclusi.txt`, utente 20/10/2026), anch'esse dopo il tetto
-    f = DATA / "fred" / "0_raw" / "esclusi.txt"
+    f = INPUT / "fred" / "0_raw" / "esclusi.txt"
     via = {f"FRED_{x[0]}": x[1] for x in (ln.split() for ln in open(f) if ln.strip() and not ln.startswith("#"))} if f.exists() else {}
     for s, v, stem, _ in crops:
         if v in via:
             drop[s][stem] = via[v]
     for s in SOURCES:
-        f = DATA / s / "5_box" / "preselezione" / "esclusi.txt"
+        f = INPUT / s / "5_box" / "preselezione" / "esclusi.txt"
         f.write_text("".join(f"{k} {m}\n" for k, m in sorted(drop[s].items())))
         print(f"{s}: esclusi {len(drop[s])} ({dict(Counter(drop[s].values()))}) -> {f}")
 
@@ -217,7 +216,7 @@ def clean_boxes(dup: float = 0.8, inside: float = 0.9, bordo: float = 4) -> None
     `inside` della loro area (si tiene la piu' esterna). Utente, 20/10/2026: gli errori
     piu' comuni in CVAT. Via anche i residui del crop: box che toccano il bordo con il
     lato corto <= `bordo` px (utente, 22/10/2026)."""
-    vc = {r["id"]: NAMES.index(r["classe"]) for r in csv.DictReader(open(DATA / "dvids" / "0_raw" / "video.csv"))}
+    vc = {r["id"]: NAMES.index(r["classe"]) for r in csv.DictReader(open(INPUT / "dvids" / "0_raw" / "video.csv"))}
 
     def xyxy(b):
         cx, cy, w, h = map(float, b[1:])
@@ -229,7 +228,7 @@ def clean_boxes(dup: float = 0.8, inside: float = 0.9, bordo: float = 4) -> None
     area = lambda a: (a[2] - a[0]) * (a[3] - a[1])  # noqa: E731
     n = Counter()
     W, H = 640, 512
-    for t in (DATA / "dvids" / "5_box" / "preselezione").glob("DVIDS_*/*.txt"):
+    for t in (INPUT / "dvids" / "5_box" / "preselezione").glob("DVIDS_*/*.txt"):
         bs = [ln.split() for ln in t.read_text().splitlines()]
         n0 = len(bs)
         px = [(x[0] * W, x[1] * H, x[2] * W, x[3] * H) for x in map(xyxy, bs)]

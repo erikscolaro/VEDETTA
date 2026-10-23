@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Passo 13, background da fonti indipendenti (Clouds-1500, Skyfinder; licenze in docs/licenze.md). Una cartella per
-passo in `data/<fonte>/`, poi la scelta per split in `data/aggregati/14_background/`.
+"""Passo 13, background da fonti indipendenti (Clouds-1500, Skyfinder; licenze in README.md (Fonti e licenze)). Una cartella per
+passo in `data/input/<fonte>/`, poi la scelta per split in `data/intermediate/14_background/`.
 
     python tools/background.py --fonte clouds1500 --step ritagli   # 1_ritagli: 640x512 sulla fascia cielo-orizzonte
     python tools/background.py --fonte clouds1500 --step detector  # 2_detector: via i ritagli con un oggetto
     python tools/background.py --fonte clouds1500 --step dedup     # 3_dedup: via i quasi-duplicati per camera
     python tools/background.py --fonte clouds1500 --step fogli     # anteprima/: tenuti ed esclusi a campione
-    python tools/background.py --step split                        # aggregati/14_background: ~10% per split
-    python tools/background.py --step raccolta                     # data/background/0_raw: le scelte in hardlink
+    python tools/background.py --step split                        # intermediate/14_background: ~10% per split
+    python tools/background.py --step raccolta                     # data/input/background/0_raw: le scelte in hardlink
 """
 
 from __future__ import annotations
@@ -22,9 +22,9 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-DATA = ROOT / "data"
+from tools.common import DATA, INPUT, INTERMEDIATE  # noqa: E402
 W, H = 640, 512
-DARK = 35  # luminosita' media sotto cui il ritaglio e' notte (regole.md, come Anti-UAV e DVIDS)
+DARK = 35  # luminosita' media sotto cui il ritaglio e' notte (README.md (Regole), come Anti-UAV e DVIDS)
 
 
 def sources(fonte: str) -> list[tuple[Path, str]]:
@@ -32,7 +32,7 @@ def sources(fonte: str) -> list[tuple[Path, str]]:
     periodo). Skyfinder: camera = cartella AMOS, senza `GSV` (Street View) e senza le camere sotto 640x512."""
     import cv2
 
-    raw = DATA / fonte / "0_raw" / "estratto"
+    raw = INPUT / fonte / "0_raw" / "estratto"
     if fonte == "clouds1500":
         return [(p, p.parent.parent.name) for p in sorted(raw.glob("*/img/*")) if p.suffix.lower() in (".jpg", ".png")]
     out = []
@@ -73,7 +73,7 @@ def crops(fonte: str, seed: int = 0) -> None:
     immagine (1.500 immagini), Skyfinder uno."""
     from concurrent.futures import ProcessPoolExecutor
 
-    dst = DATA / fonte / "1_ritagli" / "images"
+    dst = INPUT / fonte / "1_ritagli" / "images"
     dst.mkdir(parents=True, exist_ok=True)
     for f in dst.iterdir():
         f.unlink()
@@ -97,9 +97,9 @@ def filter_detector(fonte: str, conf: float = 0.1) -> None:
     from tools.common import detector
 
     model = detector()
-    src = DATA / fonte / "1_ritagli"
+    src = INPUT / fonte / "1_ritagli"
     rows = list(csv.DictReader(open(src / "ritagli.csv")))
-    out = DATA / fonte / "2_detector"
+    out = INPUT / fonte / "2_detector"
     out.mkdir(exist_ok=True)
     esc, ten = [], []
     paths = [str(src / "images" / f"{r['ritaglio']}.jpg") for r in rows]
@@ -129,10 +129,10 @@ def dedup(fonte: str, thr: float = 0.95) -> None:
     `tenuti.csv`, `embedding.npy` (dei tenuti, stesso ordine)."""
     from tools.split import embed
 
-    rows = list(csv.DictReader(open(DATA / fonte / "2_detector" / "tenuti.csv")))
-    out = DATA / fonte / "3_dedup"
+    rows = list(csv.DictReader(open(INPUT / fonte / "2_detector" / "tenuti.csv")))
+    out = INPUT / fonte / "3_dedup"
     out.mkdir(exist_ok=True)
-    e = embed([str(DATA / fonte / "1_ritagli" / "images" / f"{r['ritaglio']}.jpg") for r in rows]).astype(np.float32)
+    e = embed([str(INPUT / fonte / "1_ritagli" / "images" / f"{r['ritaglio']}.jpg") for r in rows]).astype(np.float32)
     keep = []
     by_cam = defaultdict(list)
     for i, r in enumerate(rows):
@@ -159,9 +159,9 @@ def sheets(fonte: str, n: int = 48, seed: int = 0) -> None:
     import cv2
 
     rng = np.random.default_rng(seed)
-    dst = DATA / fonte / "anteprima"
+    dst = INPUT / fonte / "anteprima"
     dst.mkdir(exist_ok=True)
-    img = DATA / fonte / "1_ritagli" / "images"
+    img = INPUT / fonte / "1_ritagli" / "images"
     tw, th = 256, 205
 
     def sheet(items, name):
@@ -179,9 +179,9 @@ def sheets(fonte: str, n: int = 48, seed: int = 0) -> None:
         cv2.imwrite(str(dst / name), np.vstack([np.hstack(tiles[k:k + 8]) for k in range(0, len(tiles), 8)]),
                     [cv2.IMWRITE_JPEG_QUALITY, 88])
 
-    ten = list(csv.DictReader(open(DATA / fonte / "3_dedup" / "tenuti.csv")))
+    ten = list(csv.DictReader(open(INPUT / fonte / "3_dedup" / "tenuti.csv")))
     sheet([(r["ritaglio"], r["ritaglio"], "") for r in rng.choice(ten, min(n, len(ten)), replace=False)], "tenuti.jpg")
-    esc = list(csv.DictReader(open(DATA / fonte / "2_detector" / "esclusi.csv")))
+    esc = list(csv.DictReader(open(INPUT / fonte / "2_detector" / "esclusi.csv")))
     if esc:
         sheet([(r["ritaglio"], f"{r['classe']} {r['conf']}", r["box"]) for r in rng.choice(esc, min(n, len(esc)), replace=False)],
               "esclusi.jpg")
@@ -189,17 +189,17 @@ def sheets(fonte: str, n: int = 48, seed: int = 0) -> None:
 
 
 def split(fonti=("clouds1500", "skyfinder"), share: float = 0.1, seed: int = 0) -> None:
-    """aggregati/14_background: ~10% di background in ogni split (bg = immagini / 9, cosi' sono il 10% del totale).
+    """intermediate/14_background: ~10% di background in ogni split (bg = immagini / 9, cosi' sono il 10% del totale).
     Camere intere in uno split (la stessa camera mai in due split): a turno, ogni camera va nello split che ha piu'
     bisogno rispetto ai ritagli gia' assegnati; poi in ogni split si pesca a turno fra le camere. ->
     `background.csv` (immagine, fonte, camera, split)."""
-    agg = DATA / "aggregati"
+    agg = INTERMEDIATE
     need = Counter(r["split"] for r in csv.DictReader(open(agg / "12_split" / "frame_split.csv")))
     need["train"] = sum(1 for _ in csv.DictReader(open(agg / "13_train_compensation" / "train.csv")))
     need = {s: round(need[s] * share / (1 - share)) for s in ("train", "val", "test")}
     cams = defaultdict(list)
     for f in fonti:
-        for r in csv.DictReader(open(DATA / f / "3_dedup" / "tenuti.csv")):
+        for r in csv.DictReader(open(INPUT / f / "3_dedup" / "tenuti.csv")):
             cams[f, r["camera"]].append(f"{f}/1_ritagli/images/{r['ritaglio']}.jpg")
     rng = np.random.default_rng(seed)
     got, lab = Counter(), {}
@@ -231,18 +231,18 @@ def split(fonti=("clouds1500", "skyfinder"), share: float = 0.1, seed: int = 0) 
 
 
 def collect() -> None:
-    """data/background/0_raw: le immagini scelte in `aggregati/14_background/background.csv` in hardlink (stesso
+    """data/input/background/0_raw: le immagini scelte in `intermediate/14_background/background.csv` in hardlink (stesso
     nome del ritaglio), piu' `background.csv` con il nuovo percorso. Una fonte a se', per i passi dopo (revisione).
     Salta i nomi in `rimossi.txt` (scelte dell'operatore: sfondi tolti a mano perche' avevano oggetti)."""
     import os
 
-    dst = DATA / "background" / "0_raw"
+    dst = INPUT / "background" / "0_raw"
     (dst / "images").mkdir(parents=True, exist_ok=True)
     for f in (dst / "images").iterdir():
         f.unlink()
     f = dst / "rimossi.txt"
     via = {ln.strip() for ln in open(f) if ln.strip() and not ln.startswith("#")} if f.exists() else set()
-    rows = [r for r in csv.DictReader(open(DATA / "aggregati" / "14_background" / "background.csv"))
+    rows = [r for r in csv.DictReader(open(INTERMEDIATE / "14_background" / "background.csv"))
             if Path(r["immagine"]).name not in via]
     names = [Path(r["immagine"]).name for r in rows]
     assert len(set(names)) == len(names), "nomi doppi"

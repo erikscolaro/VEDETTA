@@ -1,6 +1,6 @@
 # air-detection: dataset per la rilevazione di velivoli e uccelli
 
-Generato da `tools/split.py --step export` il {data} (repo air-detection; procedura completa in `docs/procedura.md`).
+Generato da `tools/split.py --step export` il {data} (repo air-detection; procedura completa nel README della repo).
 Formato Ultralytics YOLO: `images/<split>/*.jpg`, `labels/<split>/*.txt` (una riga per box: classe, centro x,
 centro y, larghezza, altezza, normalizzati), `dataset.yaml`. Tutte le immagini sono 640×512, mai ingrandite. Le immagini sono hardlink ai file del repo, le label
 sono riscritte qui con gli id sotto (nel repo restano nell'ordine airplane, bird, drone, helicopter).
@@ -65,13 +65,13 @@ Tabelle di `distribuzione.png` in `distribuzione.md`.
 
 `manifest.csv` ha una riga per immagine: `immagine` (percorso qui), `split`, `tipo` (reale, mosaico, background),
 `gruppo`, `fonte`, `sessione`, `clip` (o camera), `frame` (indice nel video originale, o nome del fotogramma per il
-background), `sorgente` (file nel repo air-detection, sotto `data/`). Per esempio:
+background), `sorgente` (file nel repo air-detection, sotto `data/`; per gli export fatti prima del 23/10/2026 i percorsi vanno letti sotto `data/input/` o `data/intermediate/`). Per esempio:
 
     images/train/R_G0000_a7bdc852_000001.jpg → fonte svanstrom, clip V_AIRPLANE_001/s0, frame 24
                                              → video V_AIRPLANE_001 del dataset di Svanström, fotogramma 24
 
 Per le clip DVIDS l'id del video è nel nome della clip (`DVIDS_<id>/s0`): pagina, autore e licenza di ogni video in
-`fonti_dvids.csv`. Le sorgenti dei mosaici (ritaglio per ritaglio) sono in `aggregati/13_train_compensation/mosaici.csv`
+`fonti_dvids.csv`. Le sorgenti dei mosaici (ritaglio per ritaglio) sono in `intermediate/13_train_compensation/mosaici.csv`
 del repo.
 
 ## Fonti, licenze e attribuzione

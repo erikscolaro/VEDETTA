@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Svanström (Drone-detection-dataset, CC0, solo i video visibili 640x512): un `--step` per passo di
-`docs/procedura.md` (passi 2-8), una cartella per passo in `data/svanstrom/`. Elenco dei comandi nel README.
+`README.md (Procedura)` (passi 2-8), una cartella per passo in `data/svanstrom/`. Elenco dei comandi nel README.
 
 Le label non si leggono con scipy (oggetti MCOS) e `mcos-decoder` sbaglia i frame con piu' oggetti: qui c'e' un
 lettore MAT5 minimo; clip scartata se il numero di label e' diverso dal numero di frame.
@@ -26,7 +26,7 @@ from xml.etree import ElementTree
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # anche lanciato come script
-from tools.common import (BAND_EDGES, BANDS, NAMES, ROOT, cvat_client, dedup_clip, mask_box,  # noqa: E402
+from tools.common import (INPUT, BAND_EDGES, BANDS, NAMES, cvat_client, dedup_clip, mask_box,  # noqa: E402
                           propose_sessions)
 
 REPO = "DroneDetectionThesis/Drone-detection-dataset"
@@ -905,10 +905,10 @@ def _yolo(boxes: np.ndarray, W: int, H: int) -> str:
 
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    p.add_argument("--src", type=Path, default=ROOT / "data" / "svanstrom",
-                   help="una cartella per passo (docs/procedura.md): 0_raw, 1_frame, ...")
+    p.add_argument("--src", type=Path, default=INPUT / "svanstrom",
+                   help="una cartella per passo (README.md (Procedura)): 0_raw, 1_frame, ...")
     p.add_argument("--step", choices=["frames", "tagli", "sequenze", "sessioni", "unione", "box", "sam", "fogli_sam", "cvat", "cvat_import", "meteo", "meteo_import", "dedup", "fogli_dedup", "conta"],
-                   required=True, help="passo della procedura (docs/procedura.md)")
+                   required=True, help="passo della procedura (README.md (Procedura))")
     p.add_argument("--hash-thr", type=int, default=16,
                    help="bit di dHash (su 64) sotto cui due frame sono uguali")
     p.add_argument("--geo-thr", type=float, default=0.05,
@@ -974,7 +974,7 @@ def main(argv=None) -> int:
             if r["tipo_clip"] == "difficile" or r["clip"] in bad:
                 clips[r["clip"]].append(r)
         (box / "sam").mkdir(exist_ok=True)
-        model = SAM(str(ROOT / "data" / "modelli" / "sam2.1_l.pt"))
+        model = SAM(str(INPUT / "modelli" / "sam2.1_l.pt"))
         t0 = time.time()
         for n, (clip, rows) in enumerate(sorted(clips.items()), 1):
             dst = box / "sam" / f"{clip.replace('/', '_')}.json"

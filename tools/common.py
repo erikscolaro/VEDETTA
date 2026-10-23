@@ -9,6 +9,9 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
+INPUT = DATA / "input"  # fonti, una cartella per passo
+INTERMEDIATE = DATA / "intermediate"  # passi su tutte le fonti
+OUTPUT = DATA / "output"  # dataset finale, congelato
 # classi del detector delle proposte (5 classi, due di droni) -> le nostre (0 airplane, 1 bird, 2 drone, 3 helicopter)
 DETECTOR_CLASSES = {0: 2, 1: 2, 2: 0, 3: 3, 4: 1}
 
@@ -27,7 +30,7 @@ def detector():
 NAMES = ["airplane", "bird", "drone", "helicopter"]  # stesso ordine di AOD4
 
 
-BANDS = ["<8", "8-16", "16-32", "32-64", "64-96", ">96"]  # sqrt(w*h) in px, regole.md
+BANDS = ["<8", "8-16", "16-32", "32-64", "64-96", ">96"]  # sqrt(w*h) in px, README.md (Regole)
 
 
 BAND_EDGES = [8, 16, 32, 64, 96]

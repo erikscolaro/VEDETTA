@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Aggiunte per i buchi di uccelli, aerei ed elicotteri (docs/procedura.md,
+"""Aggiunte per i buchi di uccelli, aerei ed elicotteri (README.md (Procedura),
 passo 10). Ogni fonte ha il suo passo `frame` (-> `1_frame/<P>_<seq>/`, label
 YOLO sul frame intero); il resto e' la catena di `tools/pipeline.py` con il prefisso
 della fonte: annotati, dedup, ritaglio, poi le label del ritaglio diventano le
@@ -45,11 +45,11 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from tools.common import INPUT, DETECTOR_CLASSES, detector  # noqa: E402
 from tools import pipeline  # noqa: E402
-from tools.common import DETECTOR_CLASSES, detector  # noqa: E402
 
-SOURCES = {"fbd": ("FBD", ROOT / "data" / "fbd_sv"), "dvids": ("DVIDS", ROOT / "data" / "dvids"),
-         "antiuav": ("AUAV", ROOT / "data" / "anti_uav")}
+SOURCES = {"fbd": ("FBD", INPUT / "fbd_sv"), "dvids": ("DVIDS", INPUT / "dvids"),
+         "antiuav": ("AUAV", INPUT / "anti_uav")}
 FPS = 5  # frame estratti al secondo dai video DVIDS (disco: ~50 GB liberi; la dedup ne toglie comunque molti)
 
 
@@ -557,7 +557,7 @@ def smoke_sheets(src: Path, per: int = 16, nome: str = "fumo", grigio: float = 2
     """Tratti di aerei gia' scaricati, mai visti in un `0_raw/fogli_fumo*/`: due
     ritagli per tratto (a 1/4 e 3/4), fogli numerati in `0_raw/fogli_fumoN/` con
     `indice.csv` (n, id, inizio_k = inizio del tratto in frame, ritagli). L'operatore
-    scrive le righe `n F` dei tratti con una scia di fumo o condensa (regole.md) e
+    scrive le righe `n F` dei tratti con una scia di fumo o condensa (README.md (Regole)) e
     le passa a `--step fumo`. Con `nome="grigi"` (utente, 20/10/2026: video in scala
     di grigi e filmati d'archivio fuori distribuzione): tratti di tutte le classi con
     almeno un ritaglio tenuto dalla preselezione con colore (`_gray`) fino a `grigio`,
