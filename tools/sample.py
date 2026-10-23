@@ -1,21 +1,21 @@
-"""Campioni di ritagli per stimare la qualita' dei box prima di CVAT.
+"""Samples of crops to estimate the box quality before CVAT.
 
     python tools/sample.py --step fogli --nome revisione --fonti dvids:70 fred:20 fbd_sv:18 anti_uav:12 --seed 0
     python tools/sample.py --step fogli --nome qualita --fonti fbd_sv:48 anti_uav:48 --seed 1 --zoom --senza-esclusi
     python tools/sample.py --step stima --nome revisione
 
-`fogli`: ritagli a caso (seed fisso) di `data/input/<fonte>/4_ritagli/` con le box di
-`5_box/preselezione/` (o `proposte/`) disegnate, numerati, in
-`data/intermediate/campioni/<nome>/` con `indice.csv` (n, fonte, frame, box). Con
-`--zoom` accanto a ogni ritaglio uno zoom 4x sulla box piu' grande; con
-`--senza-esclusi` solo i ritagli non tolti dalla preselezione.
+`fogli`: random crops (fixed seed) of `data/input/<source>/4_ritagli/` with the boxes of
+`5_box/preselezione/` (or `proposte/`) drawn, numbered, in
+`data/intermediate/campioni/<name>/` with `indice.csv` (n, fonte, frame, box). With
+`--zoom` next to each crop a 4x zoom on the largest box; with
+`--senza-esclusi` only the crops not removed by the preselection.
 
-L'operatore guarda i fogli e scrive `giudizi.csv` nella stessa cartella: righe
-`n,giudizio,tipo` solo per i ritagli da correggere (giudizio `fix` o `dubbio`;
-tipo per esempio classe, mancato, box_unite, primo_piano, falso_positivo).
+The operator looks at the sheets and writes `giudizi.csv` in the same folder: rows
+`n,giudizio,tipo` only for the crops to fix (giudizio `fix` or `dubbio`;
+tipo for example classe, mancato, box_unite, primo_piano, falso_positivo).
 
-`stima`: quota da correggere per fonte e per tipo, e proiezione sui ritagli
-che oggi vanno in CVAT.
+`stima`: share to fix per source and per type, and projection on the crops
+that currently go to CVAT.
 """
 
 import argparse
@@ -33,18 +33,18 @@ from tools.common import INPUT, INTERMEDIATE  # noqa: E402
 from tools import pipeline  # noqa: E402
 
 COL = {0: (0, 165, 255), 1: (255, 0, 255), 2: (0, 0, 255), 3: (255, 255, 0)}
-LET = "AUDE"  # aereo, uccello, drone, elicottero
+LET = "AUDE"  # airplane, bird, drone, helicopter
 
 
-def sheets(nome: str, fonti: dict[str, int], seed: int, zoom: bool, senza_esclusi: bool) -> None:
+def sheets(name: str, sources: dict[str, int], seed: int, zoom: bool, no_excluded: bool) -> None:
     import cv2
 
-    out = INTERMEDIATE / "campioni" / nome
+    out = INTERMEDIATE / "campioni" / name
     out.mkdir(parents=True, exist_ok=True)
     rng = random.Random(seed)
     rows, tiles = [], []
-    for src, n in fonti.items():
-        ex = pipeline.excluded(INPUT / src) if senza_esclusi else set()
+    for src, n in sources.items():
+        ex = pipeline.excluded(INPUT / src) if no_excluded else set()
         imgs = [p for p in sorted((INPUT / src / "4_ritagli").glob("*/images/*.jpg")) if p.stem not in ex]
         for p in rng.sample(imgs, n):
             lab = pipeline.boxes(INPUT / src) / p.parent.parent.name / f"{p.stem}.txt"
@@ -79,11 +79,11 @@ def sheets(nome: str, fonti: dict[str, int], seed: int, zoom: bool, senza_esclus
         w = csv.writer(f)
         w.writerow(["n", "fonte", "frame", "box"])
         w.writerows(rows)
-    print(f"campione {nome}: {len(rows)} ritagli, {sum(r[3] for r in rows)} box -> {out}")
+    print(f"campione {name}: {len(rows)} ritagli, {sum(r[3] for r in rows)} box -> {out}")
 
 
-def estimate(nome: str) -> None:
-    d = INTERMEDIATE / "campioni" / nome
+def estimate(name: str) -> None:
+    d = INTERMEDIATE / "campioni" / name
     idx = {r["n"]: r["fonte"] for r in csv.DictReader(open(d / "indice.csv"))}
     g = {r["n"]: r for r in csv.DictReader(open(d / "giudizi.csv"))}
     for src in dict.fromkeys(idx.values()):

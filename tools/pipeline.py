@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Catena comune delle fonti aggiunte (FRED, FBD-SV-2024, Anti-UAV, DVIDS), dopo i frame in `1_frame/<PREFIX>_<seq>/`:
-frame annotati, deduplica, ritaglio 640x512, box proposti (SAM, detector YOLO, movimento), conteggio, CVAT.
-Una cartella per passo nella cartella della fonte; `PREFIX` lo imposta lo script della fonte."""
+"""Common chain of the added sources (FRED, FBD-SV-2024, Anti-UAV, DVIDS), after the frames in
+`1_frame/<PREFIX>_<seq>/`: annotated frames, dedup, 640x512 crop, proposed boxes (SAM, YOLO detector, motion),
+count, CVAT.
+One folder per step in the source folder; `PREFIX` is set by the source script."""
 
 from __future__ import annotations
 
@@ -13,15 +14,15 @@ from pathlib import Path
 
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # anche lanciato come script
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # also when run as a script
 from tools.common import BAND_EDGES, BANDS  # noqa: E402
 
-PREFIX = ""  # nome dei video (`<PREFIX>_<seq>`), deciso dalla fonte
+PREFIX = ""  # video name (`<PREFIX>_<seq>`), set by the source
 
 
 def annotated(src: Path, seqs: list[str]) -> None:
-    """Passo 2: via i frame senza box -> `2_annotati/annotati.csv` (clip,
-    frame), aggiornato per sequenza."""
+    """Step 2: drop the frames without boxes -> `2_annotati/annotati.csv` (clip,
+    frame), updated per sequence."""
     out = src / "2_annotati"
     out.mkdir(exist_ok=True)
     f = out / "annotati.csv"
@@ -40,10 +41,10 @@ def annotated(src: Path, seqs: list[str]) -> None:
 
 
 def dedup(src: Path, seqs: list[str], hash_thr: int = 16, geo_thr: float = 0.05) -> None:
-    """Passo 3 (prima del ritaglio e di SAM): quasi-duplicati sui frame di
-    `2_annotati/annotati.csv`, interi, con l'hash di Svanstrom (`dedup_clip`,
-    16 bit) -> `3_dedup/tenuti.csv`
-    (clip, frame), aggiornato per sequenza."""
+    """Step 3 (before the crop and SAM): near-duplicates on the frames of
+    `2_annotati/annotati.csv`, whole, with the Svanstrom hash (`dedup_clip`,
+    16 bits) -> `3_dedup/tenuti.csv`
+    (clip, frame), updated per sequence."""
     from tools.common import dedup_clip
 
     out = src / "3_dedup"
@@ -67,8 +68,8 @@ def dedup(src: Path, seqs: list[str], hash_thr: int = 16, geo_thr: float = 0.05)
 
 
 def _valid(images: list[Path], thr: int = 8) -> tuple[int, int, int, int]:
-    """Area senza il bordo nero di padding: righe e colonne della mediana di
-    qualche frame sopra `thr`."""
+    """Area without the black padding border: rows and columns of the median of
+    a few frames above `thr`."""
     import cv2
 
     g = np.median([cv2.imread(str(p), cv2.IMREAD_GRAYSCALE) for p in images[::max(1, len(images) // 8)]], axis=0)
@@ -77,13 +78,13 @@ def _valid(images: list[Path], thr: int = 8) -> tuple[int, int, int, int]:
 
 
 def crop(src: Path, seqs: list[str], w: int = 640, h: int = 512, seed: int = 0) -> None:
-    """Passo 4: i frame tenuti ritagliati a `w`x`h` senza ridimensionare,
-    dentro l'area senza padding, con il box piu' grande in posizione casuale
-    (seed fisso per frame) -> `4_ritagli/<PREFIX>_<seq>/{images,labels}` e
-    `4_ritagli/ritagli.csv` (clip, frame, x0, y0). Gli altri box tagliati
-    alla finestra (parte visibile), via se restano sotto 1 px. Il box piu'
-    grande resta intero solo se sta in `w`x`h` e fuori dal padding: i casi
-    contrari si contano (tagliato) e si scrivono in `ritagli.csv`."""
+    """Step 4: the kept frames cropped to `w`x`h` without resizing, inside the
+    area without padding, with the largest box at a random position
+    (fixed seed per frame) -> `4_ritagli/<PREFIX>_<seq>/{images,labels}` and
+    `4_ritagli/ritagli.csv` (clip, frame, x0, y0). The other boxes cut
+    to the window (visible part), dropped if they stay under 1 px. The largest
+    box stays whole only if it fits in `w`x`h` and outside the padding: the
+    opposite cases are counted (cut) and written to `ritagli.csv`."""
     import random
 
     import cv2
@@ -97,7 +98,7 @@ def crop(src: Path, seqs: list[str], w: int = 640, h: int = 512, seed: int = 0) 
         v = f"{PREFIX}_{s}"
         fr = src / "1_frame" / v
         X0, Y0, X1, Y1 = _valid(sorted((fr / "images").glob("*.jpg")))
-        if X1 - X0 < w or Y1 - Y0 < h:  # video scuri: la soglia del bordo nero taglia troppo, si usa il frame intero
+        if X1 - X0 < w or Y1 - Y0 < h:  # dark videos: the black border threshold cuts too much, use the whole frame
             H, W = cv2.imread(str(next((fr / "images").glob("*.jpg")))).shape[:2]
             X0, Y0, X1, Y1 = 0, 0, W, H
         (out / v / "images").mkdir(parents=True, exist_ok=True)
@@ -144,11 +145,11 @@ def crop(src: Path, seqs: list[str], w: int = 640, h: int = 512, seed: int = 0) 
 
 
 def sam(src: Path, seqs: list[str]) -> None:
-    """Passo 5: box aderenti con SAM 2.1 Large sui ritagli, il box originale
-    (largo) come prompt -> `5_box/sam/<PREFIX>_<seq>.json` (frame, box x y w h in
-    pixel del ritaglio o None). Su Svanstrom il box come prompt ridava il box
-    stesso, ma li' gli oggetti erano di 4-6 px; qui sono grandi: da verificare
-    sui fogli (`fogli_sam`)."""
+    """Step 5: tight boxes with SAM 2.1 Large on the crops, the original (loose)
+    box as prompt -> `5_box/sam/<PREFIX>_<seq>.json` (frame, box x y w h in
+    crop pixels or None). On Svanstrom the box as prompt gave back the box
+    itself, but there the objects were 4-6 px; here they are large: to be checked
+    on the sheets (`fogli_sam`)."""
     import json
 
     import cv2
@@ -182,12 +183,12 @@ def sam(src: Path, seqs: list[str]) -> None:
 
 
 def yolo(src: Path, seqs: list[str], grow: float = 2.0, conf: float = 0.1) -> None:
-    """Passo 5, alternativa a SAM: box proposti dal detector (`common.detector`,
-    classi UAV, aereo, elicottero, uccello) sui ritagli; per ogni box originale
-    la detection UAV (classi 0 e 1) col centro dentro il box allargato `grow`
-    volte e la confidenza piu' alta -> `5_box/yolo/<PREFIX>_<seq>.json` (frame,
-    orig, box, conf; box None se non trova niente). Il box originale dice solo
-    dove cercare: i frame senza detection restano, per la revisione in CVAT."""
+    """Step 5, alternative to SAM: boxes proposed by the detector (`common.detector`,
+    classes UAV, airplane, helicopter, bird) on the crops; for each original box
+    the UAV detection (classes 0 and 1) with the center inside the box enlarged `grow`
+    times and the highest confidence -> `5_box/yolo/<PREFIX>_<seq>.json` (frame,
+    orig, box, conf; box None if nothing is found). The original box only says
+    where to look: frames without a detection stay, for the CVAT review."""
     import json
 
     from tools.common import detector
@@ -221,13 +222,13 @@ def yolo(src: Path, seqs: list[str], grow: float = 2.0, conf: float = 0.1) -> No
 
 
 def motion(src: Path, seqs: list[str], grow: float = 1.5, n_bg: int = 60, use_sam: bool = True) -> None:
-    """Passo 5 per i cortili: la camera e' su un treppiede, quindi lo sfondo
-    e' la mediana di `n_bg` frame sparsi della sequenza (il drone che si muove
-    sparisce). Nel box di FRED allargato `grow` volte, i pixel che si staccano
-    dallo sfondo (soglia: mediana + 6 MAD della differenza, almeno 20) e la
-    componente piu' grande danno il box; poi SAM 2 con un punto al centro
-    della componente, sul ritaglio -> `5_box/movimento/<PREFIX>_<seq>.json`
-    (frame, orig, mov, box: box = SAM se ha maschera, altrimenti mov)."""
+    """Step 5 for the courtyards: the camera is on a tripod, so the background
+    is the median of `n_bg` frames spread over the sequence (the moving drone
+    disappears). In the FRED box enlarged `grow` times, the pixels that stand out
+    from the background (threshold: median + 6 MAD of the difference, at least 20) and the
+    largest component give the box; then SAM 2 with a point at the center
+    of the component, on the crop -> `5_box/movimento/<PREFIX>_<seq>.json`
+    (frame, orig, mov, box: box = SAM if it has a mask, otherwise mov)."""
     import json
 
     import cv2
@@ -277,7 +278,7 @@ def motion(src: Path, seqs: list[str], grow: float = 1.5, n_bg: int = 60, use_sa
                             res = model(crop, points=[[float(px), float(py)]], labels=[1], verbose=False)[0]
                             if res.masks is not None and len(res.masks.data):
                                 b = mask_box(res.masks.data[0].cpu().numpy() > 0.5)
-                                # SAM solo se resta vicino al movimento (non l'intero muro)
+                                # SAM only if it stays close to the motion (not the whole wall)
                                 if b is not None and b[2] * b[3] <= 4 * max(bw2 * bh2, 16):
                                     box = [float(x) for x in b]
                 rec["frame"].append(i)
@@ -292,17 +293,17 @@ def motion(src: Path, seqs: list[str], grow: float = 1.5, n_bg: int = 60, use_sa
 
 
 def proposals(src: Path, seqs: list[str], W: int = 640, H: int = 512) -> None:
-    """Passo 5, box proposti per CVAT e per il conteggio: YOLO sulle sequenze di
-    cielo, sfondo fermo (`movimento`) sulle altre, come deciso il 16/10/2026 ->
-    `5_box/proposte/<PREFIX>_<seq>/<stem>.txt` YOLO 640x512 (classe 2). I box non
-    trovati restano fuori: si aggiungono in CVAT."""
+    """Step 5, boxes proposed for CVAT and for the count: YOLO on the sky
+    sequences, still background (`movimento`) on the others, as decided on 16/10/2026 ->
+    `5_box/proposte/<PREFIX>_<seq>/<stem>.txt` YOLO 640x512 (class 2). Boxes not
+    found stay out: they are added in CVAT."""
     import json
 
     sc = {r["sequenza"]: r["scenario"] for r in csv.DictReader(open(src / "0_raw" / "scenari.csv"))}
     for s in seqs:
         v = f"{PREFIX}_{s}"
-        fonte = "yolo" if sc[s].startswith("cielo") else "movimento"
-        rec = json.loads((src / "5_box" / fonte / f"{v}.json").read_text())
+        source = "yolo" if sc[s].startswith("cielo") else "movimento"
+        rec = json.loads((src / "5_box" / source / f"{v}.json").read_text())
         out = src / "5_box" / "proposte" / v
         out.mkdir(parents=True, exist_ok=True)
         lines = {f: [] for f in rec["frame"]}
@@ -313,33 +314,33 @@ def proposals(src: Path, seqs: list[str], W: int = 640, H: int = 512) -> None:
         for f, ls in lines.items():
             (out / f"{v}_f{f:05d}.txt").write_text("".join(ls))
         n = sum(map(len, lines.values()))
-        print(f"fred: {v} ({sc[s]}, {fonte}) {n} box proposti su {len(rec['box'])}", flush=True)
+        print(f"fred: {v} ({sc[s]}, {source}) {n} box proposti su {len(rec['box'])}", flush=True)
 
 
 def boxes(src: Path) -> Path:
-    """Box da contare e da mandare in CVAT: `5_box/preselezione/` (tools/preselection.py)
-    se c'e', altrimenti le proposte."""
+    """Boxes to count and to send to CVAT: `5_box/preselezione/` (tools/preselection.py)
+    if present, otherwise the proposals."""
     pre = src / "5_box" / "preselezione"
     return pre if pre.exists() else src / "5_box" / "proposte"
 
 
 def excluded(src: Path) -> set[str]:
-    """Ritagli tolti dalla preselezione (`5_box/preselezione/esclusi.txt`)."""
+    """Crops removed by the preselection (`5_box/preselezione/esclusi.txt`)."""
     f = src / "5_box" / "preselezione" / "esclusi.txt"
     return {ln.split()[0] for ln in open(f) if ln.strip()} if f.exists() else set()
 
 
 def count(src: Path) -> None:
-    """Passo 7: istanze, frame, clip, video e sessioni per cella classe x
-    fascia sui box di `5_box/manuale/` (da CVAT) per le sequenze riviste, di
-    `5_box/proposte/` per le altre, per le sequenze in `6_sessioni/sessioni.csv` ->
-    `7_conteggio/conteggio.csv`, stesso formato di Svanstrom (per tools/buchi.py)."""
+    """Step 7: instances, frames, clips, videos and sessions per class x
+    band cell on the boxes of `5_box/manuale/` (from CVAT) for the reviewed sequences, of
+    `5_box/proposte/` for the others, for the sequences in `6_sessioni/sessioni.csv` ->
+    `7_conteggio/conteggio.csv`, same format as Svanstrom (for tools/buchi.py)."""
     from collections import defaultdict
 
     from tools.common import NAMES
 
     ses = {r["clip"]: r["sessione"] for r in csv.DictReader(open(src / "6_sessioni" / "sessioni.csv"))}
-    out_ = excluded(src)
+    excl = excluded(src)
     inst, sets = Counter(), defaultdict(lambda: (set(), set(), set(), set()))
     for d in sorted((src / "5_box" / "proposte").iterdir()):
         clip = f"{d.name}/s0"
@@ -347,10 +348,10 @@ def count(src: Path) -> None:
             continue
         man = src / "5_box" / "manuale" / d.name
         for t in sorted(d.glob("*.txt")):
-            if t.stem in out_:
+            if t.stem in excl:
                 continue
             t = boxes(src) / d.name / t.name
-            # sequenza rivista in CVAT: solo le sue label (frame senza txt = nessun box)
+            # sequence reviewed in CVAT: only its labels (frame without txt = no box)
             if man.exists():
                 t = man / t.name
                 if not t.exists():
@@ -374,14 +375,14 @@ def count(src: Path) -> None:
 
 
 def cvat_export(src: Path, prefix: str | None = None, per_patch: int = 2000, per_task: int = 0) -> None:
-    """Passo 5, revisione a mano: un task CVAT `fred_<seq>` per sequenza (un
-    task unico da 12.000 file caricati dal disco dava errore 500), con i ritagli
-    tenuti dalla deduplica (CVAT monta solo data/svanstrom: si caricano dal
-    disco) e i box proposti (`5_box/proposte/`) come rettangoli. Le sequenze
-    con il task gia' fatto si saltano. Si corregge in CVAT, si esporta
-    "Ultralytics YOLO Detection 1.0" senza immagini in `5_box/cvat_zip/`, poi
-    `--step cvat_import`. Sequenze corte (FBD, DVIDS) insieme, in ordine di
-    sessione, fino a `per_task` ritagli per task: `<prefix>_<prima>-<ultima>`."""
+    """Step 5, manual review: one CVAT task `fred_<seq>` per sequence (a single
+    task of 12,000 files uploaded from disk gave error 500), with the crops
+    kept by the dedup (CVAT only mounts data/svanstrom: they are uploaded from
+    disk) and the proposed boxes (`5_box/proposte/`) as rectangles. Sequences
+    whose task is already done are skipped. Fix in CVAT, export
+    "Ultralytics YOLO Detection 1.0" without images to `5_box/cvat_zip/`, then
+    `--step cvat_import`. Short sequences (FBD, DVIDS) together, in session
+    order, up to `per_task` crops per task: `<prefix>_<first>-<last>`."""
     from cvat_sdk.api_client import models
     from cvat_sdk.core.proxies.tasks import ResourceType
 
@@ -391,17 +392,17 @@ def cvat_export(src: Path, prefix: str | None = None, per_patch: int = 2000, per
     ses = {r["clip"]: r["sessione"] for r in csv.DictReader(open(src / "6_sessioni" / "sessioni.csv"))}
     seqs = sorted((d.name for d in (src / "5_box" / "proposte").iterdir() if f"{d.name}/s0" in ses),
                   key=lambda v: (ses[f"{v}/s0"], len(v), v))
-    out_ = excluded(src)
+    excl = excluded(src)
     with cvat_client() as client:
         tasks = client.tasks.list()
         have = {t.name for t in tasks}
-        # sequenze gia' in un task: si saltano, cosi' le sequenze nuove non spostano i gruppi fatti
+        # sequences already in a task: skipped, so new sequences do not shift the groups already done
         done = {f.name.rsplit("_f", 1)[0] for t in tasks if t.name.startswith(f"{prefix}_") and t.size for f in t.get_frames_info()}
         seqs = [v for v in seqs if v not in done]
         groups, cur, n = [], [], 0
         for v in seqs:
-            k = sum(p.stem not in out_ for p in (src / "4_ritagli" / v / "images").glob("*.jpg"))
-            if not k:  # tutta esclusa dalla preselezione
+            k = sum(p.stem not in excl for p in (src / "4_ritagli" / v / "images").glob("*.jpg"))
+            if not k:  # all excluded by the preselection
                 continue
             if cur and n + k > per_task:
                 groups.append(cur)
@@ -409,14 +410,14 @@ def cvat_export(src: Path, prefix: str | None = None, per_patch: int = 2000, per
             cur, n = cur + [v], n + k
         groups += [cur] if cur else []
         for g in groups:
-            ids = [v.split("_", 1)[1] for v in g]  # AUAV_<data>_<ora>_<cam>_<pezzo>: tutto dopo il prefisso
+            ids = [v.split("_", 1)[1] for v in g]  # AUAV_<date>_<time>_<cam>_<piece>: everything after the prefix
             name = f"{prefix}_{ids[0]}" if len(g) == 1 else f"{prefix}_{ids[0]}-{ids[-1]}"
             if name in have:
                 continue
-            imgs = sorted((p for v in g for p in (src / "4_ritagli" / v / "images").glob("*.jpg") if p.stem not in out_),
+            imgs = sorted((p for v in g for p in (src / "4_ritagli" / v / "images").glob("*.jpg") if p.stem not in excl),
                           key=lambda p: p.name)  # come CVAT
             v = g[0]
-            # un solo zip per sequenza: oltre ~1000 file per richiesta il server da' errore 500
+            # a single zip per sequence: beyond ~1000 files per request the server gives error 500
             import tempfile
             with tempfile.TemporaryDirectory() as tmp:
                 zp = Path(tmp) / f"{v}.zip"
@@ -438,15 +439,15 @@ def cvat_export(src: Path, prefix: str | None = None, per_patch: int = 2000, per
                     shapes.append(models.LabeledShapeRequest(
                         type="rectangle", frame=frame, label_id=label[NAMES[int(c)]],
                         points=[cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2]))
-            for k in range(0, len(shapes), per_patch):  # a pezzi: uno solo va in timeout
+            for k in range(0, len(shapes), per_patch):  # in pieces: a single one times out
                 task.update_annotations(models.PatchedLabeledDataRequest(shapes=shapes[k:k + per_patch]))
             print(f"cvat: task {name} ({task.id}), {len(imgs)} frame, {len(shapes)} box proposti, "
                   f"sessioni {' '.join(sorted({ses[f'{x}/s0'] for x in g}))}", flush=True)
 
 
 def cvat_import(src: Path) -> None:
-    """Zip YOLO di CVAT in `5_box/cvat_zip/` -> `5_box/manuale/<PREFIX>_<seq>/<stem>.txt`;
-    uno zip piu' recente sovrascrive i frame di uno vecchio."""
+    """CVAT YOLO zips in `5_box/cvat_zip/` -> `5_box/manuale/<PREFIX>_<seq>/<stem>.txt`;
+    a newer zip overwrites the frames of an older one."""
     box = src / "5_box"
     for z in sorted((box / "cvat_zip").glob("*.zip"), key=lambda p: p.stat().st_mtime):
         n = Counter()
@@ -461,20 +462,20 @@ def cvat_import(src: Path) -> None:
         print(f"cvat: {z.name} -> " + ", ".join(f"{k} ({v} frame)" for k, v in n.items()))
 
 
-def sam_sheets(src: Path, seqs: list[str], n: int = 24, seed: int = 0, fonte: str = "sam") -> None:
-    """Fogli di controllo in `5_box/fogli_<fonte>/<PREFIX>_<seq>.jpg` (fonte sam o
-    yolo): `n` ritagli a caso attorno al box, rosso il box originale, verde
-    quello proposto."""
+def sam_sheets(src: Path, seqs: list[str], n: int = 24, seed: int = 0, source: str = "sam") -> None:
+    """Check sheets in `5_box/fogli_<source>/<PREFIX>_<seq>.jpg` (source sam or
+    yolo): `n` random crops around the box, red the original box, green
+    the proposed one."""
     import json
     import random
 
     import cv2
 
-    out = src / "5_box" / f"fogli_{fonte}"
+    out = src / "5_box" / f"fogli_{source}"
     out.mkdir(parents=True, exist_ok=True)
     for s in seqs:
         v = f"{PREFIX}_{s}"
-        rec = json.loads((src / "5_box" / fonte / f"{v}.json").read_text())
+        rec = json.loads((src / "5_box" / source / f"{v}.json").read_text())
         idx = random.Random(seed).sample(range(len(rec["frame"])), min(n, len(rec["frame"])))
         tiles = []
         for k in sorted(idx):
@@ -491,4 +492,4 @@ def sam_sheets(src: Path, seqs: list[str], n: int = 24, seed: int = 0, fonte: st
             tiles.append(cv2.copyMakeBorder(t, 2, 2, 2, 2, cv2.BORDER_CONSTANT, value=(255, 255, 255)))
         tiles += [np.zeros_like(tiles[0])] * (-len(tiles) % 8)
         cv2.imwrite(str(out / f"{v}.jpg"), np.vstack([np.hstack(tiles[j:j + 8]) for j in range(0, len(tiles), 8)]))
-    print(f"fred: fogli {fonte} in {out}")
+    print(f"fred: fogli {source} in {out}")

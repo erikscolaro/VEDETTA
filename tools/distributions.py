@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Distribuzione continua della grandezza sqrt(w*h) per classe sulle label finali (stessi frame di
-tools/buchi.py: Svanström sui frame tenuti, aggiunte da 5_box/manuale), box >= 8 px in origine.
+"""Continuous distribution of the size sqrt(w*h) per class on the final labels (same frames as
+tools/buchi.py: Svanström on the kept frames, additions from 5_box/manuale), boxes >= 8 px at origin.
 
-Due figure in docs/figure/ (motivazioni nel README, Regole), con la curva ideale (TOTALE alzato per classe con SCALA)
-come linea continua e lo stesso asse verticale nei 4 grafici:
-- distribuzioni.png: istogramma per classe con le istanze per fascia (rosso: sotto il minimo per cella);
-- distribuzioni_scale.png: la stessa con lo scale di Ultralytics (s = 0,25 e 0,5) calcolato in modo esatto.
+Two figures in docs/figure/ (rationale in README, Rules), with the ideal curve (TOTAL raised per class with SCALE)
+as a continuous line and the same vertical axis in the 4 plots:
+- distribuzioni.png: histogram per class with the instances per band (red: below the per-cell minimum);
+- distribuzioni_scale.png: the same with the Ultralytics scale (s = 0.25 and 0.5) computed exactly.
 
     python tools/distributions.py
 """
@@ -26,27 +26,27 @@ from tools.plots import _P, STYLE, WIDTH, save  # noqa: E402
 
 OUT = ROOT / "docs" / "figure"
 W, H = 640, 512
-MIN = 8  # box sotto gli 8 px in origine esclusi (utente, 22/10/2026)
-TARGET = round(2000 / 0.7)  # minimo per cella (README.md (Regole))
+MIN = 8  # boxes under 8 px at origin are excluded (user, 22/10/2026)
+TARGET = round(2000 / 0.7)  # per-cell minimum (README, Rules)
 EDGES = [8, 16, 32, 64, 96]
 BANDS = [(8, 16), (16, 32), (32, 64), (64, 96), (96, 1e9)]
 CLASSES = ["airplane", "bird", "drone", "helicopter"]
-# distribuzione ideale: densita' in log s proporzionale a s^-alpha su [SMIN, SMAX] (README.md, Regole)
-ALPHA = dict.fromkeys(["airplane", "bird", "drone", "helicopter"], 0.3)  # stessa curva per tutte (utente, 23/10/2026)
+# ideal distribution: density in log s proportional to s^-alpha on [SMIN, SMAX] (README, Rules)
+ALPHA = dict.fromkeys(["airplane", "bird", "drone", "helicopter"], 0.3)  # same curve for all (user, 23/10/2026)
 SMIN, SMAX = 8, 320
-TOTAL = round(10_000 / 0.7)  # box per classe della curva ideale: 10.000 nel train, split 70/20/10 (README.md (Regole))
-# curva alzata (utente, 23/10/2026): almeno 10.000 istanze per classe nel train, 2.000 in val, 1.000 in test; la stessa
-# curva traslata in alto fa da tetto (sopra) e da obiettivo dei mosaici (sotto), cosi' la forma resta s^-alpha
+TOTAL = round(10_000 / 0.7)  # boxes per class of the ideal curve: 10,000 in train, split 70/20/10 (README, Rules)
+# raised curve (user, 23/10/2026): at least 10,000 instances per class in train, 2,000 in val, 1,000 in test; the same
+# curve shifted up acts as the cap (above) and as the mosaics target (below), so the shape stays s^-alpha
 SCALE = dict.fromkeys(["airplane", "bird", "drone", "helicopter"], 1.2)
 TOT = {c: TOTAL * k for c, k in SCALE.items()}
-# fine della curva per classe (utente, 23/10/2026): gli uccelli sopra i 96 px sono troppo pochi, stanno solo nel train
-# e la loro curva si ferma a 96
+# end of the curve per class (user, 23/10/2026): birds above 96 px are too few, they are only in train
+# and their curve stops at 96
 CUT = {"airplane": SMAX, "bird": 96, "drone": SMAX, "helicopter": SMAX}
 BINS = np.geomspace(2, 640, 70)
 
 
 def sizes() -> dict[str, np.ndarray]:
-    """sqrt(w*h) in px per classe, box >= MIN."""
+    """sqrt(w*h) in px per class, boxes >= MIN."""
     out = defaultdict(list)
 
     def add(t: Path) -> None:
@@ -55,23 +55,23 @@ def sizes() -> dict[str, np.ndarray]:
                 c, _, _, w, h = ln.split()
                 out[NAMES[int(c)]].append(np.sqrt(float(w) * W * float(h) * H))
 
-    sv = INPUT / "svanstrom"  # frame tenuti dalla deduplica, label di 4_box/manuale (come svanstrom.count_cells)
+    sv = INPUT / "svanstrom"  # frames kept by the dedup, labels from 4_box/manuale (as svanstrom.count_cells)
     for r in csv.DictReader(open(sv / "6_dedup" / "tenuti.csv")):
         clip, v = r["clip"], r["clip"].split("/")[0]
         t = sv / "4_box" / "manuale" / clip.replace("/", "_") / f"{v}_f{int(r['frame']):05d}.txt"
         if t.exists():
             add(t)
-    for s in ["fred", "dvids", "fbd_sv", "anti_uav"]:  # come fred.count
+    for s in ["fred", "dvids", "fbd_sv", "anti_uav"]:  # as fred.count
         src = INPUT / s
-        ses = {r["clip"] for r in csv.DictReader(open(src / "6_sessioni" / "sessioni.csv"))}
+        sessions = {r["clip"] for r in csv.DictReader(open(src / "6_sessioni" / "sessioni.csv"))}
         f = src / "5_box" / "preselezione" / "esclusi.txt"
-        esclusi = {ln.split()[0] for ln in open(f) if ln.strip()} if f.exists() else set()
+        excluded = {ln.split()[0] for ln in open(f) if ln.strip()} if f.exists() else set()
         for d in sorted((src / "5_box" / "proposte").iterdir()):
-            if f"{d.name}/s0" not in ses:
+            if f"{d.name}/s0" not in sessions:
                 continue
             man = src / "5_box" / "manuale" / d.name
             for t in d.glob("*.txt"):
-                if t.stem in esclusi:
+                if t.stem in excluded:
                     continue
                 t = man / t.name if man.exists() else src / "5_box" / "preselezione" / d.name / t.name
                 if t.exists():
@@ -80,8 +80,8 @@ def sizes() -> dict[str, np.ndarray]:
 
 
 def expected(x: np.ndarray, s: float, edges) -> np.ndarray:
-    """Istanze attese per intervallo con lo scale di Ultralytics: un box di grandezza x diventa uniforme
-    in [x(1-s), x(1+s)], quindi P(intervallo) = sovrapposizione / (2 s x). Esatto, senza campionamento."""
+    """Expected instances per interval with the Ultralytics scale: a box of size x becomes uniform
+    in [x(1-s), x(1+s)], so P(interval) = overlap / (2 s x). Exact, no sampling."""
     edges = np.asarray(edges, float)
     if s == 0:
         return np.histogram(x, edges)[0].astype(float)
@@ -91,22 +91,22 @@ def expected(x: np.ndarray, s: float, edges) -> np.ndarray:
 
 
 def ideal(n: int, alpha: float, edges, smax: float = SMAX) -> np.ndarray:
-    """Istanze per intervallo con densita' in log s proporzionale a s^-alpha su [SMIN, smax], totale n."""
+    """Instances per interval with density in log s proportional to s^-alpha on [SMIN, smax], total n."""
     e = np.clip(np.asarray(edges, float), SMIN, smax)
-    F = lambda v: -v ** -alpha / alpha  # noqa: E731  primitiva di s^-alpha d(ln s)
+    F = lambda v: -v ** -alpha / alpha  # noqa: E731  antiderivative of s^-alpha d(ln s)
     return n * (F(e[1:]) - F(e[:-1])) / (F(smax) - F(SMIN))
 
 
 def uniform(n: float, edges, smax: float = SMAX) -> np.ndarray:
-    """Istanze per intervallo con densita' costante in log s su [SMIN, smax], totale n (obiettivo del test)."""
+    """Instances per interval with constant density in log s on [SMIN, smax], total n (test target)."""
     e = np.log(np.clip(np.asarray(edges, float), SMIN, smax))
     return n * np.diff(e) / np.log(smax / SMIN)
 
 
 def curve(n: int, alpha: float, smax: float = SMAX) -> tuple[np.ndarray, np.ndarray]:
-    """La distribuzione ideale come linea continua (s, istanze attese per intervallo di BINS), totale n."""
+    """The ideal distribution as a continuous line (s, expected instances per interval of BINS), total n."""
     s = np.geomspace(SMIN, smax, 400)
-    dlog = np.log(BINS[1] / BINS[0])  # BINS a passo costante in log
+    dlog = np.log(BINS[1] / BINS[0])  # BINS with constant step in log
     return s, n * s ** -alpha * dlog * alpha / (SMIN ** -alpha - smax ** -alpha)
 
 
@@ -116,21 +116,21 @@ def _axes(ax, c: str, n: int) -> None:
     ax.axvspan(2, 8, color="0.92", zorder=0)
     ax.set_xscale("log")
     ax.set_xlim(2, 512)
-    ticks = [4, 8, 16, 32, 64, 128, 256, 512]  # potenze di 2
+    ticks = [4, 8, 16, 32, 64, 128, 256, 512]  # powers of 2
     ax.set_xticks(ticks)
     ax.set_xticklabels([str(v) for v in ticks])
-    ax.xaxis.set_minor_locator(NullLocator())  # le tacche secondarie in base 10 non cadono sulle potenze di 2
+    ax.xaxis.set_minor_locator(NullLocator())  # the base-10 minor ticks do not fall on the powers of 2
     ax.set_title(f"{c} ({n:,} box)".replace(",", "."), fontsize=8)
 
 
 def fig_current(size: dict, plt) -> Path:
     f, axs = plt.subplots(2, 2, figsize=(WIDTH, WIDTH * 0.72), sharex=True, sharey=True)
     hs = {c: expected(size[c], 0, BINS) for c in CLASSES}
-    top = max(max(hs[c].max(), curve(TOT[c], ALPHA[c], CUT[c])[1].max()) for c in CLASSES) * 1.3  # stesso asse per le 4
+    top = max(max(hs[c].max(), curve(TOT[c], ALPHA[c], CUT[c])[1].max()) for c in CLASSES) * 1.3  # same axis for all 4
     for ax, c in zip(axs.flat, CLASSES):
         x = size[c]
         ax.bar(BINS[:-1], hs[c], width=np.diff(BINS), align="edge", color=_P[0], alpha=.85, lw=0)
-        for e in EDGES[:-1]:  # senza la linea a 96 px: l'asse va in potenze di 2 (utente)
+        for e in EDGES[:-1]:  # without the line at 96 px: the axis is in powers of 2 (user)
             ax.axvline(e, color="0.55", lw=.6, ls="--")
         ax.plot(*curve(TOT[c], ALPHA[c], CUT[c]), color="k", lw=.8)
         for j, (a, b) in enumerate(BANDS):
@@ -152,11 +152,11 @@ def fig_current(size: dict, plt) -> Path:
 
 def fig_scale(size: dict, plt) -> Path:
     f, axs = plt.subplots(2, 2, figsize=(WIDTH, WIDTH * 0.78), sharex=True, sharey=True)
-    curve = [(0, _P[0], "senza scale"), (.25, _P[1], "scale 0,25 (×0,75–1,25)"), (.5, _P[2], "scale 0,5 (×0,5–1,5)")]
+    scales = [(0, _P[0], "senza scale"), (.25, _P[1], "scale 0,25 (×0,75–1,25)"), (.5, _P[2], "scale 0,5 (×0,5–1,5)")]
     ymax = 0
     for ax, c in zip(axs.flat, CLASSES):
         x = size[c]
-        for s, col, lab in curve:
+        for s, col, lab in scales:
             h = expected(x, s, BINS)
             ax.stairs(h, BINS, color=col, lw=1.2, label=lab, fill=s == 0, alpha=.35 if s == 0 else 1)
             ymax = max(ymax, h.max())
@@ -167,7 +167,7 @@ def fig_scale(size: dict, plt) -> Path:
         for e in EDGES[:-1]:
             ax.axvline(e, color="0.8", lw=.5)
         _axes(ax, c, len(x))
-    axs[0, 0].set_ylim(0, ymax * 1.1)  # sharey: stesso asse per le 4
+    axs[0, 0].set_ylim(0, ymax * 1.1)  # sharey: same axis for all 4
     for ax in axs[1]:
         ax.set_xlabel(r"grandezza $\sqrt{w\,h}$ (px)")
     for ax in axs[:, 0]:

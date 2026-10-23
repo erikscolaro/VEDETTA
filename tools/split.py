@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
-"""Passi 11-14 della procedura, su tutte le fonti insieme (`data/intermediate/`).
+"""Steps 11-14 of the procedure, on all sources together (`data/intermediate/`).
 
-Passo 11, gruppi (23/10/2026): embedding DINOv2 di ogni frame annotato di tutte le fonti; il video o la
-registrazione resta l'unita' minima, gli embedding servono solo a unire. Un file per cosa, in `intermediate/9_split/`.
+Step 11, groups (23/10/2026): DINOv2 embedding of every annotated frame of all sources; the video or
+recording stays the minimum unit, the embeddings only serve to merge. One file per item, in `intermediate/9_split/`.
 
-    python tools/split.py --step frame        # frame.csv: frame annotati tenuti, tutte le fonti
+    python tools/split.py --step frame        # frame.csv: kept annotated frames, all sources
     python tools/split.py --step embedding    # embedding_s.npy: DINOv2 ViT-S per frame
-    python tools/split.py --step somiglianze  # somiglianze_s.png su un campione
-    python tools/split.py --step somiglianze_tutte  # somiglianze_tutte.png su tutti i frame
-    python tools/split.py --step anteprima [--fasce 0.95 0.99 1.01]  # coppie di sessioni diverse per fascia
-    python tools/split.py --step doppioni     # fogli numerati delle coppie di sessioni >= 0,95, da rivedere
-    python tools/split.py --step gruppi       # 11_gruppi/gruppi.csv: sessioni note + unire.txt
-    python tools/split.py --step somiglianze_gruppi  # come somiglianze_tutte, con le curve dei gruppi
-    python tools/split.py --step split        # 12_split: gruppi in train, val, test con gli obiettivi per cella
-    python tools/split.py --step controllo    # gruppi per cella di val e test, vicino piu' simile nel train
-    python tools/split.py --step mosaici      # 13_train_compensation: tetto = curva e mosaici ridotti con l'eccesso
-    python tools/split.py --step calib        # 15_calib: 512 immagini del train per l'int8, bilanciate per classe e fascia
-    python tools/split.py --step export       # data/output: dataset Ultralytics in hardlink (train, val, test, calib, background)
+    python tools/split.py --step somiglianze  # somiglianze_s.png on a sample
+    python tools/split.py --step somiglianze_tutte  # somiglianze_tutte.png on all frames
+    python tools/split.py --step anteprima [--fasce 0.95 0.99 1.01]  # pairs of different sessions per band
+    python tools/split.py --step doppioni     # numbered sheets of session pairs >= 0.95, to review
+    python tools/split.py --step gruppi       # 11_gruppi/gruppi.csv: known sessions + unire.txt
+    python tools/split.py --step somiglianze_gruppi  # like somiglianze_tutte, with the group curves
+    python tools/split.py --step split        # 12_split: groups into train, val, test with the per-cell targets
+    python tools/split.py --step controllo    # groups per val and test cell, most similar neighbour in train
+    python tools/split.py --step mosaici      # 13_train_compensation: cap = curve and reduced mosaics from the excess
+    python tools/split.py --step calib        # 15_calib: 512 train images for int8, balanced by class and band
+    python tools/split.py --step export       # data/output: Ultralytics dataset, hardlinks (train, val, test, calib, background)
 """
 
 from __future__ import annotations
@@ -35,8 +35,8 @@ from tools.common import DATA, INPUT, INTERMEDIATE, OUTPUT  # noqa: E402
 
 
 def discarded() -> set[str]:
-    """Clip tolte dal dataset in ogni fonte: scie e scartate di Svanstrom,
-    scartate di FRED (`*/*_box/scie.txt`, `*/*_box/scartate.txt`)."""
+    """Clips removed from the dataset in every source: Svanstrom trails and rejects,
+    FRED rejects (`*/*_box/scie.txt`, `*/*_box/scartate.txt`)."""
     out = set()
     for f in list(INPUT.glob("*/*_box/scie.txt")) + list(INPUT.glob("*/*_box/scartate.txt")):
         out |= {ln.split("#")[0].strip() for ln in open(f) if ln.split("#")[0].strip()}
@@ -44,13 +44,13 @@ def discarded() -> set[str]:
 
 
 def frame_table() -> None:
-    """Passo 11, tabella dei frame annotati tenuti (con almeno un box) di tutte le fonti ->
-    `intermediate/9_split/frame.csv` (fonte, video, clip, sessione, immagine, label, box). Stessi frame dei
-    conteggi: Svanstrom da `6_dedup/tenuti.csv` con le label di `4_box/manuale/`, le altre fonti come
-    `pipeline.count` (label di CVAT per le sequenze riviste, altrimenti preselezione, senza gli esclusi)."""
+    """Step 11, table of the kept annotated frames (with at least one box) of all sources ->
+    `intermediate/9_split/frame.csv` (fonte, video, clip, sessione, immagine, label, box). Same frames as the
+    counts: Svanstrom from `6_dedup/tenuti.csv` with the labels of `4_box/manuale/`, the other sources as
+    `pipeline.count` (CVAT labels for the reviewed sequences, otherwise preselection, without the excluded)."""
     from tools.pipeline import boxes, excluded
 
-    rows, via = [], discarded()
+    rows, dropped = [], discarded()
     sv = INPUT / "svanstrom"
     ses = {r["clip"]: r["sessione"] for r in csv.DictReader(open(sv / "3_sessioni" / "sessioni.csv"))}
     for r in csv.DictReader(open(sv / "6_dedup" / "tenuti.csv")):
@@ -61,22 +61,22 @@ def frame_table() -> None:
     for s in ("fred", "dvids", "anti_uav", "fbd_sv"):
         src = INPUT / s
         ses = {r["clip"]: r["sessione"] for r in csv.DictReader(open(src / "6_sessioni" / "sessioni.csv"))}
-        esclusi = excluded(src)
+        skip = excluded(src)
         for d in sorted((src / "5_box" / "proposte").iterdir()):
             clip = f"{d.name}/s0"
             if clip not in ses:
                 continue
-            man = src / "5_box" / "manuale" / d.name
+            manual = src / "5_box" / "manuale" / d.name
             for t in sorted(d.glob("*.txt")):
-                if t.stem not in esclusi:
+                if t.stem not in skip:
                     rows.append((s, d.name, clip, ses[clip], src / "4_ritagli" / d.name / "images" / f"{t.stem}.jpg",
-                                 (man if man.exists() else boxes(src) / d.name) / t.name))
+                                 (manual if manual.exists() else boxes(src) / d.name) / t.name))
     out = INTERMEDIATE / "9_split"
     out.mkdir(parents=True, exist_ok=True)
     n, kept = Counter(), []
     for s, v, clip, se, img, lab in rows:
         nb = sum(1 for ln in lab.read_text().splitlines() if ln.strip()) if lab.exists() else 0
-        if nb and clip not in via:
+        if nb and clip not in dropped:
             assert img.exists(), img
             kept.append((s, v, clip, se, img.relative_to(DATA), lab.relative_to(DATA), nb))
             n[s] += 1
@@ -88,23 +88,23 @@ def frame_table() -> None:
           f"{sum(r[6] for r in kept)} box -> {out / 'frame.csv'}")
 
 
-MODELS = {"s": "dinov2_vits14"}  # B e L provati il 23/10/2026: non separano meglio le sessioni
+MODELS = {"s": "dinov2_vits14"}  # B and L tried on 23/10/2026: they do not separate sessions better
 
 
 def embed(paths: list, batch: int = 512, workers: int = 16) -> np.ndarray:
-    """Embedding DINOv2 ViT-S/14 (CLS, norma 1) dei JPEG `paths`: decodificati e ridotti sulla GPU (-> 280x224),
-    float16, N x 384, stesso ordine."""
+    """DINOv2 ViT-S/14 embedding (CLS, norm 1) of the JPEGs `paths`: decoded and resized on the GPU (-> 280x224),
+    float16, N x 384, same order."""
     import torch
     import torchvision.io as tio
 
     mean = torch.tensor([0.485, 0.456, 0.406], device="cuda").view(1, 3, 1, 1)
     std = torch.tensor([0.229, 0.224, 0.225], device="cuda").view(1, 3, 1, 1)
 
-    class Files(torch.utils.data.Dataset):  # solo i byte: la decodifica e' sulla GPU
+    class Files(torch.utils.data.Dataset):  # bytes only: decoding is on the GPU
         def __len__(self):
             return len(paths)
 
-        def __getitem__(self, i):  # bytes, non tensori: 512 tensori per batch esauriscono i fd condivisi
+        def __getitem__(self, i):  # bytes, not tensors: 512 tensors per batch exhaust the shared fds
             return Path(paths[i]).read_bytes()
 
     model = torch.hub.load("facebookresearch/dinov2", MODELS["s"], trust_repo=True).cuda().eval().half()
@@ -125,7 +125,7 @@ def embed(paths: list, batch: int = 512, workers: int = 16) -> np.ndarray:
 
 
 def frame_embedding() -> None:
-    """Passo 11, `embed` di ogni riga di `frame.csv` -> `intermediate/9_split/embedding_s.npy` (stesso ordine)."""
+    """Step 11, `embed` of every row of `frame.csv` -> `intermediate/9_split/embedding_s.npy` (same order)."""
     out = INTERMEDIATE / "9_split"
     e = embed([str(DATA / r["immagine"]) for r in csv.DictReader(open(out / "frame.csv"))])
     np.save(out / "embedding_s.npy", e)
@@ -133,11 +133,11 @@ def frame_embedding() -> None:
 
 
 def similarity_plot(per_clip: int = 10, n_pairs: int = 100_000, seed: int = 0) -> None:
-    """Somiglianza coseno (embedding a norma 1: coseno = prodotto scalare), un grafico per modello sugli stessi
-    frame: per ogni fonte due sessioni con due clip ciascuna (DVIDS: quattro video), `per_clip` frame a passo
-    regolare per clip. A sinistra la matrice, a destra la distribuzione su `n_pairs` coppie a caso per tipo
-    (stessa clip, stessa sessione e altra clip, sessioni diverse) con l'AUC stessa sessione contro sessioni
-    diverse -> `intermediate/9_split/somiglianze_s.png`."""
+    """Cosine similarity (norm-1 embeddings: cosine = dot product), one plot per model on the same frames:
+    for each source two sessions with two clips each (DVIDS: four videos), `per_clip` evenly spaced frames per
+    clip. Matrix on the left, on the right the distribution over `n_pairs` random pairs per type
+    (same clip, same session and other clip, different sessions) with the AUC same session against different
+    sessions -> `intermediate/9_split/somiglianze_s.png`."""
     import matplotlib.pyplot as plt
 
     from tools.plots import STYLE, WIDTH, _P, save
@@ -205,14 +205,14 @@ def similarity_plot(per_clip: int = 10, n_pairs: int = 100_000, seed: int = 0) -
               save(f, out / f"somiglianze_{name}", pdf=False))
 
 
-def similarity_all(gruppi: bool = False, lo: float = -0.2, bins: int = 240, block: int = 4096, px: int = 2000) -> None:
-    """Somiglianze su tutti i frame, in ordine fonte, sessione, clip. A sinistra la matrice della somiglianza media
-    fra gruppi di N/px frame consecutivi (esatta: la media dei coseni fra due gruppi e' il prodotto delle medie
-    degli embedding), quindi l'area di ogni fonte e' proporzionale ai suoi frame.
-    A destra gli istogrammi esatti di tutte le coppie di frame (i < j) per tipo, a blocchi sulla GPU, con l'AUC
-    stessa sessione contro sessioni diverse -> `intermediate/9_split/somiglianze_tutte.png`. Con `gruppi`
-    (`11_gruppi/gruppi.csv`) altre due curve, stesso gruppo e altra sessione (le coppie unite a mano) e gruppi
-    diversi, e un riquadro sulla coda in scala log -> `intermediate/11_gruppi/somiglianze_gruppi.png`."""
+def similarity_all(by_group: bool = False, lo: float = -0.2, bins: int = 240, block: int = 4096, px: int = 2000) -> None:
+    """Similarities on all frames, in source, session, clip order. On the left the matrix of the mean similarity
+    between blocks of N/px consecutive frames (exact: the mean of the cosines between two blocks is the product of
+    the mean embeddings), so the area of each source is proportional to its frames.
+    On the right the exact histograms of all frame pairs (i < j) per type, in blocks on the GPU, with the AUC
+    same session against different sessions -> `intermediate/9_split/somiglianze_tutte.png`. With `by_group`
+    (`11_gruppi/gruppi.csv`) two more curves, same group and other session (the hand-merged pairs) and different
+    groups, and an inset on the tail in log scale -> `intermediate/11_gruppi/somiglianze_gruppi.png`."""
     import matplotlib.pyplot as plt
     import torch
 
@@ -230,13 +230,13 @@ def similarity_all(gruppi: bool = False, lo: float = -0.2, bins: int = 240, bloc
     cid = torch.tensor([ci[r["clip"]] for r in rows], device="cuda")
     sid = torch.tensor([si[r["fonte"] + ":" + r["sessione"]] for r in rows], device="cuda")
     grp = {r["sessione"]: r["gruppo"] for r in csv.DictReader(open(INTERMEDIATE / "11_gruppi" / "gruppi.csv"))}\
-        if gruppi else {s: s for s in sess}
+        if by_group else {s: s for s in sess}
     gi = {g: k for k, g in enumerate(dict.fromkeys(grp.values()))}
     pid = torch.tensor([gi[grp[r["fonte"] + ":" + r["sessione"]]] for r in rows], device="cuda")
     kinds = ["stessa clip", "stessa sessione, altra clip", "sessioni diverse"]\
-        + ["stesso gruppo, altra sessione", "gruppi diversi"] * gruppi
+        + ["stesso gruppo, altra sessione", "gruppi diversi"] * by_group
 
-    # righe della matrice: gruppi di frame consecutivi (stesso numero di frame), cosi' l'area e' proporzionale ai frame
+    # matrix rows: blocks of consecutive frames (same number of frames), so the area is proportional to the frames
     n = len(rows)
     gid = torch.arange(n, device="cuda") * px // n
     m = torch.zeros(px, e.shape[1], device="cuda").index_add_(0, gid, e.float())
@@ -286,7 +286,7 @@ def similarity_all(gruppi: bool = False, lo: float = -0.2, bins: int = 240, bloc
         ax2.stairs(x / x.sum() / (edges[1] - edges[0]), edges, lw=1.2, color=col, ls="--" if k == "gruppi diversi" else "-",
                    label=f"{k}: " + f"{x.sum():,.0f}".replace(",", ".") + " coppie, mediana " + f"{md:.2f}".replace(".", ",")
                    + ", sopra 0,95: " + f"{x[top].sum():,.0f}".replace(",", "."))
-    if gruppi:  # la coda di sessioni diverse e gruppi diversi, in scala log
+    if by_group:  # the tail of different sessions and different groups, in log scale
         ins = ax2.inset_axes([.06, .28, .42, .32])
         for x, col, ls in ((h[2], _P[2], "-"), (h[4], _P[4], "--")):
             ins.stairs(np.maximum(x, .5), edges, color=col, lw=1, ls=ls)
@@ -297,15 +297,15 @@ def similarity_all(gruppi: bool = False, lo: float = -0.2, bins: int = 240, bloc
     ax2.set_xlabel("somiglianza coseno", fontsize=7)
     ax2.set_ylabel("densità", fontsize=7)
     ax2.set_yticks([])
-    ax2.legend(fontsize=5.5, loc="upper left", bbox_to_anchor=(0, -.12), frameon=False)  # sotto: copre le curve
+    ax2.legend(fontsize=5.5, loc="upper left", bbox_to_anchor=(0, -.12), frameon=False)  # below: it covers the curves
     ax2.set_title(f"tutte le coppie di frame ({n:,})".replace(",", ".") + "; AUC stessa sessione / diverse "
                   + f"{auc:.3f}".replace(".", ","), fontsize=7)
     f.suptitle("DINOv2 ViT-S/14, tutti i frame annotati", fontsize=8)
     print(f"AUC {auc:.4f}, coppie {', '.join(f'{x.sum():,.0f}' for x in h)}, mediane {[round(float(x), 3) for x in med]}",
-          save(f, INTERMEDIATE / "11_gruppi" / "somiglianze_gruppi" if gruppi else out / "somiglianze_tutte", pdf=False))
+          save(f, INTERMEDIATE / "11_gruppi" / "somiglianze_gruppi" if by_group else out / "somiglianze_tutte", pdf=False))
 
 
-TILE = (256, 205, 16)  # miniatura 640x512 -> 256x205, striscia di testo sopra
+TILE = (256, 205, 16)  # thumbnail 640x512 -> 256x205, text strip on top
 
 
 def _who(r: dict) -> str:
@@ -313,8 +313,8 @@ def _who(r: dict) -> str:
 
 
 def _tile(r: dict, text: str | None, lw: int = 2) -> np.ndarray:
-    """Miniatura di un frame di `frame.csv` con i box in rosso (spessore `lw` a 640x512) e `text` sopra (None: senza
-    striscia)."""
+    """Thumbnail of a `frame.csv` frame with the boxes in red (thickness `lw` at 640x512) and `text` on top (None: no
+    strip)."""
     import cv2
 
     W, H, TH = TILE
@@ -333,9 +333,9 @@ def _tile(r: dict, text: str | None, lw: int = 2) -> np.ndarray:
 
 
 def _pairs_by_band(edges, seed: int = 0, block: int = 4096, same_clip: bool = False):
-    """Coppie di frame di `frame.csv` per fascia di somiglianza DINOv2 (coseno, `embedding_s.npy`): di sessioni
-    diverse, o della stessa clip con `same_clip`. Per fascia fino a 50 candidati a caso per blocco (sim, i, j), il
-    numero di coppie di frame e l'insieme delle coppie di sessioni -> (rows, cand, n_pairs, ses_pairs)."""
+    """Frame pairs of `frame.csv` per DINOv2 similarity band (cosine, `embedding_s.npy`): from different sessions,
+    or from the same clip with `same_clip`. Per band up to 50 random candidates per block (sim, i, j), the
+    number of frame pairs and the set of session pairs -> (rows, cand, n_pairs, ses_pairs)."""
     import torch
 
     out = INTERMEDIATE / "9_split"
@@ -347,7 +347,7 @@ def _pairs_by_band(edges, seed: int = 0, block: int = 4096, same_clip: bool = Fa
     cid = torch.tensor([ci[r["clip"]] for r in rows], device="cuda")
     n, nb = len(rows), len(edges) - 1
     g = torch.Generator(device="cuda").manual_seed(seed)
-    cand = [[] for _ in range(nb)]  # (sim, i, j) a caso, fino a 50 per blocco e fascia
+    cand = [[] for _ in range(nb)]  # random (sim, i, j), up to 50 per block and band
     n_pairs, ses_pairs = [0] * nb, [set() for _ in range(nb)]
     j = torch.arange(n, device="cuda")
     with torch.no_grad():
@@ -367,9 +367,10 @@ def _pairs_by_band(edges, seed: int = 0, block: int = 4096, same_clip: bool = Fa
 
 
 def pair_preview(edges=(0.6, 0.7, 0.8, 0.9, 1.01), per: int = 6, seed: int = 0, block: int = 4096) -> None:
-    """Anteprima di coppie di frame di sessioni diverse, una riga per fascia di somiglianza (0,6-0,7, 0,7-0,8, ...):
-    `per` coppie a caso per fascia, box disegnati, somiglianza e fonte/sessione/video sopra ogni immagine. Stampa per
-    fascia le coppie di frame e le coppie di sessioni coinvolte -> `intermediate/9_split/anteprima_sessioni_diverse_<prima soglia>.jpg`."""
+    """Preview of frame pairs from different sessions, one row per similarity band (0.6-0.7, 0.7-0.8, ...):
+    `per` random pairs per band, boxes drawn, similarity and source/session/video above each image. Prints per
+    band the frame pairs and the session pairs involved
+    -> `intermediate/9_split/anteprima_sessioni_diverse_<first threshold>.jpg`."""
     import cv2
 
     out = INTERMEDIATE / "9_split"
@@ -399,8 +400,8 @@ def pair_preview(edges=(0.6, 0.7, 0.8, 0.9, 1.01), per: int = 6, seed: int = 0, 
 
 
 def _session_pairs(lo: float, block: int = 4096):
-    """Coppie di sessioni diverse con almeno una coppia di frame >= `lo` (DINOv2, `embedding_s.npy`): per coppia la
-    coppia di frame piu' simile (sim, i, j) e quante coppie di frame superano `lo`."""
+    """Pairs of different sessions with at least one frame pair >= `lo` (DINOv2, `embedding_s.npy`): per pair the
+    most similar frame pair (sim, i, j) and how many frame pairs exceed `lo`."""
     import torch
 
     out = INTERMEDIATE / "9_split"
@@ -433,8 +434,8 @@ def _session_pairs(lo: float, block: int = 4096):
 
 def _pair_sheets(dst: Path, order: list, rows, e, sess, by_ses, best, cnt, thr: float, prefix: str,
                  per_sheet: int = 12, seed: int = 0) -> None:
-    """`dst/coppie.csv` e fogli numerati `dst/fogli/<prefix>NN.jpg`, una riga per coppia di sessioni: la coppia di
-    frame piu' simile, poi un frame a caso di A con il frame di B piu' simile a lui."""
+    """`dst/coppie.csv` and numbered sheets `dst/fogli/<prefix>NN.jpg`, one row per session pair: the most similar
+    frame pair, then a random frame of A with the frame of B most similar to it."""
     import cv2
     import torch
 
@@ -469,10 +470,10 @@ def _pair_sheets(dst: Path, order: list, rows, e, sess, by_ses, best, cnt, thr: 
 
 
 def duplicate_sheets(thr: float = 0.95, per_sheet: int = 12, seed: int = 0) -> None:
-    """Passo 11, doppioni fra sessioni: ogni coppia di sessioni diverse con almeno una coppia di frame >= `thr`
-    -> `intermediate/10_doppioni/coppie.csv` (n, sessioni, fonti, massimo, coppie di frame sopra soglia, frame
-    della coppia migliore) e fogli numerati `fogli/DNN.jpg` (utente, 23/10/2026). L'utente risponde con i numeri da
-    unire, che vanno in `10_doppioni/unire.txt` (un numero per riga, `#` per i commenti), letto dal passo dei gruppi."""
+    """Step 11, duplicates between sessions: every pair of different sessions with at least one frame pair >= `thr`
+    -> `intermediate/10_doppioni/coppie.csv` (n, sessions, sources, maximum, frame pairs above threshold, frames
+    of the best pair) and numbered sheets `fogli/DNN.jpg` (user, 23/10/2026). The user answers with the numbers to
+    merge, which go in `10_doppioni/unire.txt` (one number per line, `#` for comments), read by the groups step."""
     dst = INTERMEDIATE / "10_doppioni"
     rows, e, sess, by_ses, best, cnt = _session_pairs(thr)
     order = sorted(best, key=lambda k: (sess[k[0]].split(":")[0], sess[k[1]].split(":")[0], -best[k][0]))
@@ -483,33 +484,33 @@ def duplicate_sheets(thr: float = 0.95, per_sheet: int = 12, seed: int = 0) -> N
           + f"), {-(-len(order) // per_sheet)} fogli -> {dst}")
 
 
-TARATURA = (0.85, 0.90, 0.92, 0.94, 0.95)  # fasce del massimo per coppia di sessioni, sotto la soglia dei doppioni
+TUNING = (0.85, 0.90, 0.92, 0.94, 0.95)  # bands of the maximum per session pair, below the duplicates threshold
 
 
 def threshold_sheets(per: int = 40, seed: int = 0) -> None:
-    """Taratura della soglia 0,95 (utente, 23/10/2026): `per` coppie di sessioni a caso per fascia di `TARATURA`
-    (somiglianza massima fra i loro frame), sotto la soglia quindi mai riviste, in ordine di somiglianza
-    decrescente (utente, 23/10/2026) -> `10_doppioni/taratura/coppie.csv` (con la colonna `fascia`) e fogli
-    `fogli/TNN.jpg` come quelli dei doppioni. L'operatore scrive in `taratura/stessa_sessione.txt` i numeri delle
-    coppie che sono la stessa sessione (stesso posto, stesse condizioni, stesso volo o girato); lo stesso posto in
-    un altro giorno non conta. Poi `--step stima_soglia`."""
+    """Tuning of the 0.95 threshold (user, 23/10/2026): `per` random session pairs per band of `TUNING`
+    (maximum similarity between their frames), below the threshold hence never reviewed, in decreasing order of
+    similarity (user, 23/10/2026) -> `10_doppioni/taratura/coppie.csv` (with the `fascia` column) and sheets
+    `fogli/TNN.jpg` like those of the duplicates. The operator writes in `taratura/stessa_sessione.txt` the numbers
+    of the pairs that are the same session (same place, same conditions, same flight or footage); the same place on
+    another day does not count. Then `--step stima_soglia`."""
     dst = INTERMEDIATE / "10_doppioni" / "taratura"
-    rows, e, sess, by_ses, best, cnt = _session_pairs(TARATURA[0])
+    rows, e, sess, by_ses, best, cnt = _session_pairs(TUNING[0])
     rng = np.random.default_rng(seed)
     pick = []
-    for lo, hi in zip(TARATURA, TARATURA[1:]):
+    for lo, hi in zip(TUNING, TUNING[1:]):
         band = sorted(k for k in best if lo <= best[k][0] < hi)
         pick += [band[i] for i in rng.choice(len(band), min(per, len(band)), replace=False)]
         print(f"taratura {lo:.2f}-{hi:.2f}: {len(band)} coppie di sessioni, {min(per, len(band))} nei fogli")
-    order = sorted(pick, key=lambda k: -best[k][0])  # decrescente: le stranezze in alto si vedono prima (utente)
-    _pair_sheets(dst, order, rows, e, sess, by_ses, best, cnt, TARATURA[0], "T", seed=seed)
+    order = sorted(pick, key=lambda k: -best[k][0])  # decreasing: oddities on top are seen first (user)
+    _pair_sheets(dst, order, rows, e, sess, by_ses, best, cnt, TUNING[0], "T", seed=seed)
     print(f"{len(order)} coppie, {-(-len(order) // 12)} fogli -> {dst}; risposte in stessa_sessione.txt")
 
 
 def threshold_marks(per_sheet: int = 12) -> None:
-    """Giudizi degli operatori sui fogli di taratura, a colpo d'occhio (utente, 23/10/2026): legge
-    `taratura/giudizi_*.txt` (righe `N S|D[?] motivo`) e ridisegna i fogli in `taratura/fogli_esito/` con un riquadro
-    per coppia: verde = stessa sessione, rosso = diversa, arancio = incerto (`?`), con la lettera nell'intestazione."""
+    """Operators' judgements on the tuning sheets, at a glance (user, 23/10/2026): reads
+    `taratura/giudizi_*.txt` (lines `N S|D[?] reason`) and redraws the sheets in `taratura/fogli_esito/` with a frame
+    per pair: green = same session, red = different, orange = uncertain (`?`), with the letter in the header."""
     import cv2
 
     dst = INTERMEDIATE / "10_doppioni" / "taratura"
@@ -520,7 +521,7 @@ def threshold_marks(per_sheet: int = 12) -> None:
             if len(t) >= 2 and t[0].isdigit():
                 vote[int(t[0])] = t[1]
     W, H, TH = TILE
-    step = 26 + TH + H + 10  # intestazione, striscia di testo, miniatura, spazio (come `_pair_sheets`)
+    step = 26 + TH + H + 10  # header, text strip, thumbnail, gap (like `_pair_sheets`)
     (dst / "fogli_esito").mkdir(exist_ok=True)
     n = Counter()
     for f in sorted((dst / "fogli").glob("T*.jpg")):
@@ -538,14 +539,14 @@ def threshold_marks(per_sheet: int = 12) -> None:
 
 
 def threshold_estimate() -> None:
-    """Quota di coppie "stessa sessione" per fascia dalla revisione di `threshold_sheets`, con l'intervallo di
-    Wilson al 95% -> `10_doppioni/taratura/stima.csv`. Sopra 0,95 la quota e' 1 (146 coppie su 146, tutte unite)."""
+    """Share of "same session" pairs per band from the review of `threshold_sheets`, with the 95% Wilson
+    interval -> `10_doppioni/taratura/stima.csv`. Above 0.95 the share is 1 (146 pairs out of 146, all merged)."""
     dst = INTERMEDIATE / "10_doppioni" / "taratura"
     same = set(_merges(dst / "stessa_sessione.txt"))
     rows = list(csv.DictReader(open(dst / "coppie.csv")))
     out = []
-    for lo, hi in zip(TARATURA, TARATURA[1:]):
-        rs = [r for r in rows if lo <= float(r["massimo"]) < hi or hi == TARATURA[-1] == float(r["massimo"])]  # 0,950 arrotondato
+    for lo, hi in zip(TUNING, TUNING[1:]):
+        rs = [r for r in rows if lo <= float(r["massimo"]) < hi or hi == TUNING[-1] == float(r["massimo"])]  # 0.950 rounded
         n, k = len(rs), sum(int(r["n"]) in same for r in rs)
         z = 1.96
         c, h = (k + z * z / 2) / (n + z * z), z * np.sqrt(k * (n - k) / n + z * z / 4) / (n + z * z)
@@ -559,7 +560,7 @@ def threshold_estimate() -> None:
 
 
 def _merges(f: Path) -> list[int]:
-    """Numeri di `unire.txt`: `N`, `N-M`, `N via`; `#` commento."""
+    """Numbers of `unire.txt`: `N`, `N-M`, `N via`; `#` comment."""
     out = []
     for ln in f.read_text().splitlines():
         ln = ln.split("#")[0].split()
@@ -570,9 +571,9 @@ def _merges(f: Path) -> list[int]:
 
 
 def groups() -> None:
-    """Passo 11, gruppi -> `intermediate/11_gruppi/`. Unione (union-find) delle sessioni note di ogni fonte con le
-    coppie di `10_doppioni/unire.txt`: `gruppi.csv` (sessione, gruppo, frame). Niente deduplica dei frame fra
-    sessioni (23/10/2026): i doppioni veri (stessi box nello stesso punto) sono 17 coppie sopra 0,95."""
+    """Step 11, groups -> `intermediate/11_gruppi/`. Union (union-find) of the known sessions of each source with the
+    pairs of `10_doppioni/unire.txt`: `gruppi.csv` (sessione, gruppo, frame). No frame deduplication between
+    sessions (23/10/2026): the true duplicates (same boxes in the same place) are 17 pairs above 0.95."""
     out = INTERMEDIATE / "11_gruppi"
     out.mkdir(parents=True, exist_ok=True)
     rows = list(csv.DictReader(open(INTERMEDIATE / "9_split" / "frame.csv")))
@@ -586,9 +587,9 @@ def groups() -> None:
             s = parent[s]
         return s
 
-    dop = INTERMEDIATE / "10_doppioni"
-    pairs = {int(r["n"]): (r["sessione_a"], r["sessione_b"]) for r in csv.DictReader(open(dop / "coppie.csv"))}
-    for k in _merges(dop / "unire.txt"):
+    dup = INTERMEDIATE / "10_doppioni"
+    pairs = {int(r["n"]): (r["sessione_a"], r["sessione_b"]) for r in csv.DictReader(open(dup / "coppie.csv"))}
+    for k in _merges(dup / "unire.txt"):
         a, b = pairs[k]
         parent[find(a)] = find(b)
     gid = {r: f"G{k:04d}" for k, r in enumerate(dict.fromkeys(find(s) for s in sess))}
@@ -605,16 +606,16 @@ def groups() -> None:
 
 
 
-# intervalli di mezza ottava per seguire la curva dentro le fasce (utente, 23/10/2026); l'ultimo comprende fino a 320 px e oltre
+# half-octave intervals to follow the curve inside the bands (user, 23/10/2026); the last one covers 320 px and up
 HALF_OCTAVES = [8, 2 ** 3.5, 16, 2 ** 4.5, 32, 2 ** 5.5, 64, 2 ** 6.5, 128, 2 ** 7.5, 256, 1e9]
-QUARTER_OCTAVES = [8 * 2 ** (k / 4) for k in range(21)] + [1e9]  # quarti d'ottava per il train, fino a 256 px e oltre
-TEST_TOT = 1430  # box per classe nel test, uniformi in log s (286 x 5 fasce di prima)
+QUARTER_OCTAVES = [8 * 2 ** (k / 4) for k in range(21)] + [1e9]  # quarter octaves for the train, up to 256 px+
+TEST_TOT = 1430  # boxes per class in the test, uniform in log s (286 x 5 bands as before)
 
 
-_ST: dict = {}  # stato dello split per i processi figli (fork)
+_ST: dict = {}  # split state for the child processes (fork)
 
 
-CLASS_WEIGHT = np.array([1, 1, 4, 1])[:, None]  # airplane, bird, drone, helicopter: droni x4 (utente, 23/10/2026: errore ~5%)
+CLASS_WEIGHT = np.array([1, 1, 4, 1])[:, None]  # airplane, bird, drone, helicopter: drones x4 (user, 23/10/2026: ~5% error)
 
 
 def _err(x, t):
@@ -622,18 +623,18 @@ def _err(x, t):
     return ((CLASS_WEIGHT * ((x - t) / np.where(m, t, 1)) ** 2)[m]).sum()
 
 
-MIN_SPLIT = {"val": 2000, "test": 1000}  # istanze minime per classe (utente, 23/10/2026; il train ne ha 10.000)
+MIN_SPLIT = {"val": 2000, "test": 1000}  # minimum instances per class (user, 23/10/2026; the train has 10,000)
 
 
 def _obj(s: str, x, t) -> float:
-    """Errore di uno split: celle (`_err`) piu' una penalita' forte per ogni classe sotto il minimo `MIN_SPLIT`."""
+    """Error of a split: cells (`_err`) plus a strong penalty for every class below the minimum `MIN_SPLIT`."""
     short = np.maximum(0, MIN_SPLIT[s] * 1.02 - x.sum(1)) / MIN_SPLIT[s]
     return _err(x, t) + 100 * (short ** 2).sum()
 
 
 def _split_trial(seed: int) -> tuple:
-    """Un tentativo di `split_groups`: greedy su un ordine a caso dei gruppi, poi rifinitura spostando un gruppo
-    alla volta finche' l'errore scende -> (errore, assegnazione)."""
+    """One attempt of `split_groups`: greedy on a random order of the groups, then refinement moving one group
+    at a time while the error decreases -> (error, assignment)."""
     free, tg, ok, X = _ST["free"], _ST["tg"], _ST["ok"], _ST["X"]
     rng = np.random.default_rng(seed)
     cur = {s: np.zeros_like(tg[s]) for s in tg}
@@ -668,16 +669,17 @@ def _split_trial(seed: int) -> tuple:
 
 
 def split_groups(trials: int = 1000, big: float = 0.02, share: float = 0.75, seed: int = 0) -> None:
-    """Passo 11, split per gruppi -> `intermediate/12_split/`. Via le immagini con un box sotto gli 8 px (utente,
-    23/10/2026: in nessuno split). Ogni gruppo di `11_gruppi/gruppi.csv` va tutto in uno split. Obiettivi per
-    classe: val = 20% della curva (`distribuzioni.ideale`, `TOT` per classe, curva alzata) su intervalli di mezza ottava (`FINE`,
-    utente 23/10/2026: con le 5 fasce la forma dentro la fascia era libera), al piu' il 20% di quello che c'e';
-    test piatto per fascia (5 fasce), 286 per cella, al piu' il 30% di quello che c'e'; il resto in train.
-    Greedy su `trials` ordini a caso dei gruppi: ogni gruppo va in val o test se avvicina gli obiettivi (errore
-    relativo al quadrato), altrimenti in train, poi rifinitura spostando un gruppo alla volta finche' l'errore scende; i gruppi sopra `big` dei frame vanno in train, e un gruppo non
-    puo' dare piu' di `share` dell'obiettivo di una cella di val o test (varieta'). Si tiene l'ordine migliore.
-    Scrive `split.csv` (gruppo, split), `frame_split.csv` (immagine, split) e `report.csv` (cella, obiettivi e
-    istanze per split)."""
+    """Step 11, split by groups -> `intermediate/12_split/`. Images with a box under 8 px are dropped (user,
+    23/10/2026: in no split). Each group of `11_gruppi/gruppi.csv` goes entirely into one split. Targets per
+    class: val = 20% of the curve (`distributions.ideal`, `TOT` per class, raised curve) over half-octave intervals
+    (`HALF_OCTAVES`, user 23/10/2026: with the 5 bands the shape inside the band was free), at most 20% of what exists;
+    test flat per band (5 bands), 286 per cell, at most 30% of what exists; the rest in train.
+    Greedy over `trials` random orders of the groups: each group goes to val or test if it gets closer to the
+    targets (squared relative error), otherwise to train, then refinement moving one group at a time while the
+    error decreases; groups above `big` of the frames go to train, and a group cannot give more than `share` of the
+    target of a val or test cell (variety). The best order is kept.
+    Writes `split.csv` (gruppo, split), `frame_split.csv` (immagine, split) and `report.csv` (cell, targets and
+    instances per split)."""
     from tools.distributions import ALPHA, CUT, TOT, ideal, uniform
 
     edges = [8, 16, 32, 64, 96, 1e9]
@@ -688,8 +690,8 @@ def split_groups(trials: int = 1000, big: float = 0.02, share: float = 0.75, see
     names = ["airplane", "bird", "drone", "helicopter"]
     gids = sorted(set(grp.values()))
     gi = {g: k for k, g in enumerate(gids)}
-    C = np.zeros((len(gids), 4, 5))  # fasce, per il test
-    F = np.zeros((len(gids), 4, len(HALF_OCTAVES) - 1))  # mezze ottave, per il val
+    C = np.zeros((len(gids), 4, 5))  # bands, for the test
+    F = np.zeros((len(gids), 4, len(HALF_OCTAVES) - 1))  # half octaves, for the val
     nf = np.zeros(len(gids), int)
     fg, small = [], 0
     for r in rows:
@@ -707,17 +709,17 @@ def split_groups(trials: int = 1000, big: float = 0.02, share: float = 0.75, see
             F[g, int(c), np.digitize(v, HALF_OCTAVES[1:-1])] += 1
     tot = C.sum(0)
     tv = np.minimum(0.2 * np.array([ideal(TOT[c], ALPHA[c], HALF_OCTAVES, CUT[c]) for c in names]), 0.2 * F.sum(0))
-    # test uniforme in log s (utente, 23/10/2026: l'ideale del test e' piatto), sulle mezze ottave fino alla fine
-    # della curva (uccelli 96 px), 1.430 per classe (prima 286 per fascia x 5), al piu' il 30% di quello che c'e'
+    # test uniform in log s (user, 23/10/2026: the test ideal is flat), on the half octaves up to the end
+    # of the curve (birds 96 px), 1,430 per class (before 286 per band x 5), at most 30% of what exists
     tt = np.minimum(np.array([uniform(TEST_TOT, HALF_OCTAVES, CUT[c]) for c in names]), 0.3 * F.sum(0))
-    # almeno 1.000 per classe nel test (utente, 23/10/2026): se le fasce povere non bastano, si alza l'obiettivo
-    # delle altre in proporzione, sempre entro il 30% di quello che c'e'
+    # at least 1,000 per class in the test (user, 23/10/2026): if the poor bands are not enough, the target of
+    # the others is raised proportionally, always within 30% of what exists
     for c in range(4):
         while tt[c].sum() < 1050 and (room := (tt[c] < 0.3 * F.sum(0)[c]) & (tt[c] > 0)).any():
             tt[c, room] = np.minimum(tt[c, room] * 1.02, 0.3 * F.sum(0)[c, room])
     X = {"val": F, "test": F}
-    ttb = np.array([uniform(tt[c].sum(), edges, CUT[n]) for c, n in enumerate(names)])  # per fascia, solo report
-    big_bird = {g for g in range(len(gids)) if C[g, names.index("bird"), 4]}  # gruppi con uccelli > 96 px: solo train
+    ttb = np.array([uniform(tt[c].sum(), edges, CUT[n]) for c, n in enumerate(names)])  # per band, report only
+    big_bird = {g for g in range(len(gids)) if C[g, names.index("bird"), 4]}  # groups with birds > 96 px: train only
     N = nf.sum()
 
     def err(x, t):
@@ -728,11 +730,11 @@ def split_groups(trials: int = 1000, big: float = 0.02, share: float = 0.75, see
     tg = {"val": tv, "test": tt}
     ok = {s: {g for g in free if g not in big_bird and np.all(X[s][g][tg[s] > 0] <= share * tg[s][tg[s] > 0])
               and not X[s][g][tg[s] == 0].any()} for s in tg}
-    # i tentativi sono indipendenti: in parallelo su tutti i core (utente, 23/10/2026), stato condiviso via fork
+    # the trials are independent: in parallel on all cores (user, 23/10/2026), state shared via fork
     import multiprocessing as mp
 
     _ST.update(free=free, tg=tg, ok=ok, X=X)
-    with mp.get_context("fork").Pool(20) as pool:  # 20 core su 24: margine per il resto della macchina
+    with mp.get_context("fork").Pool(20) as pool:  # 20 cores out of 24: headroom for the rest of the machine
         best = min(pool.map(_split_trial, [seed * 100_000 + k for k in range(trials)]), key=lambda x: x[0])
     lab = {g: "train" for g in range(len(gids)) if nf[g]} | best[1]
     with open(out / "split.csv", "w", newline="") as fh:
@@ -745,7 +747,7 @@ def split_groups(trials: int = 1000, big: float = 0.02, share: float = 0.75, see
         w.writerows((r["immagine"], lab[g] if g >= 0 else "via_sotto_8px") for r, g in zip(rows, fg))
     S = {s: sum(C[g] for g, x in lab.items() if x == s) for s in ("train", "val", "test")}
     SF = {s: sum(F[g] for g, x in lab.items() if x == s) for s in ("train", "val", "test")}
-    tvb = np.minimum(0.2 * np.array([ideal(TOT[c], ALPHA[c], edges, CUT[c]) for c in names]), 0.2 * tot)  # per fascia, solo report
+    tvb = np.minimum(0.2 * np.array([ideal(TOT[c], ALPHA[c], edges, CUT[c]) for c in names]), 0.2 * tot)  # per band, report only
     bands = ["8-16", "16-32", "32-64", "64-96", ">96"]
     with open(out / "report.csv", "w", newline="") as fh:
         w = csv.writer(fh)
@@ -773,9 +775,9 @@ def split_groups(trials: int = 1000, big: float = 0.02, share: float = 0.75, see
 
 
 def split_check(block: int = 4096) -> None:
-    """Controllo dello split (`12_split/`): per ogni cella di val e test quanti gruppi e fonti la riempiono, e per
-    ogni immagine di val e test la somiglianza DINOv2 con l'immagine piu' vicina del train (leakage rimasto, da
-    confrontare con 0,95, la soglia delle unioni) -> `vicini.png` e la stampa."""
+    """Split check (`12_split/`): for each val and test cell how many groups and sources fill it, and for
+    each val and test image the DINOv2 similarity with the nearest train image (remaining leakage, to
+    compare with 0.95, the merge threshold) -> `vicini.png` and the printout."""
     import matplotlib.pyplot as plt
     import torch
 
@@ -821,21 +823,21 @@ def split_check(block: int = 4096) -> None:
 
 
 def train_mosaics(seed: int = 0, factors=(0.5, 0.25, 0.125)) -> None:
-    """Passo 12, tetto del train e mosaici ridotti -> `intermediate/13_train_compensation/` (utente, 23/10/2026, README.md (Regole)).
-    Tetto = curva: obiettivo del train per classe e mezza ottava (`FINE`) = 70% della curva (10.000 per classe); via, a turno fra i video,
-    le immagini del train con tutti i box in celle sopra l'obiettivo (`tetto.csv`). Con quelle immagini, mosaici
-    640x512 per le celle sotto l'obiettivo: per ogni immagine il fattore (0,5, 0,25, 0,125 -> griglia 2x2, 4x4,
-    8x8) che porta piu' box in celle mancanti, solo se tutti i box restano >= 8 px; ogni immagine al massimo una
-    volta, in ordine a caso a turno fra i video; prima le immagini fuori dal tetto, poi (se manca ancora) copie ridotte
-    di immagini rimaste nel train. Ogni casella: riduzione INTER_AREA, sfocatura gaussiana leggera
-    (sigma 0,3-0,8), rumore (sigma 1-3); il mosaico in JPEG qualita' 75-92. Scrive `images/`, `labels/`,
-    `mosaici.csv` (mosaico, casella, sorgente, fattore, sigma, rumore, jpeg) e `train.csv` (immagini reali tenute
-    piu' mosaici, con la label)."""
+    """Step 12, train cap and reduced mosaics -> `intermediate/13_train_compensation/` (user, 23/10/2026, README, Rules).
+    Cap = curve: train target per class and half octave (`HALF_OCTAVES`) = 70% of the curve (10,000 per class); removed, in
+    turn across videos, the train images with all boxes in cells above the target (`tetto.csv`). With those images,
+    640x512 mosaics for the cells below the target: for each image the factor (0.5, 0.25, 0.125 -> grid 2x2, 4x4,
+    8x8) that brings more boxes into missing cells, only if all boxes stay >= 8 px; each image at most once,
+    in random order in turn across videos; first the images out of the cap, then (if still short) reduced copies
+    of images left in the train. Each tile: INTER_AREA reduction, light Gaussian blur
+    (sigma 0.3-0.8), noise (sigma 1-3); the mosaic as JPEG quality 75-92. Writes `images/`, `labels/`,
+    `mosaici.csv` (mosaico, casella, sorgente, fattore, sigma, rumore, jpeg) and `train.csv` (real images kept
+    plus mosaics, with the label)."""
     import cv2
 
     from tools.distributions import ALPHA, CUT, TOT, ideal
 
-    edges, names = QUARTER_OCTAVES, ["airplane", "bird", "drone", "helicopter"]  # quarti d'ottava (utente, 23/10/2026: droni 8-12 px)
+    edges, names = QUARTER_OCTAVES, ["airplane", "bird", "drone", "helicopter"]  # quarter octaves (user, 23/10/2026: drones 8-12 px)
     nb = len(edges) - 1
     bands = [f"{edges[k]:.0f}-{edges[k + 1]:.0f}" if k < nb - 1 else f">{edges[k]:.0f}" for k in range(nb)]
     out = INTERMEDIATE / "13_train_compensation"
@@ -845,9 +847,9 @@ def train_mosaics(seed: int = 0, factors=(0.5, 0.25, 0.125)) -> None:
             f.unlink()
     rows = list(csv.DictReader(open(INTERMEDIATE / "9_split" / "frame.csv")))
     fs = [r["split"] for r in csv.DictReader(open(INTERMEDIATE / "12_split" / "frame_split.csv"))]
-    target = 0.7 * np.array([ideal(TOT[c], ALPHA[c], edges, CUT[c]) for c in names])  # tetto: curva alzata
-    target[target == 0] = np.inf  # oltre la fine della curva (uccelli > 96 px) nessun tetto
-    fill = 0.7 * np.array([ideal(TOT[c], ALPHA[c], edges, CUT[c]) for c in names])  # mosaici: la stessa curva alzata
+    target = 0.7 * np.array([ideal(TOT[c], ALPHA[c], edges, CUT[c]) for c in names])  # cap: raised curve
+    target[target == 0] = np.inf  # beyond the end of the curve (birds > 96 px) no cap
+    fill = 0.7 * np.array([ideal(TOT[c], ALPHA[c], edges, CUT[c]) for c in names])  # mosaics: the same raised curve
     rng = np.random.default_rng(seed)
 
     def boxes(r):
@@ -875,7 +877,7 @@ def train_mosaics(seed: int = 0, factors=(0.5, 0.25, 0.125)) -> None:
     for i in train:
         for c, b in cells(bx[i]):
             cnt[c, b] += 1
-    # tetto: via le immagini con tutti i box in celle sopra l'obiettivo, a turno fra i video, finche' si puo'
+    # cap: drop the images with all boxes in cells above the target, in turn across videos, as long as possible
     kept, out_cap = set(train), []
     moved = True
     while moved:
@@ -895,11 +897,11 @@ def train_mosaics(seed: int = 0, factors=(0.5, 0.25, 0.125)) -> None:
     print(f"tetto: via {len(out_cap)} immagini del train su {len(train)}; mancano "
           + ", ".join(f"{names[c]} {bands[b]} {round(fill[c, b] - cnt[c, b])}"
                       for c in range(4) for b in range(nb) if fill[c, b] - cnt[c, b] >= 1) + " (rispetto alla curva alzata)")
-    # mosaici: per ogni immagine fuori dal tetto il fattore che porta piu' box in celle mancanti
-    tiles = defaultdict(list)  # fattore -> [(i, bx)]
-    # prima l'eccesso del tetto, poi copie ridotte di immagini rimaste nel train (utente, 23/10/2026: va bene se
-    # un'immagine compare piu' volte nel train, purche' le copie siano ridotte). Obiettivo dei mosaici: la curva alzata,
-    # la stessa del tetto; se una classe resta sotto 10.000, si alza solo sotto i 64 px, di 0,25 alla volta fino a x3
+    # mosaics: for each image out of the cap the factor that brings more boxes into missing cells
+    tiles = defaultdict(list)  # factor -> [(i, bx)]
+    # first the excess of the cap, then reduced copies of images left in the train (user, 23/10/2026: it is fine if
+    # an image appears more than once in the train, as long as the copies are reduced). Mosaic target: the raised
+    # curve, the same as the cap; if a class stays under 10,000, raise it only below 64 px, by 0.25 at a time up to x3
     pool, used, m = round_robin(out_cap) + round_robin(sorted(kept)), set(), np.ones(4)
     small = np.array(edges[1:]) <= 64.1
     while True:
@@ -932,7 +934,7 @@ def train_mosaics(seed: int = 0, factors=(0.5, 0.25, 0.125)) -> None:
             canvas = np.zeros((512, 640, 3), np.uint8)
             lab = []
             group = idx[m0:m0 + g * g]
-            while len(group) < g * g:  # l'ultimo mosaico si completa con caselle gia' usate in questo stesso mosaico
+            while len(group) < g * g:  # the last mosaic is completed with tiles already used in this same mosaic
                 group = group + group[:g * g - len(group)]
             q = int(rng.integers(75, 93))
             name = f"M{n_m:05d}_x{g}"
@@ -943,7 +945,7 @@ def train_mosaics(seed: int = 0, factors=(0.5, 0.25, 0.125)) -> None:
                 im = cv2.GaussianBlur(im, (0, 0), sig)
                 im = np.clip(im + rng.normal(0, noise, im.shape), 0, 255).astype(np.uint8)
                 canvas[r_ * th:(r_ + 1) * th, c_ * tw:(c_ + 1) * tw] = im
-                if k < len(idx[m0:m0 + g * g]):  # le caselle ripetute non si contano due volte nel csv
+                if k < len(idx[m0:m0 + g * g]):  # repeated tiles are not counted twice in the csv
                     recs.append((name, k, rows[i]["immagine"], f, round(sig, 2), round(noise, 2), q))
                 lab += [f"{c} {(c_ + x) / g:.6f} {(r_ + y) / g:.6f} {w / g:.6f} {h / g:.6f}" for c, x, y, w, h in bx[i]]
             cv2.imwrite(str(out / "images" / f"{name}.jpg"), canvas, [cv2.IMWRITE_JPEG_QUALITY, q])
@@ -969,9 +971,9 @@ def train_mosaics(seed: int = 0, factors=(0.5, 0.25, 0.125)) -> None:
 
 
 def calib(n: int = 512, bg: float = 0.1, seed: int = 0) -> None:
-    """Passo 14, immagini di calibrazione int8 -> `intermediate/15_calib/calib.csv` (immagine, label, tipo, cella).
-    Solo dal train e solo immagini vere (niente mosaici): `bg` di background, il resto in parti uguali fra le 20
-    celle classe x fascia; per ogni cella a turno fra i video, un'immagine conta per la cella per cui e' scelta."""
+    """Step 14, int8 calibration images -> `intermediate/15_calib/calib.csv` (immagine, label, tipo, cella).
+    Only from the train and only real images (no mosaics): `bg` of background, the rest in equal parts across the 20
+    class x band cells; for each cell in turn across videos, an image counts for the cell it is chosen for."""
     edges, names = [16, 32, 64, 96], ["airplane", "bird", "drone", "helicopter"]
     bands = ["8-16", "16-32", "32-64", "64-96", ">96"]
     rng = np.random.default_rng(seed)
@@ -979,7 +981,7 @@ def calib(n: int = 512, bg: float = 0.1, seed: int = 0) -> None:
     out.mkdir(parents=True, exist_ok=True)
     train = [r for r in csv.DictReader(open(INTERMEDIATE / "13_train_compensation" / "train.csv")) if r["tipo"] == "reale"]
     video = {r["immagine"]: r["video"] for r in csv.DictReader(open(INTERMEDIATE / "9_split" / "frame.csv"))}
-    by_cell = defaultdict(lambda: defaultdict(list))  # cella -> video -> immagini
+    by_cell = defaultdict(lambda: defaultdict(list))  # cell -> video -> images
     for r in train:
         for ln in (DATA / r["label"]).read_text().splitlines():
             c, _, _, w, h = ln.split()
@@ -1015,55 +1017,55 @@ def calib(n: int = 512, bg: float = 0.1, seed: int = 0) -> None:
           f"max {max(c.values())}, {len({video[r[0]] for r in rows if r[2] == 'reale'})} video -> {out / 'calib.csv'}")
 
 
-# ordine delle classi nel dataset esportato (utente, 23/10/2026): le label sorgente restano nell'ordine di AOD4
-# (airplane, bird, drone, helicopter), l'export le riscrive con questi id
+# class order in the exported dataset (user, 23/10/2026): the source labels stay in AOD4 order
+# (airplane, bird, drone, helicopter), the export rewrites them with these ids
 OUT_NAMES = ["drone", "airplane", "helicopter", "bird"]
 OUT_ID = [OUT_NAMES.index(c) for c in ("airplane", "bird", "drone", "helicopter")]
 
 
-# testi delle figure per lingua (utente, 23/10/2026: anche in inglese, pubblico USA)
+# figure texts per language (user, 23/10/2026: also in English, US audience)
 _TXT = {
-    "it": {"classi": {"drone": "Drone", "airplane": "Aereo", "helicopter": "Elicottero", "bird": "Uccello"},
-           "orig": "Dati originali (prima della selezione)", "reali": "Addestramento, immagini reali",
-           "mosaici": "Addestramento, mosaici sintetici", "val": "Validazione", "test": "Test",
-           "ob_train": "Obiettivo addestramento", "ob_val": "Obiettivo validazione", "ob_test": "Obiettivo test (uniforme)",
+    "it": {"classes": {"drone": "Drone", "airplane": "Aereo", "helicopter": "Elicottero", "bird": "Uccello"},
+           "orig": "Dati originali (prima della selezione)", "real": "Addestramento, immagini reali",
+           "mosaics": "Addestramento, mosaici sintetici", "val": "Validazione", "test": "Test",
+           "tgt_train": "Obiettivo addestramento", "tgt_val": "Obiettivo validazione", "tgt_test": "Obiettivo test (uniforme)",
            "xsize": r"Dimensione del box $\sqrt{w\,h}$ [px]", "ysize": "Istanze per intervallo",
            "short": ["Stesso gruppo,\naltra clip (leakage)", "Gruppi diversi\n(fondo)", "Validazione", "Test"],
            "xsim": "Somiglianza con l'immagine\npiù vicina dell'addestramento", "a": "(a) Distribuzioni", "b": "(b) Coda",
-           "fondo": "Fondo", "leak": "Leakage", "xthr": "Soglia di somiglianza\n", "ythr": "Quota di immagini sopra la soglia",
+           "baseline": "Fondo", "leak": "Leakage", "xthr": "Soglia di somiglianza\n", "ythr": "Quota di immagini sopra la soglia",
            "dec": ","},
-    "en": {"classi": {"drone": "Drone", "airplane": "Airplane", "helicopter": "Helicopter", "bird": "Bird"},
-           "orig": "Original data (before selection)", "reali": "Training, real images",
-           "mosaici": "Training, synthetic mosaics", "val": "Validation", "test": "Test",
-           "ob_train": "Training target", "ob_val": "Validation target", "ob_test": "Test target (uniform)",
+    "en": {"classes": {"drone": "Drone", "airplane": "Airplane", "helicopter": "Helicopter", "bird": "Bird"},
+           "orig": "Original data (before selection)", "real": "Training, real images",
+           "mosaics": "Training, synthetic mosaics", "val": "Validation", "test": "Test",
+           "tgt_train": "Training target", "tgt_val": "Validation target", "tgt_test": "Test target (uniform)",
            "xsize": r"Box size $\sqrt{w\,h}$ [px]", "ysize": "Instances per bin",
            "short": ["Same group,\nother clip (leakage)", "Different groups\n(baseline)", "Validation", "Test"],
            "xsim": "Similarity to the nearest\ntraining image", "a": "(a) Distributions", "b": "(b) Tail",
-           "fondo": "Baseline", "leak": "Leakage", "xthr": "Similarity threshold\n", "ythr": "Share of images above threshold",
+           "baseline": "Baseline", "leak": "Leakage", "xthr": "Similarity threshold\n", "ythr": "Share of images above threshold",
            "dec": "."},
 }
 
 
 def _output_plot(rows: list, out: Path, lang: str = "it", src_names=("airplane", "bird", "drone", "helicopter"),
                  table: bool = True) -> None:
-    """`distribuzione.{png,pdf}` dell'export, per la tesi (testi in italiano, senza titolo: va nella didascalia):
-    istanze per grandezza sqrt(w*h) e classe in addestramento (reali in blu, mosaici in giallo), validazione e test,
-    l'ombra grigia dei dati originali (tutte le immagini annotate, prima di ogni selezione), con gli obiettivi
-    (curva alzata al 70% e al 20%, test uniforme in log s). Istanze ed errore rispetto all'obiettivo,
-    sum|osservato - obiettivo| / sum(obiettivo) sulle mezze ottave (`FINE`), in `distribuzione.md` (se `table`).
-    `lang` it o en (`_TXT`; in inglese il file e' `distribution_en`); `src_names`: ordine delle classi nelle label
-    di `rows` (sorgenti nell'export, `OUT_NAMES` se le label vengono da `data/output`)."""
+    """`distribuzione.{png,pdf}` of the export, for the thesis (Italian texts, no title: it goes in the caption):
+    instances per size sqrt(w*h) and class in training (real in blue, mosaics in yellow), validation and test,
+    the grey shadow of the original data (all annotated images, before any selection), with the targets
+    (curve raised to 70% and 20%, test uniform in log s). Instances and error with respect to the target,
+    sum|observed - target| / sum(target) over the half octaves (`HALF_OCTAVES`), in `distribuzione.md` (if `table`).
+    `lang` it or en (`_TXT`; in English the file is `distribution_en`); `src_names`: class order in the labels
+    of `rows` (sources in the export, `OUT_NAMES` if the labels come from `data/output`)."""
     import matplotlib.pyplot as plt
 
     from tools.distributions import ALPHA, BINS, CUT, SMIN, TOT, _axes, curve, ideal, uniform
     from tools.plots import STYLE, WIDTH, _P, save
 
     T = _TXT[lang]
-    it = T["classi"]
+    cname = T["classes"]
     s = defaultdict(list)
     rep = list(csv.DictReader(open(INTERMEDIATE / "12_split" / "report.csv")))
 
-    def sizes(lab, names=("airplane", "bird", "drone", "helicopter")):  # id delle label sorgente
+    def sizes(lab, names=("airplane", "bird", "drone", "helicopter")):  # source label ids
         for ln in (DATA / lab).read_text().splitlines():
             c, _, _, w, h = ln.split()
             yield names[int(c)], np.sqrt(float(w) * 640 * float(h) * 512)
@@ -1074,7 +1076,7 @@ def _output_plot(rows: list, out: Path, lang: str = "it", src_names=("airplane",
                 s[r["split"], c].append(v)
                 if r["tipo"] == "mosaico":
                     s["mosaico", c].append(v)
-    # dati originali: tutte le immagini annotate, prima di filtro < 8 px, split, tetto e mosaici
+    # original data: all annotated images, before the < 8 px filter, split, cap and mosaics
     for r in csv.DictReader(open(INTERMEDIATE / "9_split" / "frame.csv")):
         for c, v in sizes(r["label"]):
             s["orig", c].append(v)
@@ -1091,71 +1093,72 @@ def _output_plot(rows: list, out: Path, lang: str = "it", src_names=("airplane",
         h_tr = np.histogram(s["train", c], BINS)[0]
         h_mo = np.histogram(s["mosaico", c], BINS)[0]
         ax.stairs(h_or, BINS, fill=True, color="0.6", alpha=.22, lw=0, zorder=0, label=T["orig"])
-        ax.stairs(h_or, BINS, color="0.5", lw=.5, zorder=1.5)  # davanti alla zona < 8 px: si vede anche cosa e' stato tolto
-        ax.stairs(h_tr - h_mo, BINS, fill=True, color=_P[0], alpha=.35, lw=0, label=T["reali"])
+        ax.stairs(h_or, BINS, color="0.5", lw=.5, zorder=1.5)  # in front of the < 8 px zone: what was removed shows too
+        ax.stairs(h_tr - h_mo, BINS, fill=True, color=_P[0], alpha=.35, lw=0, label=T["real"])
         ax.stairs(h_tr, BINS, baseline=h_tr - h_mo, fill=True, color=_P[3], alpha=.75, lw=0,
-                  label=T["mosaici"])
+                  label=T["mosaics"])
         ax.stairs(h_tr, BINS, color=_P[0], lw=.6, alpha=.8)
         for sp, col in (("val", _P[1]), ("test", _P[2])):
             ax.stairs(np.histogram(s[sp, c], BINS)[0], BINS, color=col, lw=1.1, label=T[sp])
-        ax.plot(*curve(TOT[c] * .7, ALPHA[c], CUT[c]), color="0.1", lw=.9, label=T["ob_train"])
-        ax.plot(*curve(TOT[c] * .2, ALPHA[c], CUT[c]), color="0.1", lw=.9, ls=(0, (4, 2)), label=T["ob_val"])
+        ax.plot(*curve(TOT[c] * .7, ALPHA[c], CUT[c]), color="0.1", lw=.9, label=T["tgt_train"])
+        ax.plot(*curve(TOT[c] * .2, ALPHA[c], CUT[c]), color="0.1", lw=.9, ls=(0, (4, 2)), label=T["tgt_val"])
         n_t = sum(float(r["obiettivo_test"]) for r in rep if r["classe"] == c)  # test: uniforme in log s
         ax.plot([SMIN, CUT[c]], [n_t * dlog / np.log(CUT[c] / SMIN)] * 2, color="0.1", lw=.9, ls=(0, (1, 1.5)),
-                label=T["ob_test"])
+                label=T["tgt_test"])
         _axes(ax, c, 0)
-        ax.set_title("")  # il titolo centrato di `_assi` (in inglese) non serve
-        ax.set_title(f"({'abcd'[k_ax]}) {it[c]}", loc="left", fontsize=9)
+        ax.set_title("")  # the centred title of `_axes` (in English) is not needed
+        ax.set_title(f"({'abcd'[k_ax]}) {cname[c]}", loc="left", fontsize=9)
         ax.tick_params(labelsize=7.5)
-        # errore rispetto all'obiettivo, sulle mezze ottave
+        # error with respect to the target, on the half octaves
         err = {}
         for sp, k in (("train", .7), ("val", .2)):
             ide = k * ideal(TOT[c], ALPHA[c], HALF_OCTAVES, CUT[c])
             err[sp] = np.abs(np.histogram(s[sp, c], HALF_OCTAVES)[0] - ide).sum() / ide.sum()
         ide = uniform(n_t, HALF_OCTAVES, CUT[c])
         err["test"] = np.abs(np.histogram(s["test", c], HALF_OCTAVES)[0] - ide).sum() / ide.sum()
-        ax.tick_params(labelbottom=True)  # numeri dell'asse x anche nei pannelli in alto
+        ax.tick_params(labelbottom=True)  # x-axis numbers in the top panels too
         md.append((c, err, {sp: len(s[sp, c]) for sp in ("train", "val", "test")},
                    {sp: np.histogram(s[sp, c], HALF_OCTAVES)[0] for sp in ("train", "val", "test")},
                    {"train": .7 * ideal(TOT[c], ALPHA[c], HALF_OCTAVES, CUT[c]), "val": .2 * ideal(TOT[c], ALPHA[c], HALF_OCTAVES, CUT[c]),
                     "test": uniform(n_t, HALF_OCTAVES, CUT[c])}, len(s["mosaico", c])))
     top = max(np.histogram(s[k, c], BINS)[0].max() for c in OUT_NAMES for k in ("train", "orig"))
-    axs[0, 0].set_yscale("log")  # originali (centinaia), addestramento, val e test (decine) leggibili insieme (utente)
+    axs[0, 0].set_yscale("log")  # originals (hundreds), training, val and test (tens) readable together (user)
     axs[0, 0].set_ylim(3, top * 1.5)
     for ax in axs[1]:
         ax.set_xlabel(T["xsize"])
     for ax in axs[:, 0]:
         ax.set_ylabel(T["ysize"])
     hs, ls = axs[0, 0].get_legend_handles_labels()
-    # handle: 0 originali, 1 reali, 2 mosaici, 3 validazione, 4 test, 5 ob. addestramento, 6 ob. validazione, 7 ob. test
-    order = [0, 5, 1, 6, 2, 7, 3, 4]  # quattro colonne di due: i dati sopra, gli obiettivi sotto
+    # handles: 0 originals, 1 real, 2 mosaics, 3 validation, 4 test, 5 training tgt, 6 validation tgt, 7 test tgt
+    order = [0, 5, 1, 6, 2, 7, 3, 4]  # four columns of two: the data above, the targets below
     f.legend([hs[k] for k in order], [ls[k] for k in order], loc="outside lower center", ncol=4, fontsize=7, frameon=False)
     save(f, out / ("distribuzione" if lang == "it" else "distribution_en"), pdf=True)
     if not table:
         return
-    # la tabella che accompagna il grafico (utente, 23/10/2026): stessi numeri, fuori dalla figura
+    # the table that goes with the plot (user, 23/10/2026): same numbers, outside the figure
     lab = [f"{HALF_OCTAVES[k]:.0f}–{HALF_OCTAVES[k + 1]:.0f}" if k < len(HALF_OCTAVES) - 2 else f"> {HALF_OCTAVES[k]:.0f}" for k in range(len(HALF_OCTAVES) - 1)]
     L = ["# Distribuzione delle grandezze", "",
          "Generata con `distribuzione.png` da `tools/split.py --step export`. Errore = Σ|osservato − obiettivo| / Σ obiettivo",
          "sulle mezze ottave; obiettivi: addestramento e validazione la curva s^−0,3 alzata ×1,2 (70% e 20%), test uniforme",
          "in scala logaritmica. Uccelli fino a 96 px.", "",
          "| classe | addestramento | di cui mosaici | errore | validazione | errore | test | errore |", "|---|---|---|---|---|---|---|---|"]
-    L += [f"| {it[c]} | {num(n['train'])} | {num(nm)} | {e['train']:.0%} | {num(n['val'])} | {e['val']:.0%} | {num(n['test'])} | {e['test']:.0%} |"
+    L += [f"| {cname[c]} | {num(n['train'])} | {num(nm)} | {e['train']:.0%} | {num(n['val'])} | {e['val']:.0%} | {num(n['test'])} | {e['test']:.0%} |"
           for c, e, n, _, _, nm in md]
     for c, e, n, h, ide, _ in md:
-        L += ["", f"## {it[c]}", "", "| √(w·h) [px] | addestramento | obiettivo | validazione | obiettivo | test | obiettivo |",
+        L += ["", f"## {cname[c]}", "", "| √(w·h) [px] | addestramento | obiettivo | validazione | obiettivo | test | obiettivo |",
               "|---|---|---|---|---|---|---|"]
         L += [f"| {lab[k]} | {num(int(h['train'][k]))} | {num(round(ide['train'][k]))} | {num(int(h['val'][k]))} | "
               f"{num(round(ide['val'][k]))} | {num(int(h['test'][k]))} | {num(round(ide['test'][k]))} |" for k in range(len(lab))]
     (out / "distribuzione.md").write_text("\n".join(L).replace("%", " %") + "\n")
 
 def _leakage_plot(out: Path, block: int = 2048, lang: str = "it", table: bool = True) -> None:
-    """`leakage.{png,pdf,md}` dell'export, per la tesi: per ogni immagine reale di validazione e test la somiglianza
-    DINOv2 (ViT-S, coseno) con l'immagine reale piu' vicina dell'addestramento, contro due riferimenti dentro
-    l'addestramento: stesso gruppo e altra clip (com'e' fatto un leakage vero) e gruppi diversi (il fondo: il cielo
-    somiglia al cielo). (a) densita', (b) quota di immagini sopra ogni soglia, in scala logaritmica; 0,95 e' la
-    soglia dei doppioni rivisti a mano. La tabella con mediana, percentili e quote in `leakage.md` (se `table`).
-    Legge solo `intermediate/` (frame, split, gruppi, embedding), scrive in `out`; `lang` it o en (`leakage_en`)."""
+    """`leakage.{png,pdf,md}` of the export, for the thesis: for each real validation and test image the DINOv2
+    similarity (ViT-S, cosine) with the nearest real training image, against two references inside the
+    training set: same group and other clip (what a true leakage looks like) and different groups (the baseline:
+    sky resembles sky). (a) density, (b) share of images above each threshold, in log scale; 0.95 is the
+    threshold of the hand-reviewed duplicates. The table with median, percentiles and shares in `leakage.md` (if
+    `table`). Reads only `intermediate/` (frame, split, groups, embedding), writes to `out`; `lang` it or en
+    (`leakage_en`)."""
     import matplotlib.pyplot as plt
     import torch
 
@@ -1172,33 +1175,33 @@ def _leakage_plot(out: Path, block: int = 2048, lang: str = "it", table: bool = 
     tr = torch.tensor([i for i, s in enumerate(sp) if s == "train"], device="cuda")
 
     def nearest(q, mode):
-        """massimo coseno di ogni riga di q verso il train, con la maschera `mode`"""
+        """max cosine of each row of q towards the train, with the mask `mode`"""
         outv = []
         for k in range(0, len(q), block):
             qq = q[k:k + block]
             S = (e[qq] @ e[tr].T).float()
-            if mode == "stesso":  # stesso gruppo, altra clip
+            if mode == "same":  # same group, other clip
                 S[(g[qq][:, None] != g[tr][None]) | (c[qq][:, None] == c[tr][None])] = -2
-            elif mode == "diversi":
+            elif mode == "other":
                 S[g[qq][:, None] == g[tr][None]] = -2
             outv.append(S.max(1).values)
         v = torch.cat(outv).cpu().numpy()
         return v[v > -2]
 
     res = {
-        "Validazione → addestramento": nearest(torch.tensor([i for i, s in enumerate(sp) if s == "val"], device="cuda"), "tutti"),
-        "Test → addestramento": nearest(torch.tensor([i for i, s in enumerate(sp) if s == "test"], device="cuda"), "tutti"),
-        "Addestramento, stesso gruppo e altra clip (leakage)": nearest(tr, "stesso"),
-        "Addestramento, gruppi diversi (fondo)": nearest(tr, "diversi"),
+        "Validazione → addestramento": nearest(torch.tensor([i for i, s in enumerate(sp) if s == "val"], device="cuda"), "all"),
+        "Test → addestramento": nearest(torch.tensor([i for i, s in enumerate(sp) if s == "test"], device="cuda"), "all"),
+        "Addestramento, stesso gruppo e altra clip (leakage)": nearest(tr, "same"),
+        "Addestramento, gruppi diversi (fondo)": nearest(tr, "other"),
     }
-    # (a) un violino orizzontale per confronto, dall'alto: leakage, fondo, validazione, test
+    # (a) one horizontal violin per comparison, from the top: leakage, baseline, validation, test
     keys = ["Addestramento, stesso gruppo e altra clip (leakage)", "Addestramento, gruppi diversi (fondo)",
             "Validazione → addestramento", "Test → addestramento"]
     T = _TXT[lang]
     short = T["short"]
     cols = ["0.2", "0.6", _P[1], _P[2]]
     plt.style.use(STYLE)
-    f, (a1, a2) = plt.subplots(1, 2, figsize=(WIDTH, WIDTH * 0.45))  # stessa larghezza per i due pannelli
+    f, (a1, a2) = plt.subplots(1, 2, figsize=(WIDTH, WIDTH * 0.45))  # same width for the two panels
     pos = np.arange(len(keys))[::-1]
     vp = a1.violinplot([res[k] for k in keys], positions=pos, vert=False, widths=.85, showextrema=False)
     for body, col in zip(vp["bodies"], cols):
@@ -1218,10 +1221,10 @@ def _leakage_plot(out: Path, block: int = 2048, lang: str = "it", table: bool = 
     a1.set_xlabel(T["xsim"], fontsize=8)
     a1.set_title(T["a"], loc="left", fontsize=9)
     a1.grid(axis="y", visible=False)
-    # (b) coda: quota di immagini sopra ogni soglia
-    x = 1 - np.geomspace(.5, .002, 600)  # fitto vicino a 1, dove l'asse si allarga
+    # (b) tail: share of images above each threshold
+    x = 1 - np.geomspace(.5, .002, 600)  # dense near 1, where the axis widens
     tail = {k: np.array([(res[k] >= s).mean() for s in x]) for k in keys}
-    a2.fill_between(x, 1e-5, np.maximum(tail[keys[1]], 1e-5), color="0.6", alpha=.3, lw=0, label=T["fondo"])
+    a2.fill_between(x, 1e-5, np.maximum(tail[keys[1]], 1e-5), color="0.6", alpha=.3, lw=0, label=T["baseline"])
     a2.plot(x, tail[keys[0]], color=cols[0], lw=1.6, ls=(0, (4, 2)), label=T["leak"])
     for k, col, lab in zip(keys[2:], cols[2:], short[2:]):
         a2.plot(x, tail[k], color=col, lw=1.6, label=lab)
@@ -1229,12 +1232,12 @@ def _leakage_plot(out: Path, block: int = 2048, lang: str = "it", table: bool = 
     a2.set_yscale("log")
     a2.set_xlim(.5, .999)
     a2.set_ylim(1e-4, 1.3)
-    a2.set_xlabel(T["xthr"], fontsize=8)  # due righe come (a), assi allineati
+    a2.set_xlabel(T["xthr"], fontsize=8)  # two lines like (a), aligned axes
     a2.set_ylabel(T["ythr"], fontsize=8)
     a2.set_title(T["b"], loc="left", fontsize=9)
     a2.text(.95, 1.5e-4, f" 0{T['dec']}95", ha="left", va="bottom", fontsize=7, color="0.3")
     f.legend(*a2.get_legend_handles_labels(), loc="outside lower center", ncol=4, fontsize=7, frameon=False)
-    # asse x che allarga la zona vicino a 1 (utente, 23/10/2026): -log10(1 - s), tacche in somiglianza
+    # x axis that widens the zone near 1 (user, 23/10/2026): -log10(1 - s), ticks in similarity
     for a in (a1, a2):
         a.set_xscale("function", functions=(lambda v: -np.log10(np.clip(1 - v, 1e-4, None)),
                                              lambda u: 1 - 10 ** -u))
@@ -1268,13 +1271,13 @@ def _leakage_plot(out: Path, block: int = 2048, lang: str = "it", table: bool = 
     (out / "leakage.md").write_text("\n".join(L) + "\n")
 
 
-FIG = ROOT / "docs" / "figure"  # figure del README, in italiano e in inglese
+FIG = ROOT / "docs" / "figure"  # README figures, in Italian and English
 
 
 def figures() -> None:
-    """Figure del dataset finito per il README, in `docs/figure/`, in italiano e in inglese (`distribuzione`,
-    `distribution_en`, `leakage`, `leakage_en`): stesse funzioni dell'export, ma `data/output` (congelato) si legge
-    soltanto (manifest e label, con gli id di `OUT_NAMES`); niente tabelle .md."""
+    """Figures of the finished dataset for the README, in `docs/figure/`, in Italian and English (`distribuzione`,
+    `distribution_en`, `leakage`, `leakage_en`): same functions as the export, but `data/output` (frozen) is only
+    read (manifest and labels, with the ids of `OUT_NAMES`); no .md tables."""
     out = OUTPUT
     rows = [dict(split=r["split"], tipo=r["tipo"],
                  lab=None if r["tipo"] == "background" else
@@ -1287,12 +1290,12 @@ def figures() -> None:
 
 
 def threshold_panel(edges=(0.80, 0.85, 0.90, 0.95, 0.98, 1.01), per: int = 3, seed: int = 0) -> None:
-    """Pannello per la tesi sulla soglia 0,95 dei doppioni fra sessioni (`docs/figure/soglia.{png,pdf}` e
-    `soglia_en`): una riga per fascia di somiglianza DINOv2 con `per` coppie a caso (seed fisso) di frame di
-    sessioni diverse, box in rosso, e in fondo coppie della stessa clip come riferimento. Sotto 0,95 riprese diverse
-    con lo stesso tipo di cielo; sopra, la stessa ripresa o lo stesso girato ripubblicato (le 146 coppie di sessioni
-    sopra 0,95 rivisti a mano e unite, passo 10). Riferimento: le coppie della stessa clip al 25°, 50° e 75°
-    percentile della loro somiglianza (a caso sarebbero troppo disperse: una clip DVIDS cambia inquadratura)."""
+    """Panel for the thesis on the 0.95 threshold of duplicates between sessions (`docs/figure/soglia.{png,pdf}` and
+    `soglia_en`): one row per DINOv2 similarity band with `per` random pairs (fixed seed) of frames from
+    different sessions, boxes in red, and at the bottom same-clip pairs as reference. Below 0.95 different shots
+    with the same kind of sky; above, the same shot or the same footage republished (the 146 session pairs
+    above 0.95 reviewed by hand and merged, step 10). Reference: the same-clip pairs at the 25th, 50th and 75th
+    percentile of their similarity (random ones would be too scattered: a DVIDS clip changes framing)."""
     import matplotlib.pyplot as plt
 
     from tools.plots import STYLE, WIDTH, save
@@ -1316,10 +1319,10 @@ def threshold_panel(edges=(0.80, 0.85, 0.90, 0.95, 0.98, 1.01), per: int = 3, se
             return f"{v:.{d}f}".replace(".", T["dec"])
 
         wr = sum(([1, 1, .12] for _ in range(per)), [])[:-1]
-        left, top, row = .2, .25, (1 - .2) * WIDTH / sum(wr) * .8 + .28  # in pollici: immagine 5:4 + titolo
+        left, top, row = .2, .25, (1 - .2) * WIDTH / sum(wr) * .8 + .28  # in inches: 5:4 image + title
         H = (nb + 1) * row + top
         f, axs = plt.subplots(nb + 1, len(wr), figsize=(WIDTH, H), gridspec_kw=dict(width_ratios=wr, wspace=.03))
-        f.set_layout_engine("none")  # posizioni fisse: servono per le linee fra le righe
+        f.set_layout_engine("none")  # fixed positions: needed for the lines between rows
         f.subplots_adjust(left=left, right=1, top=1 - top / H, bottom=.005, hspace=.28 / (row - .28))
         for r in range(nb + 1):
             for k in range(len(wr)):
@@ -1334,8 +1337,8 @@ def threshold_panel(edges=(0.80, 0.85, 0.90, 0.95, 0.98, 1.01), per: int = 3, se
             else:
                 lab = T["ref"]
             axs[r, 0].text(-.08, .5, lab, transform=axs[r, 0].transAxes, ha="right", va="center", fontsize=6.5)
-        # linea della soglia fra la riga 0,90-0,95 e quella 0,95-0,98
-        gap = .03 / H  # appena sotto la riga sopra, prima dei titoli della riga sotto
+        # threshold line between the 0.90-0.95 row and the 0.95-0.98 one
+        gap = .03 / H  # just below the row above, before the titles of the row below
         y = axs[list(edges).index(0.95) - 1, 0].get_position().y0 - gap
         f.add_artist(plt.Line2D([.02, 1], [y, y], transform=f.transFigure, color="0.2", lw=.8, ls=(0, (4, 2))))
         f.text(1, y - .004, T["thr"], ha="right", va="top", fontsize=6.5, color="0.2")
@@ -1348,23 +1351,23 @@ def threshold_panel(edges=(0.80, 0.85, 0.90, 0.95, 0.98, 1.01), per: int = 3, se
 
 
 def export() -> None:
-    """Passo 14, il dataset per Ultralytics in `data/output/` (cancellato e rifatto ogni volta), immagini in hardlink,
-    label riscritte con gli id di `OUT_NAMES` (0 drone, 1 airplane, 2 helicopter, 3 bird):
-    `images/{train,val,test,calib}/` e `labels/...` con lo stesso nome, e `raw/{images,labels}/` con train, val e test
-    insieme (senza calib), per chi vuole rifare gli split; train = reali tenuti dal tetto e mosaici
-    (`13_train_compensation/train.csv`), val e test da `12_split/frame_split.csv`, piu' il background di
-    `data/input/background/0_raw/background.csv` (senza label: per Ultralytics e' un'immagine di solo sfondo), calib da
-    `15_calib/calib.csv` (stesso nome dell'immagine del train). Nomi (utente, 23/10/2026):
-    reale `R_<gruppo>_<hash8 di fonte:clip>_<n>`, mosaico `M_x<griglia>_<n>`, background `B_<hash8 di
-    fonte:camera>_<n>`; n a 6 cifre, in ordine di frame dentro la clip o la camera. `dataset.yaml`, `calib.yaml` e
-    `manifest.csv` (immagine, split, tipo, gruppo, fonte, clip o camera, frame originale, sorgente)."""
+    """Step 14, the Ultralytics dataset in `data/output/` (deleted and rebuilt every time), images as hardlinks,
+    labels rewritten with the ids of `OUT_NAMES` (0 drone, 1 airplane, 2 helicopter, 3 bird):
+    `images/{train,val,test,calib}/` and `labels/...` with the same name, and `raw/{images,labels}/` with train, val
+    and test together (without calib), for whoever wants to redo the splits; train = real images kept by the cap and
+    mosaics (`13_train_compensation/train.csv`), val and test from `12_split/frame_split.csv`, plus the background of
+    `data/input/background/0_raw/background.csv` (no label: for Ultralytics it is a background-only image), calib
+    from `15_calib/calib.csv` (same name as the train image). Names (user, 23/10/2026):
+    real `R_<group>_<hash8 of source:clip>_<n>`, mosaic `M_x<grid>_<n>`, background `B_<hash8 of
+    source:camera>_<n>`; n with 6 digits, in frame order inside the clip or camera. `dataset.yaml`, `calib.yaml` and
+    `manifest.csv` (immagine, split, tipo, gruppo, fonte, clip or camera, original frame, sorgente)."""
     import hashlib
     import os
     import re
 
     agg = INTERMEDIATE
     out = OUTPUT
-    if out.exists():  # congelato (utente, 23/10/2026): per rifarlo va spostato o cancellato a mano
+    if out.exists():  # frozen (user, 23/10/2026): to rebuild it, move or delete it by hand
         sys.exit(f"{out} esiste ed e' congelato: non lo sovrascrivo")
     grp = {r["sessione"]: r["gruppo"] for r in csv.DictReader(open(agg / "11_gruppi" / "gruppi.csv"))}
     info = {r["immagine"]: r for r in csv.DictReader(open(agg / "9_split" / "frame.csv"))}
@@ -1396,18 +1399,18 @@ def export() -> None:
     by_key = defaultdict(list)
     for r in rows:
         by_key[r["tipo"], r["fonte"], r["clip"]].append(r)
-    for (tipo, f, c), rs in by_key.items():
+    for (kind, f, c), rs in by_key.items():
         for n, r in enumerate(sorted(rs, key=lambda r: (str(r["frame"]).zfill(12), r["img"]))):
-            if tipo == "reale":
+            if kind == "reale":
                 r["nome"] = f"R_{r['gruppo']}_{h8(f'{f}:{c}')}_{n:06d}"
-            elif tipo == "background":
+            elif kind == "background":
                 r["nome"] = f"B_{h8(f'{f}:{c}')}_{n:06d}"
             else:
                 k, g = re.match(r"M(\d+)_x(\d+)", Path(r["img"]).stem).groups()
                 r["nome"] = f"M_x{g}_{int(k):06d}"
     assert len({r["nome"] for r in rows}) == len(rows), "nomi doppi"
     f = agg / "15_calib" / "calib.csv"
-    if f.exists():  # calibrazione int8: copie in piu' (hardlink) di immagini del train, con lo stesso nome
+    if f.exists():  # int8 calibration: extra copies (hardlink) of train images, with the same name
         tr = {r["img"]: r for r in rows if r["split"] == "train"}
         rows += [dict(tr[r["immagine"]], split="calib") for r in csv.DictReader(open(f))]
     for s in ("train", "val", "test", "calib"):
@@ -1421,14 +1424,14 @@ def export() -> None:
                       (ln.split(" ", 1) for ln in (DATA / r["lab"]).read_text().splitlines() if ln.strip())) if r["lab"] else ""
         if r["lab"]:
             (out / "labels" / r["split"] / f"{r['nome']}.txt").write_text(lab)
-        if r["split"] != "calib":  # raw/: tutto il dataset in una cartella sola, senza split (utente, 23/10/2026)
+        if r["split"] != "calib":  # raw/: the whole dataset in a single folder, no split (user, 23/10/2026)
             os.link(DATA / r["img"], out / "raw" / "images" / f"{r['nome']}.jpg")
             if r["lab"]:
                 (out / "raw" / "labels" / f"{r['nome']}.txt").write_text(lab)
     (out / "dataset.yaml").write_text(
         f"# air-detection, tools/split.py --step export\npath: {out}\ntrain: images/train\nval: images/val\n"
         "test: images/test\nnames:\n" + "".join(f"  {k}: {c}\n" for k, c in enumerate(OUT_NAMES)))
-    (out / "calib.yaml").write_text(  # per l'export int8 di Ultralytics, che calibra sullo split val
+    (out / "calib.yaml").write_text(  # for the Ultralytics int8 export, which calibrates on the val split
         f"# calibrazione int8 (intermediate/15_calib), tools/split.py --step export\npath: {out}\ntrain: images/calib\n"
         "val: images/calib\nnames:\n" + "".join(f"  {k}: {c}\n" for k, c in enumerate(OUT_NAMES)))
     with open(out / "manifest.csv", "w", newline="") as fh:
@@ -1436,7 +1439,7 @@ def export() -> None:
         w.writerow(["immagine", "split", "tipo", "gruppo", "fonte", "sessione", "clip", "frame", "sorgente"])
         w.writerows((f"images/{r['split']}/{r['nome']}.jpg", r["split"], r["tipo"], r["gruppo"], r["fonte"],
                      r["sessione"], r["clip"], r["frame"], r["img"]) for r in rows)
-    # video DVIDS usati: pagina, autore e licenza (attribuzione, pubblico dominio video per video)
+    # DVIDS videos used: page, author and licence (attribution, public domain video by video)
     used = {r["clip"].split("/")[0].removeprefix("DVIDS_") for r in rows if r["fonte"] == "dvids"}
     with open(out / "fonti_dvids.csv", "w", newline="") as fh:
         w = csv.writer(fh)

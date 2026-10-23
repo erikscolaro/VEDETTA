@@ -1,26 +1,26 @@
 #!/usr/bin/env python3
-"""FRED (Florence RGB-Event Drone dataset, ACM MM 2025, Apache 2.0) come
-aggiunta per i buchi dei droni (README.md (Procedura), passo 10). Uno zip per
-sequenza su Hugging Face; dentro, prima i dati a eventi e in fondo label e
-frame RGB: si leggono solo questi, con richieste HTTP a intervalli.
+"""FRED (Florence RGB-Event Drone dataset, ACM MM 2025, Apache 2.0) as an
+addition for the drone gaps (README.md, Procedure, step 10). One zip per
+sequence on Hugging Face; inside, event data first and labels and RGB
+frames at the end: only these are read, with HTTP range requests.
 
-    python tools/fred.py --step label      # passo 0: solo le label di tutte le sequenze
-    python tools/fred.py --step anteprima  # passo 0: un frame per sequenza e fogli, per togliere le indoor
-    python tools/fred.py --step frame --seq 107 210 18     # passo 1: RGB e label -> 1_frame
-    python tools/fred.py --step annotati --seq 107 210 18  # passo 2: via i frame senza box -> 2_annotati
-    python tools/fred.py --step dedup --seq 107 210 18     # passo 3: hash a 16 bit sui frame interi -> 3_dedup
-    python tools/fred.py --step ritaglio --seq 107 210 18  # passo 4: 640x512 dei tenuti -> 4_ritagli
-    python tools/fred.py --step sam --seq 107 210 18       # passo 5: SAM 2 col box come prompt -> 5_box/sam
-    python tools/fred.py --step fogli_sam --seq 107 210 18 # passo 5: fogli di controllo -> 5_box/fogli_sam
-    python tools/fred.py --step yolo --seq 107 210 18      # passo 5: box proposti dal detector ($DETECTOR_PESI) -> 5_box/yolo
+    python tools/fred.py --step label      # step 0: only the labels of all sequences
+    python tools/fred.py --step anteprima  # step 0: one frame per sequence and sheets, to drop the indoor ones
+    python tools/fred.py --step frame --seq 107 210 18     # step 1: RGB and labels -> 1_frame
+    python tools/fred.py --step annotati --seq 107 210 18  # step 2: drop frames without boxes -> 2_annotati
+    python tools/fred.py --step dedup --seq 107 210 18     # step 3: 16-bit hash on whole frames -> 3_dedup
+    python tools/fred.py --step ritaglio --seq 107 210 18  # step 4: 640x512 of the kept ones -> 4_ritagli
+    python tools/fred.py --step sam --seq 107 210 18       # step 5: SAM 2 with the box as prompt -> 5_box/sam
+    python tools/fred.py --step fogli_sam --seq 107 210 18 # step 5: check sheets -> 5_box/fogli_sam
+    python tools/fred.py --step yolo --seq 107 210 18      # step 5: detector ($DETECTOR_PESI) boxes -> 5_box/yolo
     python tools/fred.py --step fogli_yolo --seq 107 210 18
-    python tools/fred.py --step movimento --seq 18           # passo 5, cortili: sfondo mediano + SAM a punto
+    python tools/fred.py --step movimento --seq 18           # step 5, courtyards: median background + SAM with a point
     python tools/fred.py --step fogli_movimento --seq 18
-    python tools/fred.py --step sessioni                    # passo 6: proposta di sessioni e fogli -> 6_sessioni
-    python tools/fred.py --step proposte --seq ...          # passo 5: YOLO sul cielo, movimento sui cortili -> 5_box/proposte
-    python tools/fred.py --step conta                       # passo 7: conteggio per cella -> 7_conteggio
-    python tools/fred.py --step cvat                        # passo 5: un task CVAT 'fred_<seq>' per sequenza, con i box proposti
-    python tools/fred.py --step cvat_import                 # passo 5: zip YOLO di CVAT in 5_box/cvat_zip -> 5_box/manuale
+    python tools/fred.py --step sessioni                    # step 6: session proposal and sheets -> 6_sessioni
+    python tools/fred.py --step proposte --seq ...          # step 5: YOLO on sky, motion on courtyards -> proposte
+    python tools/fred.py --step conta                       # step 7: count per cell -> 7_conteggio
+    python tools/fred.py --step cvat                        # step 5: one CVAT task 'fred_<seq>' per sequence, with boxes
+    python tools/fred.py --step cvat_import                 # step 5: CVAT YOLO zips in 5_box/cvat_zip -> 5_box/manuale
 """
 
 from __future__ import annotations
@@ -45,13 +45,12 @@ from tools.pipeline import (annotated, count, crop, cvat_export, cvat_import, de
                           proposals, sam, sam_sheets, yolo)
 
 HF = "https://huggingface.co/datasets/GabrieleMagrini/FRED"
-PREFIX = "FRED"  # nome dei video (`<PREFIX>_<seq>`); tools/extra_sources.py lo cambia per le altre fonti
+PREFIX = "FRED"  # video name (`<PREFIX>_<seq>`); tools/extra_sources.py changes it for the other sources
 
 
 class HttpFile(io.RawIOBase):
-    """File remoto in sola lettura per `zipfile`: ogni lettura e' una richiesta
-    Range, con almeno `chunk` byte letti in anticipo e qualche riprova (il
-    proxy va a tratti)."""
+    """Read-only remote file for `zipfile`: each read is a Range request, with at
+    least `chunk` bytes read ahead and a few retries (the proxy comes and goes)."""
 
     def __init__(self, url: str, chunk: int = 1 << 20):
         self.url, self.chunk, self.pos = url, chunk, 0
@@ -93,7 +92,7 @@ class HttpFile(io.RawIOBase):
 
 
 def sequences() -> list[tuple[str, str]]:
-    """(split, sequenza) di tutti gli zip, dall'API di Hugging Face."""
+    """(split, sequence) of all zips, from the Hugging Face API."""
     api = HF.replace("/datasets/", "/api/datasets/") + "/tree/main/"
     out = []
     for split in ("train", "test"):
@@ -108,7 +107,7 @@ def sequences() -> list[tuple[str, str]]:
 
 
 def parse_labels(text: str) -> list[tuple[float, float, float, float, float, str]]:
-    """Righe `tempo: x1, y1, x2, y2, id, modello` -> tuple."""
+    """Lines `time: x1, y1, x2, y2, id, model` -> tuples."""
     rows = []
     for ln in text.splitlines():
         if ":" not in ln:
@@ -120,8 +119,8 @@ def parse_labels(text: str) -> list[tuple[float, float, float, float, float, str
 
 
 def seq_labels(args) -> tuple[list, str]:
-    """Una sequenza: indice dello zip e `coordinates_rgb.txt` -> (riga di
-    `sequenze.csv`, testo delle label)."""
+    """One sequence: zip index and `coordinates_rgb.txt` -> (row of
+    `sequenze.csv`, label text)."""
     split, seq = args
     hf = HttpFile(f"{HF}/resolve/main/{split}/{seq}.zip")
     z = zipfile.ZipFile(hf)
@@ -141,11 +140,11 @@ def seq_labels(args) -> tuple[list, str]:
 
 
 def fetch_labels(raw: Path, workers: int = 8) -> None:
-    """Passo 0: per ogni sequenza l'indice dello zip e `coordinates_rgb.txt` ->
-    `0_raw/label/<seq>.txt` e `0_raw/sequenze.csv` (frame, box, modelli, date,
-    box per fascia sulla sqrt(w*h) in pixel originali). I box di FRED non sono
-    aderenti: le fasce qui servono solo per scegliere le sequenze. `workers`
-    sequenze in parallelo: il tempo e' la latenza del proxy, non i byte."""
+    """Step 0: for each sequence the zip index and `coordinates_rgb.txt` ->
+    `0_raw/label/<seq>.txt` and `0_raw/sequenze.csv` (frames, boxes, models, dates,
+    boxes per band on sqrt(w*h) in original pixels). FRED boxes are not
+    tight: the bands here only serve to choose the sequences. `workers`
+    sequences in parallel: the time is the proxy latency, not the bytes."""
     from concurrent.futures import ThreadPoolExecutor
 
     lab = raw / "label"
@@ -167,7 +166,7 @@ def fetch_labels(raw: Path, workers: int = 8) -> None:
 
 
 def seq_preview(args) -> str:
-    """Il frame RGB a meta' sequenza, con i box del frame piu' vicino ->
+    """The RGB frame at mid-sequence, with the boxes of the nearest frame ->
     `0_raw/anteprima/<seq>.jpg`."""
     import cv2
 
@@ -181,9 +180,9 @@ def seq_preview(args) -> str:
 
 
 def previews(raw: Path, workers: int = 8, per: int = 24) -> None:
-    """Un frame per sequenza in `0_raw/anteprima/` e fogli numerati in
-    `0_raw/fogli/` (`per` sequenze per foglio, numero = sequenza) per
-    scegliere a occhio quelle indoor da togliere."""
+    """One frame per sequence in `0_raw/anteprima/` and numbered sheets in
+    `0_raw/fogli/` (`per` sequences per sheet, number = sequence) to
+    pick by eye the indoor ones to drop."""
     from concurrent.futures import ThreadPoolExecutor
 
     import cv2
@@ -211,7 +210,7 @@ def previews(raw: Path, workers: int = 8, per: int = 24) -> None:
 
 
 def _sec(name: str) -> float:
-    """Ora del frame dal nome (`..._HH_MM_SS.micro.jpg`) in secondi."""
+    """Frame time from the name (`..._HH_MM_SS.micro.jpg`) in seconds."""
     h, m, x = Path(name).stem.split("_")[-3:]
     return int(h) * 3600 + int(m) * 60 + float(x)
 
@@ -222,11 +221,11 @@ def _split(seq: str) -> str:
 
 
 def download_frames(src: Path, seq: str, W: int = 1280, H: int = 720) -> None:
-    """Passo 1: solo i frame di `RGB/` e le label dello zip (letti in ordine di
-    posizione, a blocchi da 32 MB: niente dati a eventi) -> `1_frame/FRED_<seq>/`
-    con `images/FRED_<seq>_fNNNNN.jpg` (byte originali, in ordine di tempo) e
-    `labels/*.txt` YOLO (classe 2, drone) sul frame piu' vicino nel tempo,
-    entro mezzo frame. Box tagliati al frame."""
+    """Step 1: only the `RGB/` frames and the labels of the zip (read in position
+    order, in 32 MB blocks: no event data) -> `1_frame/FRED_<seq>/`
+    with `images/FRED_<seq>_fNNNNN.jpg` (original bytes, in time order) and
+    `labels/*.txt` YOLO (class 2, drone) on the nearest frame in time,
+    within half a frame. Boxes clipped to the frame."""
     v = f"{PREFIX}_{seq}"
     dst = src / "1_frame" / v
     (dst / "images").mkdir(parents=True, exist_ok=True)
@@ -247,7 +246,7 @@ def download_frames(src: Path, seq: str, W: int = 1280, H: int = 720) -> None:
         if x2 - x1 >= 1 and y2 - y1 >= 1:
             lab[i].append(f"2 {(x1 + x2) / 2 / W:.6f} {(y1 + y2) / 2 / H:.6f} {(x2 - x1) / W:.6f} {(y2 - y1) / H:.6f}\n")
     name = {x.filename: i for i, x in enumerate(rgb)}
-    for x in sorted(rgb, key=lambda x: x.header_offset):  # in ordine di posizione: letture contigue
+    for x in sorted(rgb, key=lambda x: x.header_offset):  # in position order: contiguous reads
         i = name[x.filename]
         (dst / "images" / f"{v}_f{i:05d}.jpg").write_bytes(z.read(x))
         (dst / "labels" / f"{v}_f{i:05d}.txt").write_text("".join(lab[i]))
@@ -256,8 +255,8 @@ def download_frames(src: Path, seq: str, W: int = 1280, H: int = 720) -> None:
 
 
 def _embed(raw: Path, seqs: list[str]) -> dict[str, np.ndarray]:
-    """Embedding DINOv2 ViT-S/14 (CLS, norma 1) dell'anteprima di ogni
-    sequenza, senza il bordo nero, come per le sessioni di Svanstrom."""
+    """DINOv2 ViT-S/14 embedding (CLS, norm 1) of the preview of each
+    sequence, without the black border, as for the Svanstrom sessions."""
     import cv2
     import torch
 
@@ -268,23 +267,23 @@ def _embed(raw: Path, seqs: list[str]) -> dict[str, np.ndarray]:
     with torch.no_grad():
         for s in seqs:
             im = cv2.imread(str(raw / "anteprima" / f"{s}.jpg"))[36:693, 28:1247]
-            x = (cv2.resize(im, (448, 252))[..., ::-1] / 255 - mean) / std  # multipli di 14
+            x = (cv2.resize(im, (448, 252))[..., ::-1] / 255 - mean) / std  # multiples of 14
             x = torch.tensor(x.transpose(2, 0, 1)[None], dtype=torch.float32, device=dev)
             out[s] = torch.nn.functional.normalize(m(x), dim=1).cpu().numpy()
     return out
 
 
 def session_sheets(src: Path, gap: float = 3600, thr: float = 0.9) -> None:
-    """Passo 6, proposta di sessioni senza interne e notte: stesso **giorno**
-    (blocchi orari: sequenze in ordine di numero, blocco nuovo quando l'ora
-    torna indietro o dopo una pausa di oltre `gap` s) **o** stesso **posto**
-    (gruppi per legame medio della somiglianza DINOv2 delle anteprime sopra
-    `thr`), uniti per transitivita'; poi le eccezioni di `correzioni.txt`. ->
-    `6_sessioni/sessioni.csv` (clip, sessione), `proposta.csv` (sequenza,
-    proposta, sessione, blocco, gruppo visivo, ora, drone, scenario), `embedding.npz` e un foglio per
-    sessione in `6_sessioni/fogli/SNN.jpg` (numero, ora, blocco = giorno, gruppo
-    visivo = posto, drone; in fondo
-    in grigio la sequenza piu' simile fuori dalla sessione)."""
+    """Step 6, session proposal without indoor and night: same **day**
+    (hourly blocks: sequences in number order, new block when the time
+    goes back or after a pause of more than `gap` s) **or** same **place**
+    (groups by average linkage of the DINOv2 similarity of the previews above
+    `thr`), merged by transitivity; then the exceptions of `correzioni.txt`. ->
+    `6_sessioni/sessioni.csv` (clip, session), `proposta.csv` (sequence,
+    proposal, session, block, visual group, time, drone, scenario), `embedding.npz` and one sheet per
+    session in `6_sessioni/fogli/SNN.jpg` (number, time, block = day, visual
+    group = place, drone; at the end
+    in gray the most similar sequence outside the session)."""
     import cv2
 
     from tools.common import propose_sessions
@@ -331,7 +330,7 @@ def session_sheets(src: Path, gap: float = 3600, thr: float = 0.9) -> None:
     ses = {s: f"S{roots.index(find(blk[s])) + 1:02d}" for s in seqs}
     vis = {s: f"g{g:02d}" for s, g in zip(seqs, groups)}
     prop = dict(ses)
-    # correzioni: "SNN: via a b c-d" -> le sequenze escono da SNN e formano una sessione nuova
+    # corrections: "SNN: via a b c-d" -> the sequences leave SNN and form a new session
     cf = out / "correzioni.txt"
     for k2, ln in enumerate(cf.read_text().splitlines() if cf.exists() else []):
         if ":" not in ln or ln.startswith("#"):
@@ -342,7 +341,7 @@ def session_sheets(src: Path, gap: float = 3600, thr: float = 0.9) -> None:
             for q in range(int(a), int(b) + 1):
                 if prop.get(str(q)) == S.strip():
                     ses[str(q)] = f"{S.strip()}.{k2}"
-    # "separa a b c-d": le sequenze elencate formano insieme una sessione nuova (numeri di sequenza: stabili)
+    # "separa a b c-d": the listed sequences together form a new session (sequence numbers: stable)
     for k2, ln in enumerate(cf.read_text().splitlines() if cf.exists() else []):
         if ln.startswith("separa"):
             for tok in ln.split()[1:]:
@@ -350,7 +349,7 @@ def session_sheets(src: Path, gap: float = 3600, thr: float = 0.9) -> None:
                 for q in range(int(a), int(b) + 1):
                     if str(q) in ses:
                         ses[str(q)] = f"sep{k2}"
-    # "unisci a b c": le sessioni delle sequenze a, b, c diventano una (numeri di sequenza: stabili)
+    # "unisci a b c": the sessions of sequences a, b, c become one (sequence numbers: stable)
     for ln in cf.read_text().splitlines() if cf.exists() else []:
         if ln.startswith("unisci"):
             qs = [q for q in ln.split()[1:] if q in ses]
@@ -358,11 +357,11 @@ def session_sheets(src: Path, gap: float = 3600, thr: float = 0.9) -> None:
             for q in seqs:
                 if ses[q] in old:
                     ses[q] = ses[qs[0]]
-    # la notte (tolta dall'utente) resta nel raggruppamento, cosi' la proposta e le correzioni non cambiano,
-    # e si toglie qui
+    # the night (removed by the user) stays in the grouping, so the proposal and the corrections do not change,
+    # and is removed here
     for q in [q for q in seqs if sc[q] == "notte"]:
         del ses[q]
-    allseq, seqs = seqs, [q for q in seqs if q in ses]  # allseq: indici di `sim`
+    allseq, seqs = seqs, [q for q in seqs if q in ses]  # allseq: indices of `sim`
     order = sorted(set(ses.values()), key=lambda x: min(int(q) for q in seqs if ses[q] == x))
     ses = {q: f"S{order.index(ses[q]) + 1:02d}" for q in seqs}
     by = {r["sequenza"]: r for r in R}
@@ -402,9 +401,9 @@ def session_sheets(src: Path, gap: float = 3600, thr: float = 0.9) -> None:
 
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--src", type=Path, default=INPUT / "fred", help="una cartella per passo")
+    p.add_argument("--src", type=Path, default=INPUT / "fred", help="one folder per step")
     p.add_argument("--step", choices=["label", "anteprima", "frame", "annotati", "dedup", "ritaglio", "sam", "yolo", "movimento", "fogli_sam", "fogli_yolo", "fogli_movimento", "sessioni", "proposte", "conta", "cvat", "cvat_import"], required=True)
-    p.add_argument("--seq", nargs="+", default=[], help="sequenze (numeri) per frame, dedup, ritaglio")
+    p.add_argument("--seq", nargs="+", default=[], help="sequences (numbers) for frame, dedup, ritaglio")
     a = p.parse_args(argv)
     pipeline.PREFIX = PREFIX
     if a.step == "label":
@@ -437,7 +436,7 @@ def main(argv=None) -> int:
     if a.step == "movimento":
         motion(a.src, a.seq)
     if a.step in ("fogli_sam", "fogli_yolo", "fogli_movimento"):
-        sam_sheets(a.src, a.seq, fonte=a.step.split("_")[1])
+        sam_sheets(a.src, a.seq, source=a.step.split("_")[1])
     return 0
 
 

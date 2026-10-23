@@ -18,8 +18,9 @@ ripresa e bilanciato per grandezza dell'oggetto. Il dataset finale è in `data/o
 1. [Il dataset](#il-dataset)
 2. [Regole](#regole)
 3. [Fonti e licenze](#fonti-e-licenze)
-4. [Procedura](#procedura)
-5. [Uso degli strumenti](#uso-degli-strumenti)
+4. [Crediti e citazioni](#crediti-e-citazioni)
+5. [Procedura](#procedura)
+6. [Uso degli strumenti](#uso-degli-strumenti)
 
 ## Il dataset
 
@@ -178,7 +179,7 @@ Fissate prima di toccare i dati e aggiornate con le decisioni prese durante la c
 | DVIDS | aerei, elicotteri, droni | pubblico dominio, video per video | [dvidshub.net](https://www.dvidshub.net) |
 | FBD-SV-2024, Sun et al., Scientific Data 2025 | uccelli | **solo ricerca, non commerciale** ⚠ | [figshare](https://figshare.com/articles/dataset/FBD-SV-2024/27377595) |
 | Clouds-1500, Mendeley Data 2023 | background | CC BY 4.0 | [Mendeley](https://data.mendeley.com/datasets/2khchjbgzr/2) |
-| Skyfinder, Mihail et al., WACV 2016 | background | **incerta** ⚠ (webcam di terzi) | [Zenodo 2562396](https://zenodo.org/records/2562396) |
+| SkyFinder, Mihail et al., WACV 2016 (copia di Nice e Wijnands 2019) | background | CC BY 4.0 sul record Zenodo, ma immagini di webcam AMOS di terzi ⚠ | [Zenodo 2562396](https://zenodo.org/records/2562396) |
 
 ⚠ FBD-SV-2024 e Skyfinder sono usati perché il dataset serve a una tesi di ricerca. Sono separabili dalla colonna
 `fonte` di `manifest.csv` e vanno tolti prima di pubblicare il dataset o di usarlo a fini commerciali.
@@ -190,6 +191,84 @@ Attribuzione:
 - per Anti-UAV: riportare copyright e licenza MIT.
 
 Dettagli, link di download e frase di attribuzione in `data/output/README.md`.
+
+## Crediti e citazioni
+
+Il dataset esiste grazie a queste fonti. Chi lo usa deve citare gli articoli e rispettare le licenze.
+
+| fonte | cosa abbiamo usato | come citarla e licenza |
+|---|---|---|
+| Svanström, Alonso-Fernandez, Englund | 284 video RGB 640×512 | `svanstrom2021dataset`; dati CC0 1.0 (DOI dei dati 10.5281/zenodo.5500576), articolo CC BY 4.0 |
+| FRED, Magrini et al. | 10 sequenze RGB di droni | `magrini2025fred`; Apache 2.0, riportare la licenza |
+| Anti-UAV, Jiang et al. | registrazioni RGB di Anti-UAV300 | `jiang2023antiuav` (online 2021, vol. 25 del 2023); MIT, riportare copyright e licenza |
+| FBD-SV-2024, Sun et al. | 483 video di uccelli | `sun2025fbdsv`; dati su figshare (DOI 10.6084/m9.figshare.27377595, CC BY 4.0 secondo DataCite), ma il readme del dataset dice "for learning and research purposes only, not for commercial use" ⚠ |
+| Clouds-1500, Arrais et al. | immagini di background | `arrais2023clouds1500`; CC BY 4.0 |
+| SkyFinder, Mihail et al. | immagini di background | `mihail2016sky`; scaricate dalla copia di Nice e Wijnands (2019), "Dataset for: Sky pixel detection in outdoor imagery using an adaptive algorithm and machine learning", Zenodo, doi:10.5281/zenodo.2562396, CC BY 4.0 (cartella `GSV` esclusa); immagini da webcam AMOS, termini di AMOS non verificati ⚠ |
+| DVIDS | video di pubblico dominio di aerei, elicotteri e droni | nessuna citazione; frase obbligatoria: "The appearance of U.S. Department of War (DoW) visual information does not imply or constitute DoW endorsement."; elenco dei video con autore in `data/output/fonti_dvids.csv` |
+
+```bibtex
+@article{svanstrom2021dataset,
+  author  = {Svanstr{\"o}m, Fredrik and Alonso-Fernandez, Fernando and Englund, Cristofer},
+  title   = {A dataset for multi-sensor drone detection},
+  journal = {Data in Brief},
+  volume  = {39},
+  pages   = {107521},
+  year    = {2021},
+  doi     = {10.1016/j.dib.2021.107521}
+}
+
+@inproceedings{magrini2025fred,
+  author    = {Magrini, Gabriele and Marini, Niccol{\`o} and Becattini, Federico and Berlincioni, Lorenzo and
+               Biondi, Niccol{\`o} and Pala, Pietro and Del Bimbo, Alberto},
+  title     = {{FRED}: The Florence {RGB}-Event Drone Dataset},
+  booktitle = {Proceedings of the 33rd ACM International Conference on Multimedia},
+  pages     = {13170--13176},
+  year      = {2025},
+  doi       = {10.1145/3746027.3758271}
+}
+
+@article{jiang2023antiuav,
+  author  = {Jiang, Nan and Wang, Kuiran and Peng, Xiaoke and Yu, Xuehui and Wang, Qiang and Xing, Junliang and
+             Li, Guorong and Guo, Guodong and Ye, Qixiang and Jiao, Jianbin and Zhao, Jian and Han, Zhenjun},
+  title   = {Anti-{UAV}: A Large-Scale Benchmark for Vision-Based {UAV} Tracking},
+  journal = {IEEE Transactions on Multimedia},
+  volume  = {25},
+  pages   = {486--500},
+  year    = {2023},
+  doi     = {10.1109/TMM.2021.3128047}
+}
+
+@article{sun2025fbdsv,
+  author  = {Sun, Zi-Wei and Hua, Ze-Xi and Li, Heng-Chao and Qi, Zhi-Peng and Li, Xiang and Li, Yan and
+             Zhang, Jin-Chi},
+  title   = {{FBD-SV-2024}: Flying Bird Object Detection Dataset in Surveillance Video},
+  journal = {Scientific Data},
+  volume  = {12},
+  pages   = {530},
+  year    = {2025},
+  doi     = {10.1038/s41597-025-04872-6}
+}
+
+@misc{arrais2023clouds1500,
+  author    = {Arrais, Juliana Marian and Cerentini, Allan and Juncklaus, Bruno and Polli, Marco and Chaves, Thiago and
+               von Wangenheim, Aldo and Ricci, Gilberto and Mantelli, Sylvio and Silva, Caio and Rosa, Gabriel},
+  title     = {Clouds-1500},
+  year      = {2023},
+  publisher = {Mendeley Data},
+  version   = {2},
+  doi       = {10.17632/2khchjbgzr.2}
+}
+
+@inproceedings{mihail2016sky,
+  author    = {Mihail, Radu Paul and Workman, Scott and Bessinger, Zach and Jacobs, Nathan},
+  title     = {Sky Segmentation in the Wild: An Empirical Study},
+  booktitle = {IEEE Winter Conference on Applications of Computer Vision (WACV)},
+  pages     = {1--6},
+  year      = {2016},
+  doi       = {10.1109/WACV.2016.7477637}
+}
+```
+
 
 ## Procedura
 

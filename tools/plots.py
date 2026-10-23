@@ -1,4 +1,4 @@
-"""Stile e salvataggio comuni a tutti i grafici (report, esperimenti, notebook).
+"""Style and saving shared by all plots (report, experiments, notebooks).
 
     import matplotlib.pyplot as plt
     from tools.plots import STYLE, WIDTH, color, save
@@ -8,8 +8,8 @@
     ax.bar(qs, vals, color=[color(q) for q in qs])
     save(fig, out / "latency")          # latency.png + latency.pdf
 
-Il colore segue l'entita', non la posizione: int8 e' arancio in ogni figura
-della tesi, anche quando in un grafico mancano fp16 o fp32.
+The color follows the entity, not the position: int8 is orange in every figure
+of the thesis, even when a plot lacks fp16 or fp32.
 """
 
 from __future__ import annotations
@@ -18,15 +18,15 @@ from pathlib import Path
 
 STYLE = Path(__file__).with_name("plots.mplstyle")
 
-#: \textwidth di una tesi A4 (15 cm); mezza larghezza per figure affiancate
+#: \textwidth of an A4 thesis (15 cm); half width for side-by-side figures
 WIDTH = 15 / 2.54
-# slot della palette in plots.mplstyle
+# palette slots in plots.mplstyle
 _P = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100",
       "#e87ba4", "#008300", "#4a3aa7", "#e34948"]
 COLORS = {
     # split
     "train": _P[0], "val": _P[1], "test": _P[2], "calib": _P[3],
-    # precisione
+    # precision
     "fp32": _P[0], "fp16": _P[2], "int8": _P[1],
     # backend
     "onnxruntime": _P[0], "onnxruntime_py": _P[4], "openvino": _P[1],
@@ -38,12 +38,12 @@ COLORS = {
 
 
 def color(key, i: int = 0) -> str:
-    """Colore dell'entita' `key`; per chiavi nuove lo slot `i` della palette."""
+    """Color of the entity `key`; for new keys the palette slot `i`."""
     return COLORS.get(str(key), _P[i % len(_P)])
 
 
 def save(fig, path: Path, pdf: bool = True) -> Path:
-    """PNG (anteprima, report) e PDF (LaTeX) con lo stesso nome; chiude la figura."""
+    """PNG (preview, report) and PDF (LaTeX) with the same name; closes the figure."""
     import matplotlib.pyplot as plt
 
     path = Path(path).with_suffix("")

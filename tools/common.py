@@ -1,4 +1,4 @@
-"""Costanti e funzioni comuni a tutte le fonti: classi, fasce di grandezza, deduplica, sessioni, CVAT."""
+"""Constants and functions shared by all sources: classes, size bands, dedup, sessions, CVAT."""
 
 from __future__ import annotations
 
@@ -9,20 +9,20 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
-INPUT = DATA / "input"  # fonti, una cartella per passo
-INTERMEDIATE = DATA / "intermediate"  # passi su tutte le fonti
-OUTPUT = DATA / "output"  # dataset finale, congelato
-# classi del detector delle proposte (5 classi, due di droni) -> le nostre (0 airplane, 1 bird, 2 drone, 3 helicopter)
+INPUT = DATA / "input"  # sources, one folder per step
+INTERMEDIATE = DATA / "intermediate"  # steps over all sources
+OUTPUT = DATA / "output"  # final dataset, frozen
+# proposal detector classes (5 classes, two of drones) -> ours (0 airplane, 1 bird, 2 drone, 3 helicopter)
 DETECTOR_CLASSES = {0: 2, 1: 2, 2: 0, 3: 3, 4: 1}
 
 
 def _load_env(f: Path = ROOT / ".env") -> None:
-    """Impostazioni locali da `.env` (modello in `.env.example`): righe `CHIAVE=valore`, `#` per i commenti. Le
-    variabili gia' nell'ambiente vincono."""
+    """Local settings from `.env` (template in `.env.example`): `KEY=value` lines, `#` for comments. Variables
+    already in the environment win."""
     if f.exists():
         for ln in f.read_text().splitlines():
             k, sep, v = ln.split("#", 1)[0].partition("=")
-            if sep and k.strip() and v.strip():  # vuoto = non impostato
+            if sep and k.strip() and v.strip():  # empty = not set
                 os.environ.setdefault(k.strip(), v.strip())
 
 
@@ -30,32 +30,32 @@ _load_env()
 
 
 def _weights(var: str) -> str:
-    """Percorso dei pesi da `$<var>`, relativo alla radice della repo se non assoluto."""
+    """Path of the weights from `$<var>`, relative to the repo root if not absolute."""
     p = os.environ.get(var)
     if not p:
         raise SystemExit(f"serve {var} in .env (vedi .env.example)")
-    return str(ROOT / p)  # ROOT / assoluto = assoluto
+    return str(ROOT / p)  # ROOT / absolute = absolute
 
 
 def detector():
-    """YOLO delle proposte e del filtro del background: pesi privati, fuori dalla repo, da `DETECTOR_PESI`. Le classi
-    sono mappate con `DETECTOR_CLASSES`."""
+    """YOLO for the proposals and the background filter: private weights, outside the repo, from `DETECTOR_PESI`.
+    Classes are mapped with `DETECTOR_CLASSES`."""
     from ultralytics import YOLO
 
     return YOLO(_weights("DETECTOR_PESI"))
 
 
 def sam():
-    """SAM 2 per i box (Svanström, FRED), pesi da `SAM_PESI`; Ultralytics li scarica se mancano."""
+    """SAM 2 for the boxes (Svanström, FRED), weights from `SAM_PESI`; Ultralytics downloads them if missing."""
     from ultralytics import SAM
 
     return SAM(_weights("SAM_PESI"))
 
 
-NAMES = ["airplane", "bird", "drone", "helicopter"]  # stesso ordine di AOD4
+NAMES = ["airplane", "bird", "drone", "helicopter"]  # same order as AOD4
 
 
-BANDS = ["<8", "8-16", "16-32", "32-64", "64-96", ">96"]  # sqrt(w*h) in px, README.md (Regole)
+BANDS = ["<8", "8-16", "16-32", "32-64", "64-96", ">96"]  # sqrt(w*h) in px, README.md, Rules
 
 
 BAND_EDGES = [8, 16, 32, 64, 96]
@@ -69,11 +69,11 @@ def dhash(gray: np.ndarray) -> np.ndarray:
 
 
 def signature(gray: np.ndarray, boxes: np.ndarray):
-    """Hash del ritaglio attorno all'unione dei box + geometria normalizzata."""
+    """Hash of the crop around the union of the boxes + normalized geometry."""
     h, w = gray.shape
     x0, y0 = boxes[:, 0].min(), boxes[:, 1].min()
     x1, y1 = (boxes[:, 0] + boxes[:, 2]).max(), (boxes[:, 1] + boxes[:, 3]).max()
-    pad = max(x1 - x0, y1 - y0, 8)  # contesto: lo sfondo vicino conta
+    pad = max(x1 - x0, y1 - y0, 8)  # context: the nearby background matters
     crop = gray[int(max(0, y0 - pad)):int(min(h, y1 + pad)),
                 int(max(0, x0 - pad)):int(min(w, x1 + pad))]
     geo = np.array([(x0 + x1) / 2 / w, (y0 + y1) / 2 / h,
@@ -82,8 +82,8 @@ def signature(gray: np.ndarray, boxes: np.ndarray):
 
 
 def is_new(sig, kept, hash_thr: int, geo_thr: float) -> bool:
-    # ponytail: confronto con tutti i frame tenuti, O(n*k) per video; basta
-    # finche' i video restano da ~300 frame
+    # ponytail: compared against all kept frames, O(n*k) per video; enough
+    # as long as videos stay around ~300 frames
     hsh, geo, k = sig
     for h2, g2, k2 in kept:
         if (k == k2 and np.count_nonzero(hsh != h2) <= hash_thr
@@ -94,10 +94,10 @@ def is_new(sig, kept, hash_thr: int, geo_thr: float) -> bool:
 
 
 def dedup_clip(args) -> tuple[str, list[int], int]:
-    """Frame tenuti di una clip, in ordine: un frame resta se nessun frame gia'
-    tenuto della clip ha lo stesso numero di box, dHash del ritaglio sui box
-    entro `hash_thr` bit e posizione/grandezza vicine (`is_new`). Frame senza
-    box: dHash del frame intero."""
+    """Kept frames of a clip, in order: a frame stays if no frame already kept
+    from the clip has the same number of boxes, a crop dHash on the boxes
+    within `hash_thr` bits and a close position/size (`is_new`). Frames
+    without boxes: dHash of the whole frame."""
     import cv2
 
     frames, man, clip, idx, hash_thr, geo_thr = args
@@ -108,7 +108,7 @@ def dedup_clip(args) -> tuple[str, list[int], int]:
         t = man / f"{v}_f{i:05d}.txt"
         rows = np.array([ln.split()[1:] for ln in t.read_text().splitlines() if ln.strip()] if t.exists() else [],
                         float).reshape(-1, 4) * ([gray.shape[1], gray.shape[0]] * 2)
-        boxes = np.c_[rows[:, :2] - rows[:, 2:] / 2, rows[:, 2:]]  # (x, y, w, h) in pixel
+        boxes = np.c_[rows[:, :2] - rows[:, 2:] / 2, rows[:, 2:]]  # (x, y, w, h) in pixels
         sig = signature(gray, boxes) if len(boxes) else (dhash(gray), None, 0)
         if is_new(sig, kept, hash_thr, geo_thr):
             kept.append(sig)
@@ -122,9 +122,9 @@ def mask_box(m: np.ndarray):
 
 
 def propose_sessions(emb: dict[str, np.ndarray], thr: float) -> tuple[list[str], np.ndarray, np.ndarray]:
-    """Somiglianza fra clip = massimo fra le coppie dei loro frame; gruppi per
-    legame medio sopra `thr`. Il legame singolo
-    incatena tutto: su cielo uniforme quasi ogni coppia supera 0,9."""
+    """Similarity between clips = maximum over the pairs of their frames; groups by
+    average linkage above `thr`. Single linkage
+    chains everything: on uniform sky almost every pair exceeds 0.9."""
     from scipy.cluster.hierarchy import fcluster, linkage
     from scipy.spatial.distance import squareform
 
@@ -138,7 +138,7 @@ def propose_sessions(emb: dict[str, np.ndarray], thr: float) -> tuple[list[str],
 
 
 def cvat_client():
-    """Client CVAT da `.env` (`CVAT_URL`, `CVAT_USER`, `CVAT_PASS`); in mancanza le credenziali da ~/.config/cvat.env."""
+    """CVAT client from `.env` (`CVAT_URL`, `CVAT_USER`, `CVAT_PASS`); else credentials from ~/.config/cvat.env."""
     from cvat_sdk import make_client
 
     env = os.environ
