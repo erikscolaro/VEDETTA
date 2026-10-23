@@ -25,6 +25,7 @@ scritto in `docs/procedura.md` (richiesta dell'utente).
 | 9 buchi (tutte le fonti, `tools/buchi.py`) | fatto | `data/aggregati/8_buchi/buchi.csv`: 15 buchi su 16 celle |
 | 10 aggiunte | raccolta finita, preselezione fatta, **task CVAT pronti** | FRED 541–551 (8.996 ritagli); DVIDS 599–628 (28.520); Anti-UAV 629–633 (4.616); FBD 634–644 (10.544). Preselezione in `data/<fonte>/5_box/preselezione/` (`tools/preselezione.py`) |
 | 9 buchi dopo la revisione CVAT (22/10/2026, 2.857 per cella) | **8 buchi su 20** (prima, sui box proposti, 4) | aerei 8–16 (865), 16–32 (2.387); uccelli 8–16 (2.571), 64–96 (562), > 96 (209); elicotteri 8–16 (762), 16–32 (1.864), 64–96 (2.596); droni chiusi |
+| 11 split (23/10/2026) | fatto: doppioni rivisti (146 coppie unite), gruppi (`11_gruppi/`, 1.010), split per gruppi con val e tetto su mezze ottave (`12_split/`: via 7.198 immagini con box < 8 px); tetto e mosaici (`13_train_compensation/`: 26.841 reali + 929 mosaici); background (`14_background/`, Clouds-1500 e Skyfinder); export in `data/output/` (train 30.579, val 9.013, test 5.165; `distribuzione.{png,pdf,md}`, `leakage.{png,pdf,md}`; minimi 10k/2k/1k per classe rispettati; verificato con Ultralytics; classi 0 drone, 1 airplane, 2 helicopter, 3 bird; README con licenze e legenda, `raw/`, `distribuzione.png`); calib (512, `15_calib/`, `data/output/calib.yaml`); **prossimo**: consegna (sottoinsiemi per fascia, mosaici di deploy, report, manifest) | `aggregati/9_split/frame.csv` (58.960 frame annotati), `embedding_s.npy` (DINOv2 ViT-S; B e L provati e scartati), `somiglianze_s.png`, `somiglianze_tutte.png` |
 
 Passo 5: tolte 12 clip con la scia (`scie.txt`) e 6 scartate in CVAT (`scartate.txt`); 1.233 frame senza box in 18
 clip tenuti apposta. Il rapporto √area originale/corretta non si calcola (decisione dell'utente).
@@ -37,7 +38,7 @@ clip tenuti apposta. Il rapporto √area originale/corretta non si calcola (deci
 4. Fumo degli airshow DVIDS = scia (deciso nel giro 10): 86 tratti in `data/dvids/0_raw/fumo.txt`, 7.233 ritagli tolti.
 5. Licenze in `docs/licenze.md`: solo aperte (pubblico dominio, CC0, CC BY). FBD-SV-2024 ("solo ricerca") tenuto
    come eccezione dichiarata. DVIDS: frase di non-endorsement nella tesi.
-6. Oggetti sotto i 4 px via; 4–8 px solo nel train (deciso il 19/10/2026).
+6. Oggetti sotto i 4 px via; immagini con box sotto gli 8 px via da tutti gli split (23/10/2026, prima solo nel train).
 
 7. **A fine progetto** (utente, 19/10/2026): una sola procedura per rifare **lo stesso identico dataset**. Cartella
    `manifest/` in git con i soli video usati (DVIDS: id, url, mp4, licenza, autore, tratti, sha256; Anti-UAV,
@@ -47,7 +48,7 @@ clip tenuti apposta. Il rapporto √area originale/corretta non si calcola (deci
    con l'essenziale; la cronaca dei giri in un diario a parte (query in un file di dati, tabella dei giri
    generata da script).
 
-8. **Obiettivo nuovo** (22/10/2026, `regole.md`): curva continua s^−α, 14.286 box per classe; drone e uccello principali, deficit di aerei ed elicotteri piccoli accettato. **Da fare**: raffinare la distribuzione (forma e α, soprattutto uccelli) e allineare `tools/buchi.py` alla curva.
+8. **Obiettivo nuovo** (22/10/2026, `regole.md`): curva continua s^−α, 14.286 box per classe; drone e uccello principali, deficit di aerei ed elicotteri piccoli accettato. α = 0,3 per tutte le classi (23/10/2026, stima: dominio sconosciuto). Uccelli grandi sotto la curva accettati; piccoli del train con mosaici ridotti dopo lo split (`regole.md`). **Da fare**: allineare `tools/buchi.py` alla curva.
 
 ## Note pratiche
 

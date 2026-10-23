@@ -2,7 +2,7 @@
 
 Analisi del 22/10/2026 sulle label finali dopo la revisione CVAT, con gli stessi frame di `tools/buchi.py`:
 Svanström sui frame tenuti, le aggiunte da `5_box/manuale`. Solo box di almeno 8 px in origine. Grandezza =
-√(w·h) in pixel sul frame 640×512. Figure rifatte con `python tools/distribuzioni.py`.
+√(w·h) in pixel sul frame 640×512. Figure rifatte con `python tools/distribuzioni.py`; curva ideale a 14.286 box per classe in entrambe.
 
 ## Distribuzione attuale
 
@@ -33,22 +33,24 @@ Le istanze attese in un intervallo [a, b) sono, in modo esatto:
 Lo scale non aggiunge istanze: le sposta tra le fasce a ogni epoca. Il conto non include il ritaglio ai bordi
 né il filtro `box_candidates` (lato < 2 px, area persa), che tolgono qualcosa in più ai due estremi.
 
-| cella | senza | s = 0,5 | s = 0,75 |
+| cella | senza | s = 0,25 | s = 0,5 |
 |---|---|---|---|
-| aerei 8–16 | 865 | 1.007 | 1.249 |
-| aerei 16–32 | 2.387 | 2.611 | 2.899 |
-| aerei 64–96 | 4.016 | 3.190 | 2.853 |
-| uccelli 8–16 | 2.571 | 2.597 | 2.687 |
-| uccelli 64–96 | 562 | 732 | 900 |
-| uccelli > 96 | 209 | 259 | 342 |
-| elicotteri 8–16 | 762 | 825 | 1.024 |
-| elicotteri 16–32 | 1.864 | 2.044 | 2.202 |
-| elicotteri 64–96 | 2.596 | 2.345 | 2.144 |
-| droni 64–96 | 3.422 | 2.772 | 2.329 |
+| aerei 8–16 | 865 | 884 | 1.007 |
+| aerei 16–32 | 2.387 | 2.426 | 2.611 |
+| aerei 64–96 | 4.016 | 3.623 | 3.190 |
+| uccelli 8–16 | 2.571 | 2.529 | 2.597 |
+| uccelli 64–96 | 562 | 612 | 732 |
+| uccelli > 96 | 209 | 214 | 259 |
+| elicotteri 8–16 | 762 | 760 | 825 |
+| elicotteri 16–32 | 1.864 | 1.912 | 2.044 |
+| elicotteri 64–96 | 2.596 | 2.500 | 2.345 |
+| droni 64–96 | 3.422 | 3.236 | 2.772 |
 
-Con s = 0,75 si chiudono solo gli aerei 16–32, e di poco. In cambio la fascia 64–96, che sta al centro del
-picco, si svuota verso i lati: aerei, elicotteri e droni 64–96 scendono sotto il minimo. Aerei ed elicotteri
-8–16 e gli uccelli grandi restano lontani. Lo scale allarga la distribuzione, ma non sostituisce la raccolta.
+Con s = 0,25 (quello di `regole.md`) la distribuzione resta quasi uguale: nessun buco si chiude. Con s = 0,5
+nemmeno: gli aerei 16–32 arrivano a 2.611, ancora sotto il minimo. In cambio la fascia 64–96, al centro del
+picco, si svuota verso i lati e i droni 64–96 scendono sotto il minimo; circa 900 droni finiscono sotto gli 8 px.
+Aerei ed elicotteri 8–16 e gli uccelli grandi restano lontani. Lo scale allarga la distribuzione, ma non
+sostituisce la raccolta.
 Gli oggetti piccoli ottenuti riducendo un'immagine sono anche più nitidi di quelli ripresi davvero lontani.
 
 ## Distribuzione ideale
@@ -64,26 +66,29 @@ Ragionamento, senza le regole delle fasce:
 3. **Ruolo delle classi.** Aerei, elicotteri e uccelli servono soprattutto a non dare falsi allarmi sui droni,
    e la confusione c'è dove tutti sono piccoli. Un aereo da 200 px non si scambia mai per un drone.
 
-Forma scelta: decrescente in modo continuo, densità in scala logaritmica proporzionale a s^−α tra 8 e 320 px.
-- **Droni:** α = 0,3, circa −19% per ogni raddoppio di grandezza.
-- **Aerei, elicotteri, uccelli:** α = 0,45, circa −27% per raddoppio.
+Forma scelta: decrescente in modo continuo, densità in scala logaritmica proporzionale a s^−α tra 8 e 320 px,
+con **α = 0,3 per tutte le classi**, circa −19% per ogni raddoppio di grandezza (utente, 23/10/2026; prima 0,45
+per aerei, elicotteri e uccelli).
 
-Nella seconda figura la curva ideale ha lo stesso totale della classe: mostra la forma. Nella terza ha il totale
-deciso, **14.286 box per classe** (10.000 nel train con lo split 70/20/10): mostra quanto manca.
+È una **stima**, il nostro best guess: la distribuzione vera del dominio non la conosciamo e non abbiamo dati per
+misurarla. Uno standard non c'è: Ultralytics chiede solo istanze e immagini per classe, COCO e AI-TOD hanno la
+distribuzione che è uscita dalla raccolta. La stessa curva per tutte le classi ha due vantaggi: in ogni fascia il
+rapporto fra le classi è lo stesso, quindi il modello non può legare la classe alla grandezza ("piccolo =
+drone"), e c'è un solo parametro da giustificare.
 
-![ideale 14k](figure/distribuzioni_ideale_14k.png)
+Nelle figure la curva ideale (linea nera continua) ha il totale deciso, **14.286 box per classe** (10.000 nel
+train con lo split 70/20/10): mostra quanto manca. Lo stesso asse verticale nei 4 grafici.
 
 | | 8–16 | 16–32 | 32–64 | 64–96 | > 96 |
 |---|---|---|---|---|---|
-| ideale, α = 0,45 | 4.727 | 3.460 | 2.533 | 1.154 | 2.412 |
-| ideale droni, α = 0,3 | 4.007 | 3.255 | 2.644 | 1.310 | 3.070 |
-| mancano aerei | 3.862 | 1.073 | – | – | – |
-| mancano uccelli | 2.156 | – | – | 592 | 2.203 |
-| mancano elicotteri | 3.965 | 1.596 | – | – | – |
+| ideale, α = 0,3 | 4.007 | 3.255 | 2.644 | 1.310 | 3.070 |
+| mancano aerei | 3.142 | 868 | – | – | – |
+| mancano uccelli | 1.436 | – | – | 748 | 2.861 |
+| mancano elicotteri | 3.245 | 1.391 | – | – | – |
 
 I droni stanno sopra la curva in ogni fascia. **Decisione dell'utente (22/10/2026)**: questa è la regola nuova
 (`regole.md`). Drone e uccello sono le classi principali, aereo ed elicottero secondarie: il loro deficit sul
-piccolo è un compromesso accettato. Da raffinare: forma e α della curva, soprattutto per gli uccelli.
+piccolo è un compromesso accettato. Forma e α decisi il 23/10/2026 (sopra): stessa curva per tutte.
 
 Rispetto all'ideale:
 - **Aerei ed elicotteri** sono rovesciati: troppi tra 40 e 200 px, troppo pochi sotto i 32.

@@ -2,13 +2,12 @@
 """Distribuzione continua della grandezza sqrt(w*h) per classe sulle label finali (stessi frame di
 tools/buchi.py: Svanström sui frame tenuti, aggiunte da 5_box/manuale), box >= 8 px in origine.
 
-Due figure in docs/figure/ (considerazioni in docs/distribuzioni.md):
+Due figure in docs/figure/ (considerazioni in docs/distribuzioni.md), con la curva ideale (TOTALE alzato per classe con SCALA)
+come linea continua e lo stesso asse verticale nei 4 grafici:
 - distribuzioni.png: istogramma per classe con le istanze per fascia (rosso: sotto il minimo per cella);
-- distribuzioni_scale.png: la stessa con lo scale di Ultralytics (s = 0,5 e 0,75) calcolato in modo
-  esatto e la distribuzione ideale a parita' di totale.
+- distribuzioni_scale.png: la stessa con lo scale di Ultralytics (s = 0,25 e 0,5) calcolato in modo esatto.
 
-    python tools/distribuzioni.py                 # ideale con lo stesso totale della classe
-    python tools/distribuzioni.py --totale 10000  # ideale con 10.000 box per classe -> distribuzioni_ideale_10k.png
+    python tools/distribuzioni.py
 """
 
 from __future__ import annotations
@@ -33,8 +32,16 @@ EDGES = [8, 16, 32, 64, 96]
 BANDS = [(8, 16), (16, 32), (32, 64), (64, 96), (96, 1e9)]
 CLASSI = ["airplane", "bird", "drone", "helicopter"]
 # distribuzione ideale: densita' in log s proporzionale a s^-alpha su [SMIN, SMAX] (docs/distribuzioni.md)
-ALPHA = {"drone": 0.3, "airplane": 0.45, "bird": 0.45, "helicopter": 0.45}
+ALPHA = dict.fromkeys(["airplane", "bird", "drone", "helicopter"], 0.3)  # stessa curva per tutte (utente, 23/10/2026)
 SMIN, SMAX = 8, 320
+TOTALE = round(10_000 / 0.7)  # box per classe della curva ideale: 10.000 nel train, split 70/20/10 (regole.md)
+# curva alzata (utente, 23/10/2026): almeno 10.000 istanze per classe nel train, 2.000 in val, 1.000 in test; la stessa
+# curva traslata in alto fa da tetto (sopra) e da obiettivo dei mosaici (sotto), cosi' la forma resta s^-alpha
+SCALA = dict.fromkeys(["airplane", "bird", "drone", "helicopter"], 1.2)
+TOT = {c: TOTALE * k for c, k in SCALA.items()}
+# fine della curva per classe (utente, 23/10/2026): gli uccelli sopra i 96 px sono troppo pochi, stanno solo nel train
+# e la loro curva si ferma a 96
+CUT = {"airplane": SMAX, "bird": 96, "drone": SMAX, "helicopter": SMAX}
 BINS = np.geomspace(2, 640, 70)
 
 
@@ -83,31 +90,49 @@ def attese(x: np.ndarray, s: float, edges) -> np.ndarray:
     return (ov / (hi - lo)).sum(0)
 
 
-def ideale(n: int, alpha: float, edges) -> np.ndarray:
-    """Istanze per intervallo con densita' in log s proporzionale a s^-alpha su [SMIN, SMAX], totale n."""
-    e = np.clip(np.asarray(edges, float), SMIN, SMAX)
+def ideale(n: int, alpha: float, edges, smax: float = SMAX) -> np.ndarray:
+    """Istanze per intervallo con densita' in log s proporzionale a s^-alpha su [SMIN, smax], totale n."""
+    e = np.clip(np.asarray(edges, float), SMIN, smax)
     F = lambda v: -v ** -alpha / alpha  # noqa: E731  primitiva di s^-alpha d(ln s)
-    return n * (F(e[1:]) - F(e[:-1])) / (F(SMAX) - F(SMIN))
+    return n * (F(e[1:]) - F(e[:-1])) / (F(smax) - F(SMIN))
+
+
+def uniforme(n: float, edges, smax: float = SMAX) -> np.ndarray:
+    """Istanze per intervallo con densita' costante in log s su [SMIN, smax], totale n (obiettivo del test)."""
+    e = np.log(np.clip(np.asarray(edges, float), SMIN, smax))
+    return n * np.diff(e) / np.log(smax / SMIN)
+
+
+def curva(n: int, alpha: float, smax: float = SMAX) -> tuple[np.ndarray, np.ndarray]:
+    """La distribuzione ideale come linea continua (s, istanze attese per intervallo di BINS), totale n."""
+    s = np.geomspace(SMIN, smax, 400)
+    dlog = np.log(BINS[1] / BINS[0])  # BINS a passo costante in log
+    return s, n * s ** -alpha * dlog * alpha / (SMIN ** -alpha - smax ** -alpha)
 
 
 def _assi(ax, c: str, n: int) -> None:
+    from matplotlib.ticker import NullLocator
+
     ax.axvspan(2, 8, color="0.92", zorder=0)
     ax.set_xscale("log")
-    ax.set_xlim(2, 640)
-    ax.set_xticks([4, 8, 16, 32, 64, 96, 256, 640])
-    ax.set_xticklabels(["4", "8", "16", "32", "64", "96", "256", "640"])
+    ax.set_xlim(2, 512)
+    ticks = [4, 8, 16, 32, 64, 128, 256, 512]  # potenze di 2
+    ax.set_xticks(ticks)
+    ax.set_xticklabels([str(v) for v in ticks])
+    ax.xaxis.set_minor_locator(NullLocator())  # le tacche secondarie in base 10 non cadono sulle potenze di 2
     ax.set_title(f"{c} ({n:,} box)".replace(",", "."), fontsize=8)
 
 
 def fig_attuale(size: dict, plt) -> Path:
-    f, axs = plt.subplots(2, 2, figsize=(WIDTH, WIDTH * 0.72), sharex=True)
+    f, axs = plt.subplots(2, 2, figsize=(WIDTH, WIDTH * 0.72), sharex=True, sharey=True)
+    hs = {c: attese(size[c], 0, BINS) for c in CLASSI}
+    top = max(max(hs[c].max(), curva(TOT[c], ALPHA[c], CUT[c])[1].max()) for c in CLASSI) * 1.3  # stesso asse per le 4
     for ax, c in zip(axs.flat, CLASSI):
         x = size[c]
-        h = attese(x, 0, BINS)
-        ax.bar(BINS[:-1], h, width=np.diff(BINS), align="edge", color=_P[0], alpha=.85, lw=0)
-        for e in EDGES:
+        ax.bar(BINS[:-1], hs[c], width=np.diff(BINS), align="edge", color=_P[0], alpha=.85, lw=0)
+        for e in EDGES[:-1]:  # senza la linea a 96 px: l'asse va in potenze di 2 (utente)
             ax.axvline(e, color="0.55", lw=.6, ls="--")
-        top = h.max() * 1.38
+        ax.plot(*curva(TOT[c], ALPHA[c], CUT[c]), color="k", lw=.8)
         for j, (a, b) in enumerate(BANDS):
             n = int(((x >= a) & (x < b)).sum())
             ax.text(np.sqrt(a * min(b, 300)), top * (.97 if j % 2 == 0 else .87), f"{n:,}".replace(",", "."),
@@ -119,41 +144,40 @@ def fig_attuale(size: dict, plt) -> Path:
         ax.set_xlabel(r"grandezza $\sqrt{w\,h}$ (px)")
     for ax in axs[:, 0]:
         ax.set_ylabel("istanze per intervallo")
-    f.suptitle(f"Box >= 8 px dopo la revisione CVAT — in rosso le fasce sotto {TARGET:,}".replace(",", "."),
-               fontsize=8.5)
+    f.suptitle(f"Box >= 8 px dopo la revisione CVAT — in rosso le fasce sotto {TARGET:,}".replace(",", ".")
+               + "; in nero l'ideale (curva alzata per classe)", fontsize=8.5)
     f.tight_layout()
     return save(f, OUT / "distribuzioni", pdf=False)
 
 
-def fig_scale(size: dict, plt, totale: int = 0) -> Path:
-    """totale 0: ideale con lo stesso totale della classe; altrimenti `totale` box per classe."""
-    f, axs = plt.subplots(2, 2, figsize=(WIDTH, WIDTH * 0.78), sharex=True)
-    curve = [(0, _P[0], "senza scale"), (.5, _P[1], "scale 0,5 (×0,5–1,5)"), (.75, _P[2], "scale 0,75 (×0,25–1,75)")]
+def fig_scale(size: dict, plt) -> Path:
+    f, axs = plt.subplots(2, 2, figsize=(WIDTH, WIDTH * 0.78), sharex=True, sharey=True)
+    curve = [(0, _P[0], "senza scale"), (.25, _P[1], "scale 0,25 (×0,75–1,25)"), (.5, _P[2], "scale 0,5 (×0,5–1,5)")]
+    ymax = 0
     for ax, c in zip(axs.flat, CLASSI):
         x = size[c]
-        ymax = 0
         for s, col, lab in curve:
             h = attese(x, s, BINS)
             ax.stairs(h, BINS, color=col, lw=1.2, label=lab, fill=s == 0, alpha=.35 if s == 0 else 1)
             ymax = max(ymax, h.max())
-        hi = ideale(totale or len(x), ALPHA[c], BINS)
-        lab_i = "ideale, " + f"{totale:,}".replace(",", ".") + " box" if totale else "ideale, stesso totale"
-        ax.stairs(hi, BINS, color="k", lw=1.4, ls="--", label=lab_i)
-        ax.text(.98, .95, f"ideale ∝ $s^{{-{ALPHA[c]:g}}}$", transform=ax.transAxes, ha="right", va="top", fontsize=6.5)
-        for e in EDGES:
+        sc, hi = curva(TOT[c], ALPHA[c], CUT[c])
+        ax.plot(sc, hi, color="k", lw=.8, label="ideale (alzata per classe)")
+        ymax = max(ymax, hi.max())
+        ax.text(.98, .95, f"ideale ∝ $s^{{-{ALPHA[c]:g}}}$, ×{SCALA[c]:g}", transform=ax.transAxes, ha="right", va="top", fontsize=6.5)
+        for e in EDGES[:-1]:
             ax.axvline(e, color="0.8", lw=.5)
-        ax.set_ylim(0, max(ymax, hi.max()) * 1.1)
         _assi(ax, c, len(x))
+    axs[0, 0].set_ylim(0, ymax * 1.1)  # sharey: stesso asse per le 4
     for ax in axs[1]:
         ax.set_xlabel(r"grandezza $\sqrt{w\,h}$ (px)")
     for ax in axs[:, 0]:
         ax.set_ylabel("istanze attese per epoca")
     hs, ls = axs[0, 0].get_legend_handles_labels()
     f.legend(hs, ls, loc="lower center", ncol=4, fontsize=6.5, frameon=False, bbox_to_anchor=(.5, -.01))
-    quanto = f"con {totale:,} box per classe".replace(",", ".") if totale else "a parità di totale"
-    f.suptitle(f"Box >= 8 px: attuale, con scale (uniforme in ±s·px) e distribuzione ideale {quanto}", fontsize=8.5)
+    f.suptitle("Box >= 8 px: attuale, con scale (uniforme in ±s·px) e distribuzione ideale (alzata per classe)",
+               fontsize=8.5)
     f.tight_layout(rect=(0, .04, 1, 1))
-    return save(f, OUT / (f"distribuzioni_ideale_{totale // 1000}k" if totale else "distribuzioni_scale"), pdf=False)
+    return save(f, OUT / "distribuzioni_scale", pdf=False)
 
 
 def main() -> int:
@@ -162,18 +186,15 @@ def main() -> int:
     import matplotlib.pyplot as plt
 
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--totale", type=int, default=0, help="box per classe della curva ideale (0: stesso totale)")
     a = p.parse_args()
     plt.style.use(STYLE)
     size = sizes()
     print(fig_attuale(size, plt))
-    print(fig_scale(size, plt, a.totale))
-    if a.totale:
-        print(f"ideale {a.totale} per classe:" + "".join(f"{round(v):>8}" for v in ideale(a.totale, .45, [8, 16, 32, 64, 96, 1e6])),
-              "(alpha 0,45);", "".join(f"{round(v):>8}" for v in ideale(a.totale, .3, [8, 16, 32, 64, 96, 1e6])), "(alpha 0,3)")
+    print(fig_scale(size, plt))
+    print("ideale droni per fascia:" + "".join(f"{round(v):>8}" for v in ideale(TOT["drone"], ALPHA["drone"], [8, 16, 32, 64, 96, 1e6])))
     print(f"{'':<11}{'s':>5}" + "".join(f"{a:>8}" for a in ["<8", "8-16", "16-32", "32-64", "64-96", ">96"]))
     for c in CLASSI:
-        for s in (0, .5, .75):
+        for s in (0, .25, .5):
             n = attese(size[c], s, [0, 8, 16, 32, 64, 96, 1e6])
             print(f"{c:<11}{s:>5}" + "".join(f"{round(v):>8}" for v in n))
     return 0

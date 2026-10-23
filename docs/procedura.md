@@ -3,7 +3,7 @@
 Ogni passo dipende dal precedente, tranne il meteo (6), che non usa i box. Regole in [`regole.md`](regole.md).
 
 Ogni passo di una fonte ha la sua cartella in `data/<fonte>/`; i passi su tutte le fonti (9 e 11–14) hanno la loro
-cartella numerata in `data/aggregati/` (`8_buchi/`, `9_split/`). Ogni cartella legge solo da quelle dei passi prima, così si rifà un passo senza ripartire da
+cartella numerata in `data/aggregati/` (`8_buchi/`, `9_split/`, `10_doppioni/`, `11_gruppi/`, `12_split/`, `13_train_compensation/`, `14_background/`). Ogni cartella legge solo da quelle dei passi prima, così si rifà un passo senza ripartire da
 zero. Nelle cartelle di soli indici (2, 3, 5, 6, 7) vanno CSV, non copie delle immagini.
 
 | cartella | contenuto | passo |
@@ -16,7 +16,15 @@ zero. Nelle cartelle di soli indici (2, 3, 5, 6, 7) vanno CSV, non copie delle i
 | `5_meteo/` | `proposta.csv`, `meteo.csv` (clip, sessione, meteo), `meteo.log` | 6 |
 | `6_dedup/` | `tenuti.csv` (frame che restano) | 7 |
 | `7_conteggio/` | `conteggio.csv` (classe, fascia, istanze, frame, clip, video, sessioni) | 8 |
-| `data/aggregati/9_split/` (tutte le fonti) | `images/` e `labels/{train,val,test}` in hardlink + `manifest.json` + report | 11–14 |
+| `data/aggregati/9_split/` (tutte le fonti) | `frame.csv`, `embedding_s.npy`, grafici delle somiglianze; poi `images/` e `labels/{train,val,test}` in hardlink + `manifest.json` + report | 11–14 |
+| `data/aggregati/10_doppioni/` (tutte le fonti) | `coppie.csv`, `fogli/DNN.jpg`, `unire.txt` (risposte dell'operatore) | 11 |
+| `data/aggregati/11_gruppi/` (tutte le fonti) | `gruppi.csv` (sessione, gruppo, frame), `somiglianze_gruppi.png` | 11 |
+| `data/aggregati/12_split/` (tutte le fonti) | `split.csv` (gruppo, split), `frame_split.csv` (immagine, split), `report.csv`, `vicini.png` | 11 |
+| `data/aggregati/14_background/` (fonti di background) | `background.csv` (immagine, fonte, camera, split) | 13 |
+| `data/background/0_raw/` | `images/` (hardlink delle 3.886 scelte), `background.csv`, `rimossi.txt` | 13 |
+| `data/aggregati/15_calib/` | `calib.csv` (512 immagini del train per l'int8) | 14 |
+| `data/output/` | dataset Ultralytics in hardlink: `images/`, `labels/` (train, val, test, calib), `dataset.yaml`, `calib.yaml`, `manifest.csv` | 14 |
+| `data/aggregati/13_train_compensation/` (tutte le fonti) | `tetto.csv`, `images/` e `labels/` dei mosaici, `mosaici.csv`, `train.csv` (reali + mosaici) | 12 |
 
 ## Come rifare le aggiunte (passo 10)
 
@@ -737,8 +745,21 @@ Su tutte le fonti:
       elicotteri 8–16 762 (2.095), 16–32 1.864 (993), 64–96 2.596 (261). Droni tutti chiusi.
     - **Distribuzione delle grandezze** (22/10/2026, `tools/distribuzioni.py` -> `docs/figure/`, considerazioni in
       [`distribuzioni.md`](distribuzioni.md)): istogramma continuo per classe (box >= 8 px in origine), scale di
-      Ultralytics a 0,5 e 0,75 calcolato in modo esatto (uniforme in ±s·px) e distribuzione ideale s^−α (droni 0,3,
+      Ultralytics a 0,25 e 0,5 calcolato in modo esatto (uniforme in ±s·px) e distribuzione ideale s^−α (droni 0,3,
       altre classi 0,45). Lo scale sposta le istanze tra le fasce ma non chiude i buchi piccoli né gli uccelli grandi.
+      Rifatte il 23/10/2026 con s = 0,25 e 0,5: la prima versione usava 0,75 per errore (utente).
+      Curva ideale come linea continua e sottile invece che a gradini, sempre a 14.286 box per classe, anche in
+      `distribuzioni.png`, e stesso asse verticale nei 4 grafici (utente, 23/10/2026); tolti l'opzione `--totale` e
+      `distribuzioni_ideale_14k.png`, ora uguale a `distribuzioni_scale.png`.
+      Asse x in potenze di 2, da 4 a 512 (via 96 e 640; la linea della fascia a 96 px resta), senza tacche secondarie.
+      **Stessa curva per tutte le classi** (utente, 23/10/2026): α = 0,3 anche per aerei, elicotteri e uccelli
+      (prima 0,45), dichiarata come stima perché il dominio vero non si conosce; `regole.md` e `distribuzioni.md`
+      aggiornati, mancano ora aerei 8–16 3.142 e 16–32 868, uccelli 8–16 1.436, 64–96 748, > 96 2.861, elicotteri
+      8–16 3.245 e 16–32 1.391.
+    - **Piccoli mancanti** (utente, 23/10/2026): uccelli grandi accettati sotto la curva (difficili da trovare); per
+      i piccoli, **mosaici ridotti solo nel train** dopo split e tetto (regola in `regole.md`, passo 12). Scartati:
+      ritaglio più largo dal frame originale (zone mai riviste in CVAT, oggetti senza box) e la sola immagine
+      ridotta (Ultralytics la riporta a `imgsz`). Ordine: split di tutti i gruppi reali, tetto del train, mosaici.
       **Regola nuova** (utente, 22/10/2026, in `regole.md`): curva s^−α con 14.286 box per classe al posto dei 2.857
       per cella; drone e uccello principali, deficit di aerei ed elicotteri piccoli accettato; curva da raffinare.
       Split (utente, 22/10/2026): val segue la curva (la fitness di Ultralytics si calcola lì), test piatto per fascia.
@@ -787,9 +808,249 @@ Su tutte le fonti:
       e della sua sessione. Dopo lo split si misura il leakage rimasto: per ogni immagine di val e test la somiglianza
       DINOv2 con l'immagine più vicina del train (distribuzione nel report). `split.py` va esteso a FBD, DVIDS e
       Anti-UAV.
-12. **Bilanciamento** in ogni split: val e test piatti (~571 e ~286 per cella), train con **tetto di 4.000 per cella** (utente, 19/10/2026), tetto per sessione. Niente copie ridotte a 0,75 per la fascia 8–16: lo scale di Ultralytics in training basta (decisione dell'utente). Stima sui box proposti: train ~60.900, val + test ~14.900, fuori ~32.000 (soprattutto aerei ed elicotteri > 96).
+    - **Gruppi per frame** (utente, 23/10/2026): l'unità minima resta il video o la registrazione, mai divisa; gli
+      embedding servono solo a **unire** (quasi-duplicati anche fra video diversi, es. DVIDS che ripubblica lo
+      stesso girato), non a dividere le clip. Da qui si usano **solo i frame annotati**; i background si aggiungono
+      dopo ed ereditano lo split del loro video o gruppo. Somiglianza fra clip = 99° percentile delle coppie di frame;
+      matrice dei frame salvata su disco per tarare le soglie (sulle sessioni manuali di Svanström e FRED). Nomi
+      dei file nuovi solo all'export finale.
+    - `split.py --step frame` (23/10/2026) → `aggregati/9_split/frame.csv` (fonte, video, clip, sessione, immagine,
+      label, box): frame tenuti con almeno un box, stessi criteri dei conteggi (Svanström da `6_dedup/tenuti.csv` e
+      `4_box/manuale/`; le altre fonti come `fred.count`), senza scie e scartate. **58.960 frame, 71.423 box**:
+      Svanström 14.480, FRED 6.742, DVIDS 22.635, Anti-UAV 4.559, FBD 10.544.
+    - `split.py --step embedding` (23/10/2026) → `aggregati/9_split/embedding_{s,b,l}.npy`, un file per modello
+      (float16, 58.960 × 384/768/1.024, stesso ordine di `frame.csv`): DINOv2 ViT-S, B, L /14, CLS a norma 1,
+      640×512 → 280×224 come le strisce; i tre modelli in un solo passaggio, JPEG decodificati e ridotti sulla GPU
+      (con la decodifica su CPU la GPU restava al 2–4%). Pesi di B e L scaricati a pezzi (il proxy interrompe).
+      Tolti il vecchio passo `gruppi` a strisce di `split.py` (un'impronta per clip, 16/10) e il suo
+      `embedding_fred.npz`: lo sostituiscono gli embedding per frame (richiesta dell'utente: un file per cosa).
+    - `split.py --step somiglianze` (23/10/2026), prima prova con il solo ViT-S → `somiglianze.png`: matrice su 10 clip × 10
+      frame (due clip della stessa sessione per fonte, due video DVIDS) e distribuzione su 20.000 coppie a caso per
+      tipo. Mediane: stessa clip 0,85, stessa sessione e altra clip 0,86, sessioni diverse 0,17; le sessioni
+      diverse sopra 0,85 sono rarissime, la stessa clip ha una coda fino a ~0,1 (ritagli che si spostano, montaggi).
+    - Grafico rifatto per S, B e L (23/10/2026) → `somiglianze_{s,b,l}.png`: stessi 20 clip × 10 frame (per fonte due
+      sessioni con due clip; DVIDS quattro video) e 100.000 coppie a caso per tipo. AUC stessa sessione contro sessioni
+      diverse: **S 0,986, B 0,984, L 0,987**; mediane (stessa clip / stessa sessione / diverse): S 0,86 / 0,86 /
+      0,17, B 0,86 / 0,85 / 0,13, L 0,86 / 0,85 / 0,14. I modelli più grandi abbassano un po' le sessioni diverse ma
+      non separano meglio. A occhio: le clip di solo cielo (Svanström S084, DVIDS) si somigliano fra loro anche fra
+      fonti, e le due sessioni Anti-UAV dello stesso posto stanno a ~0,5–0,6 (leakage dello sfondo accettato).
+    - **Decisione (utente, 23/10/2026): solo ViT-S.** Tolti pesi, embedding e grafici di B e L; `MODELS` in
+      `split.py` ha solo S, l'uscita resta `embedding_s.npy`.
+    - `split.py --step somiglianze_tutte` (23/10/2026) → `aggregati/9_split/somiglianze_tutte.png`, su tutti i
+      58.960 frame, 5 s sulla GPU: matrice clip × clip (1.776 clip, somiglianza media esatta = prodotto degli
+      embedding medi, ordine fonte e sessione) e istogrammi esatti di tutte le 1,74 miliardi di coppie (bin da
+      0,005: più fini si vede il passo del float16). Coppie: stessa clip 4.935.101 (mediana 0,85), stessa sessione e
+      altra clip 8.688.865 (0,86), sessioni diverse 1.724.487.354 (0,17); **AUC 0,985**. Dentro DVIDS, Anti-UAV e
+      Svanström le clip di cielo si somigliano fra loro (0,3–0,5) e con quelle delle altre fonti di cielo; FBD
+      (uccelli su campi e alberi) sta per conto suo.
+      Matrice rifatta (utente, 23/10/2026: FRED sembrava troppo piccolo) con una riga ogni ~29 frame invece di una
+      per clip: l'area di ogni fonte è proporzionale ai frame (FRED ha 10 clip lunghe, Svanström ~320 corte). FRED
+      mostra due blocchi scuri (le coppie di sequenze 107–108 e 18–19, stessa sessione).
+    - `split.py --step anteprima [--fasce ...]` (23/10/2026) → `aggregati/9_split/anteprima_sessioni_diverse_<soglia>.jpg`:
+      coppie di frame di **sessioni diverse** per fascia di somiglianza, 6 a caso per fascia, con i box. Coppie di
+      frame / di sessioni: 0,6–0,7 44.950.240 / 193.050; 0,7–0,8 15.821.085 / 97.354; 0,8–0,9 3.108.052 / 24.708;
+      0,9–1 158.593 / 1.093; 0,95–0,99 5.524 / **146**; sopra 0,99 nessuna (su 1.116 sessioni, ~622.000 coppie).
+      Fino a 0,9 la somiglianza viene dal **cielo** (azzurro di Svanström, nuvole di DVIDS), non dalla sessione: una
+      soglia lì unirebbe tutto in un gruppo. Sopra 0,95 compaiono i veri doppioni: video DVIDS con id vicini e lo
+      stesso aereo o drone (1011221–1011396, 955172–955242), stessa camera FBD in sessioni diverse (S216–S220,
+      S137–S144; le sessioni FBD sono gruppi DINOv2 a 0,9 del frame a metà clip), insieme a qualche cielo azzurro
+      di Svanström (S003–S043).
+    - **Doppioni fra sessioni** (decisione dell'utente, 23/10/2026): niente soglia automatica sul frame intero; si
+      rivedono a mano le coppie di sessioni con almeno una coppia di frame ≥ 0,95. `split.py --step doppioni` →
+      `data/aggregati/10_doppioni/`: `coppie.csv` (n, sessione_a, sessione_b, massimo, coppie di frame ≥ 0,95,
+      frame della coppia migliore) e `fogli/D01.jpg`–`D13.jpg`, 12 righe per foglio, ordinate per fonte e
+      somiglianza: per ogni coppia di sessioni la coppia di frame più simile, poi un frame a caso di A con il frame
+      di B più simile a lui (utente: confrontare frame simili, non due frame a caso). **146 coppie**: FBD 111,
+      DVIDS 15, Svanström 12, Anti-UAV 8; nessuna fra fonti diverse. **[operatore]** i numeri da unire vanno in
+      `10_doppioni/unire.txt` (un numero per riga, `#` per i commenti), letto dal passo dei gruppi.
+    - Revisione (utente, 23/10/2026): per ogni riga 0 = solo cielo, 1 = match solo nella coppia migliore, 2 = match
+      anche nella seconda coppia (criterio: stessi elementi fissi, stessa telecamera o stesso punto, non pixel
+      identici). Esito: **tutte 2** → `unire.txt` = `1-146`. Le righe Svanström di solo cielo (135–140, 142–145:
+      S003, S011, S015, S043, S047, S067, S106–S107) l'utente non sa distinguerle: unite per prudenza, costo 853
+      frame (1,4%); la 141 è sicura. Nessun `via`: invece di togliere video
+      interi (anche i DVIDS ripubblicati, es. 1011221–1011396), dopo l'unione si tolgono i frame quasi identici
+      dentro ogni gruppo.
+    - `split.py --step gruppi` (23/10/2026) → `data/aggregati/11_gruppi/gruppi.csv` (sessione, gruppo, frame):
+      union-find delle sessioni note di ogni fonte (Svanström e FRED manuali, video DVIDS, registrazioni Anti-UAV,
+      gruppi FBD) con le coppie di `unire.txt`. **1.116 sessioni → 1.010 gruppi**, 46 con più sessioni (il più
+      grande 23); i più grandi in frame: 2.701 (4,6%), 2.502 (4,2%), 2.134 (3,6%), 1.832 (3,1%), 1.059 (1,8%).
+      Sostituisce i gruppi automatici a 0,85 del 19/10 (sopra 0,6 la somiglianza viene dal cielo) e il vecchio
+      `9_split/gruppi.csv` (tolto).
+    - **Niente deduplica dei frame fra sessioni** (23/10/2026). Provata: coppie di frame di sessioni diverse dello
+      stesso gruppo sopra 0,96 con box di uguale numero e grandezza → 234 frame a 0,96, 64 a 0,97, 6 a 0,98; a
+      occhio sono quasi tutte la stessa telecamera o lo stesso cielo con l'oggetto in un **altro punto**, cioè
+      frame diversi. Chiedendo anche la stessa posizione dei box (centri entro il 2% del frame) i doppioni veri
+      sono 158 coppie sopra 0,9 e 17 sopra 0,95, su 58.960 frame: trascurabili, e stando nello stesso gruppo non
+      danno leakage.
+    - `split.py --step somiglianze_gruppi` (23/10/2026) → `data/aggregati/11_gruppi/somiglianze_gruppi.png`: come
+      `somiglianze_tutte` con due curve in più, **stesso gruppo e altra sessione** (le coppie unite a mano:
+      3.365.602, mediana 0,72) e **gruppi diversi** (1.721.121.752, mediana 0,17), più un riquadro sulla coda in
+      scala log. Sopra 0,95: sessioni diverse 5.524 coppie, gruppi diversi **0** (per costruzione: si sono unite
+      tutte le coppie di sessioni con frame ≥ 0,95). Massimo fra gruppi diversi ~0,95; nel resto della curva
+      sessioni e gruppi diversi coincidono. Le sessioni unite si somigliano anche fuori dalla coppia migliore
+      (mediana 0,72 contro 0,17): l'unione era giusta.
+    - **Immagini con box sotto gli 8 px via da tutti gli split** (utente, 23/10/2026, in `regole.md`): 7.198 su
+      58.960; i box ≥ 8 px persi sono pochi (es. aerei 8–16 da 865 a 861).
+    - `split.py --step split` (23/10/2026) → `data/aggregati/12_split/`: ogni gruppo tutto in uno split. Obiettivi
+      per cella: val = 20% della curva (α = 0,3, 14.286 per classe), al più il 20% di quello che c'è; test piatto
+      286, al più il 30%; il resto in train. Greedy su 100 ordini a caso dei gruppi più una rifinitura (sposta un
+      gruppo alla volta finché l'errore relativo al quadrato scende); gruppi sopra il 2% delle immagini sempre in
+      train; un gruppo non può dare più del 75% dell'obiettivo di una cella (col 50% nessuna sequenza FRED entrava
+      nel test e i droni 16–32 in test erano 117 su 286). Esito: errore 0,04; **train 40.653 immagini (78,5%, 669
+      gruppi), val 7.015 (13,6%, 165), test 4.094 (7,9%, 162)**. Tutte le celle entro pochi punti dall'obiettivo
+      tranne droni 8–16 (val 738 su 801, test 266 su 286), droni 16–32 (val 593 su 651) e uccelli 64–96 (test 150
+      su 168); `report.csv` per cella. Le percentuali di immagini non sono 70/20/10 perché gli obiettivi sono in
+      istanze per cella.
+    - `split.py --step controllo` (23/10/2026) → `12_split/vicini.png`: gruppi per cella di val e test e immagine
+      più vicina del train. Varietà bassa sui droni piccoli (val 8–16 5 gruppi, test 8–16 6, test 16–32 5) e sugli
+      aerei 8–16 in val (4): i droni piccoli stanno in 32 gruppi in tutto, i più ricchi in train. Vicino più simile
+      nel train: val mediana 0,82, 99° 0,93, massimo 0,950; test 0,82, 0,94, 0,949; **nessuna immagine sopra 0,95**.
+      La mediana alta è lo sfondo (cielo con cielo), leakage accettato.
+      **Decisione (utente, 23/10/2026)**: la poca varietà dei droni piccoli in val e test si accetta e si dichiara
+      (limite in `da_decidere.md`, barra d'errore dal bootstrap per gruppo); le copie ridotte non servono, val e test
+      restano solo reali. Altre riprese vere se c'è tempo.
+    - **Tetto del train** (utente, 23/10/2026): tetto = curva (70%, 10.000 per classe) invece di 4.000 per cella,
+      così i mosaici si fanno con l'eccesso e nessun oggetto compare due volte nel train. `split.py --step mosaici`
+      → `data/aggregati/13_train_compensation/`: via, a turno fra i video, le immagini del train con tutti i box in celle sopra
+      l'obiettivo (`tetto.csv`): **17.217 su 40.653**, restano 23.436 reali. Mosaici con quelle immagini: per
+      ognuna il fattore (×0,5, ×0,25, ×0,125) che porta più box in celle mancanti, solo se tutti i box restano
+      ≥ 8 px; caselle ridotte INTER_AREA, sfocatura gaussiana σ 0,3–0,8, rumore σ 1–3, JPEG 75–92 (`mosaici.csv`).
+      Esito: **428 mosaici** (2×2 237, 4×4 154, 8×8 37) da 5.746 immagini; `train.csv` = 23.436 reali + 428
+      mosaici. Celle del train dopo i mosaici: tutte all'obiettivo tranne elicotteri 8–16 (2.087 su 2.805, finite
+      le sorgenti) e uccelli 64–96 (301 su 917) e > 96 (97 su 2.149), accettati. L'ultimo mosaico di ogni griglia
+      si completa ripetendo caselle dello stesso mosaico (3 mosaici).
+    - **Background, fonte Clouds-1500** (23/10/2026; CC BY 4.0, in `licenze.md`): tar unico da 1,78 GB dalla API
+      pubblica di Mendeley (`public-api/datasets/2khchjbgzr/files?version=2`), sha256 verificato, in
+      `data/clouds1500/0_raw/clouds1500.tar`; estratte solo `img/` e `ann/` in `0_raw/estratto/`. **1.500 immagini
+      2592×1944**, 19 cartelle, due camere (nord e sud) in un solo posto, 2021–2022, a grandangolo; annotazioni a
+      poligoni dei tipi di nuvola (stratocumuliformi 3.452, cirriformi 1.277, cumuliformi 1.172, stratiformi 1.016)
+      e degli alberi (1.709), nessuna delle nostre classi. Anteprima di 40 a caso in `data/clouds1500/anteprima/`:
+      sereno, nuvole sparse, cirri, coperto grigio, alba e tramonto; niente pioggia né nebbia; data e ora stampate
+      in basso a destra (da tagliare).
+    - **Background, fonte Skyfinder** (23/10/2026; licenza incerta, eccezione dichiarata dall'utente in
+      `licenze.md`): `OriginalImages.zip` (4,0 GB, md5 verificato) dal record Zenodo 2562396 in
+      `data/skyfinder/0_raw/`, estratto in `0_raw/estratto/`. **38.522 immagini in 40 cartelle**: 39 webcam AMOS
+      (città, laghi, montagne, coste; neve, nuvole, sereno, tramonto; anche notte) e `GSV` (Google Street View,
+      407, panoramiche: **esclusa**). Risoluzioni da 320×240 a 1296×960: solo **18 camere** arrivano a 640×512
+      senza ingrandire, **20.232 immagini**. Molte inquadrature hanno più terra che cielo, scritte e date in
+      sovraimpressione e immagini notturne: i ritagli vanno presi sulla fascia cielo e orizzonte, via le scure.
+      Anteprima, una per camera: `data/skyfinder/anteprima/camere.jpg`.
+    - **Pipeline del background** (23/10/2026, `tools/background.py`, lanciata da
+      `data/aggregati/background_pipeline.sh`, log in `background_pipeline.log`), una cartella per passo e fonte:
+      - `1_ritagli/`: ritagli 640×512 senza ridimensionare, angolo in alto a sinistra a caso nella metà alta
+        (cielo e orizzonte, lontano dalle scritte in basso), via i ritagli con luminosità media < 35 (notte);
+        Clouds-1500 due per immagine, Skyfinder uno (`ritagli.csv`: ritaglio, sorgente, camera, x0, y0).
+        Clouds-1500 2.995 ritagli (5 scuri), Skyfinder 20.230 (2 scuri).
+      - `2_detector/`: la YOLO delle proposte (`yolo26m-intern.pt`, le 4 classi) a confidenza 0,1; un ritaglio con
+        una detection va via (`esclusi.csv`). Clouds-1500 81 via, Skyfinder 1.273; a occhio gli esclusi sono uccelli
+        veri (anche uno stormo), un aliante a terra e molti falsi allarmi su tetti e nuvole: si butta volentieri.
+      - `3_dedup/`: DINOv2 ViT-S (`split.embed`, ora funzione comune), per camera un ritaglio resta se la
+        somiglianza con quelli già tenuti è < 0,95. Clouds-1500 2.151 su 2.914, Skyfinder 14.915 su 18.957.
+      - `anteprima/`: `tenuti.jpg` e `esclusi.jpg`, 48 a caso. Nei tenuti anche viste di città con molta terra e
+        qualche crepuscolo: negativi utili, anche se meno "verso il cielo" dei nostri.
+      - `data/aggregati/14_background/background.csv` (immagine, fonte, camera, split): background = 10% di ogni
+        split (immagini / 9); camere intere in uno split, le grandi prima nello split più indietro; dentro lo split
+        a turno fra le camere. **train 2.652** (Clouds-1500 1.108, Skyfinder 1.544; 26 camere), **val 779** (373,
+        406; 7), **test 455** (163, 292; 4). Le cartelle di Clouds-1500 sono due camere nello stesso posto: lo
+        sfondo può ripetersi fra split (leakage dello sfondo accettato).
+      - `background.py --step raccolta` (utente, 23/10/2026: un dataset `background` a sé) → `data/background/0_raw/`:
+        le 3.886 immagini scelte in **hardlink** in `images/` (stesso nome del ritaglio, nessuno spazio in più) e
+        `background.csv` (immagine, sorgente, fonte, camera, split). Base per la revisione a mano degli sfondi.
+      - Revisione a mano (utente, 23/10/2026): **17 sfondi tolti** perché avevano oggetti (13 della camera Skyfinder
+        7211; 16 train, 1 val), "minuzie trascurabili". Registrati in `data/background/0_raw/rimossi.txt`, che la
+        `raccolta` salta.
+    - **Export** (`split.py --step export`, 23/10/2026) → `data/output/` (cancellato e rifatto ogni volta), struttura
+      Ultralytics in hardlink: `images/{train,val,test}/`, `labels/{train,val,test}/` con lo stesso nome,
+      `dataset.yaml` (classi 0 airplane, 1 bird, 2 drone, 3 helicopter), `manifest.csv` (immagine, split, tipo,
+      sorgente); il background senza label. **train 26.500** (23.436 reali, 428 mosaici, 2.636 background), **val
+      7.793** (7.015 + 778), **test 4.549** (4.094 + 455). Verificato con il loader di Ultralytics
+      (`YOLODataset`): 0 corrotte, val 8.542 box, test 5.248 box. Non ancora il dataset finale della consegna
+      (mancano sottoinsiemi per fascia, mosaici di deploy, report, congelamento).
+    - **Calibrazione int8** (utente, 23/10/2026: 512 bastano, bilanciate per classe e grandezza):
+      `split.py --step calib` → `data/aggregati/15_calib/calib.csv` (immagine, label, tipo, cella): solo train e
+      solo immagini vere (niente mosaici), 51 background (10%) e 461 con oggetti, 23–24 per ognuna delle 20 celle
+      classe × fascia, a turno fra i video (352 video). L'export le mette in `data/output/images/calib` e
+      `labels/calib` (hardlink, copie in più di immagini del train) con `calib.yaml` (train e val = calib), da
+      passare a Ultralytics per l'export int8, che calibra sullo split val.
+    - **Nomi nell'export** (utente, 23/10/2026; prima i nomi delle fonti): reale `R_<gruppo>_<hash8>_<n>` (hash8 =
+      primi 8 caratteri dello sha1 di `fonte:clip`, n a 6 cifre in ordine di frame dentro la clip), mosaico
+      `M_x<griglia>_<n>` (numero del mosaico), background `B_<hash8 di fonte:camera>_<n>`; calib con lo stesso
+      nome dell'immagine del train. Lo script controlla che hash e nomi siano unici. `manifest.csv` ora ha
+      immagine, split, tipo, gruppo, fonte, clip (o camera), frame originale, sorgente. I file originali non cambiano.
+    - **Documentazione nell'export** (utente, 23/10/2026): `data/output/README.md` (dal modello
+      `docs/output_readme.md`, con i conteggi): classi, contenuto degli split, legenda dei nomi (R, M, B, gruppo,
+      hash, n), come risalire all'origine col manifest (ora con la colonna `sessione`), fonti con licenza, link di
+      download e attribuzione, eccezioni (FBD, Skyfinder). `fonti_dvids.csv`: i 567 video DVIDS usati (id, titolo,
+      autore, licenza, url). `distribuzione.png`: istanze per grandezza e classe in train, val e test con le curve
+      obiettivo di train e val.
+    - `data/output/raw/` (utente, 23/10/2026): `images/` e `labels/` di train, val e test insieme (senza calib), per
+      chi vuole rifare gli split: 38.842 immagini, 34.973 label.
+    - **Ordine delle classi nell'export** (utente, 23/10/2026): **0 drone, 1 airplane, 2 helicopter, 3 bird**. Le label
+      del repo restano nell'ordine di AOD4 (airplane, bird, drone, helicopter): l'export le riscrive (non più
+      hardlink), le immagini restano hardlink. Controllo: una label di V_AIRPLANE_001 esce con l'id 1.
+    - **Distribuzione dentro le fasce** (utente, 23/10/2026, dopo `distribuzione.png`: picco dei droni a ~90 px in
+      train e val). Causa: tetto e split controllavano solo le 5 fasce, e dentro ">96" (96–320 px) la forma era
+      libera. Ora val (obiettivo) e tetto del train usano **mezze ottave** (`FINE` in `split.py`: 8, 11, 16, 23, 32,
+      45, 64, 91, 128, 181, 256 px e oltre); il test resta piatto sulle 5 fasce. Split con 400 ordini a caso:
+      errore 0,15; val per mezza ottava quasi tutto entro pochi punti, droni 8–16 in val 684 su 801 e 16–32 nel test
+      246 su 286. Tetto: via 17.569 immagini del train, 403 mosaici da 5.887 immagini; il train segue la curva per
+      mezza ottava tranne uccelli sopra 64 px (accettato), elicotteri 8–11 (789 su 1.475, finite le sorgenti),
+      droni e aerei sopra 256 px (99 e 217 su 342). Rifatti background (train 2.559 dopo i 17 tolti a mano, val 756,
+      test 524), calib (345 video), export: **train 25.634** (22.672 reali, 403 mosaici, 2.559 background), **val
+      7.559**, **test 5.242**; vicino più simile nel train sempre < 0,95. Val e test solo reali (utente).
+    - Grafici senza la linea verticale a 96 px (utente, 23/10/2026): in `distribuzioni.py` le linee solo a 8, 16,
+      32, 64; in `distribuzione.png` nessuna linea di fascia.
+    - **Minimi per classe** (utente, 23/10/2026): almeno **10.000** istanze nel train, **2.000** in val, **1.000** nel
+      test. Scelte, in ordine:
+      - curva **alzata ×1,2** per tutte le classi (`SCALA` in `distribuzioni.py`): la stessa curva traslata fa da
+        tetto del train (sopra) e da obiettivo dei mosaici (sotto), così la forma s^−0,3 resta; obiettivo del val
+        il 20% della stessa curva. Prima prova con fattori diversi per classe (fino a ×3): tetto e mosaici su curve
+        diverse deformavano il train, scartata;
+      - **uccelli sopra i 96 px solo nel train** (utente: troppo pochi): i gruppi con uccelli > 96 px non vanno in
+        val e test, e la curva degli uccelli si ferma a 96 (`CUT`). La fascia 64–96 degli uccelli resta in val e
+        test, poca (val 78, test 81): risultato da leggere con la barra d'errore;
+      - **mosaici anche da copie ridotte di immagini del train** (utente: va bene se un'immagine compare più volte,
+        purché ridotta), dopo l'eccesso del tetto;
+      - **test uniforme in log s** (utente: l'ideale del test è piatto): 1.430 per classe ripartiti per mezza ottava
+        (`TEST_TOT`, `distribuzioni.uniforme`), al più il 30% di quello che c'è, alzati se servono per arrivare a
+        1.050; prima era piatto sulle 5 fasce (gobba dei droni a 64–96 px, fascia stretta);
+      - nello split una **penalità** per ogni classe sotto il minimo di val o test (`MIN_SPLIT`, `_obj`): senza, gli
+        uccelli nel test restavano a 936–977;
+      - split **in parallelo** su 20 core (`_split_trial`, 400 tentativi in ~15 s invece di ~2 min).
+      Esito: train aerei 12.090, uccelli 11.163, droni 11.471, elicotteri 12.412 (con 929 mosaici); val 2.291,
+      2.265, 3.067, 2.166; test 1.341, 1.246, 1.411, 1.369. Export: **train 30.849** (26.841 reali, 929 mosaici,
+      3.079 background), **val 9.180**, **test 5.106**; vicino più simile nel train < 0,95.
+    - **Grafico da tesi** `data/output/distribuzione.{png,pdf}` (utente, 23/10/2026): testi in italiano, senza titolo
+      (va nella didascalia), pannelli (a)–(d); train in blu (reali) e giallo (mosaici sintetici), validazione e test
+      a linee, ombra grigia dei dati originali (tutte le 58.960 immagini annotate, anche sotto gli 8 px), obiettivi in
+      nero (continua, tratteggiata, punteggiata per il test uniforme), asse verticale logaritmico; in alto a destra
+      istanze ed errore per split, Σ|osservato − obiettivo| / Σ obiettivo sulle mezze ottave. Errori: train 4–9%,
+      test 7–15%, val 13% droni e 35–37% le altre (mancano aerei ed elicotteri piccoli veri).
+    - Ritocchi (utente, 23/10/2026): tabella di istanze ed errore fuori dal grafico, in `data/output/distribuzione.md`
+      (generata insieme alla figura, con il dettaglio per mezza ottava e classe); numeri dell'asse x anche nei pannelli
+      in alto; asse verticale logaritmico (provato lineare: validazione e test schiacciati in basso; l'utente torna al logaritmico). Train a
+      **quarti d'ottava** per tetto e mosaici (`QUARTI`): droni 8–11 px nel train 1.778 su 1.770. Split con peso ×4
+      sui droni e 1.000 tentativi: l'errore dei droni non scende (val 14%, test 11%) perché val e test possono avere
+      al più il 20% e il 30% dei droni di ogni intervallo e i droni grandi sono pochi; l'utente accetta così. Nel val
+      degli aerei c'è un picco intorno ai 45 px (un gruppo con molti aerei di quella grandezza).
+      Export: train 30.579 (26.580 reali, 949 mosaici, 3.050 background), val 9.013, test 5.165.
+    - **Grafico del leakage** (utente, 23/10/2026), nell'export: `data/output/leakage.{png,pdf,md}` (`_leakage_plot`).
+      Per ogni immagine reale di val e test la somiglianza DINOv2 con la più vicina del train, contro due riferimenti
+      nel train: stesso gruppo e altra clip (leakage vero) e gruppi diversi (fondo). (a) densità, (b) quota sopra ogni
+      soglia in scala log. Mediane: val 0,820, test 0,818, fondo 0,819, leakage 0,954; sopra 0,95: val e test 0%,
+      leakage 53%. Val e test coincidono con il fondo anche fra 0,85 e 0,95; il taglio a 0,95 è in parte per
+      costruzione (le coppie sopra 0,95 sono state unite). Sostituisce `12_split/vicini.png` per la tesi.
+      Rifatto per leggibilità (utente, 23/10/2026): (a) un violino orizzontale per confronto (mediana e quartili,
+      mediana scritta a destra) invece di quattro istogrammi sovrapposti, (b) legenda sotto i pannelli; asse x che
+      allarga la zona vicino a 1 (−log10(1 − s), tacche 0,5 – 0,9 – 0,99 – 0,999, linea a 0,95): si vede la coda del
+      leakage fino a 0,998, mentre val, test e fondo si fermano prima di 0,95.
+    - **Niente sottoinsiemi per fascia** (utente, 23/10/2026): provati come cartelle (immagini con tutti i box nella
+      fascia) e tolti, perché perdevano fino al 61% dei box di aerei ed elicotteri (formazioni). La mAP per fascia si
+      calcola in yoloeval.
+12. **Bilanciamento** in ogni split: val e test piatti (~571 e ~286 per cella), train con **tetto di 4.000 per cella** (utente, 19/10/2026), tetto per sessione. Piccoli del train: **mosaici di ritagli ridotti** dalle immagini fuori dal tetto (utente, 23/10/2026, in `regole.md`; prima "niente copie ridotte, basta lo scale", decisione del 19/10). Stima sui box proposti: train ~60.900, val + test ~14.900, fuori ~32.000 (soprattutto aerei ed elicotteri > 96).
 13. **Background** circa 10%.
-14. **Mosaici di deploy, report, manifest**, bootstrap per sessione su val e test, **congelamento**.
+14. **Report, manifest**, **congelamento**. Mosaici di deploy, mAP per fascia e bootstrap per gruppo si fanno in
+    yoloeval (utente, 23/10/2026).
 
 ## Da cambiare in `tools/svanstrom.py`
 

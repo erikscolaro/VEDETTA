@@ -15,7 +15,9 @@ Da `NEW_MASTERPLAN.md` (§2, §5).
 - Fasce: **8–16, 16–32, 32–64** (AI-TOD), **64–96, > 96** (COCO). La 8–16 è in tutti gli split (decisione
   dell'utente, 19/10/2026; prima gli oggetti sotto i 16 px stavano solo nel train).
 - Oggetti con area **sotto i 4 px²** (√(w·h) < 2 px: 4×1, 2×2…): via (label tolta; utente, 19/10/2026, prima
-  era "sotto i 4 px" di lato). Fino a 8 px: solo nel train, con la label, senza obiettivo.
+  era "sotto i 4 px" di lato). **Immagini con un box sotto gli 8 px (√(w·h)): via da tutti gli split**, train compreso (utente, 23/10/2026;
+  prima "fino a 8 px solo nel train"). Si toglie l'immagine intera: togliere solo il box lascerebbe un oggetto
+  senza label.
 - **Niente dominio notturno** (utente, 19/10/2026): via i ritagli bui (luminosità media < 35) di Anti-UAV e DVIDS
   (luci nel buio, visori notturni); di notte c'erano quasi solo droni. Lo scenario è diurno.
 - **Fumo degli airshow** = scia (utente, 19/10/2026): via i tratti DVIDS con scie di fumo o condensa.
@@ -24,8 +26,10 @@ Da `NEW_MASTERPLAN.md` (§2, §5).
 - Celle accettate sotto il margine: elicotteri 16–32 (utente, 19/10/2026).
 - **Obiettivo: distribuzione continua per classe** (decisione dell'utente del 22/10/2026, sostituisce i 2.857
   per cella del 19/10/2026): **14.286 box per classe** in tutto (10.000 nel train, Ultralytics, con lo split
-  70/20/10), con densità in log s proporzionale a **s^−α tra 8 e 320 px** (s = √(w·h)): **α = 0,3 per i droni,
-  0,45 per uccelli, aerei ed elicotteri**. Più esempi dove gli oggetti sono piccoli: è lì che la torretta deve
+  70/20/10), con densità in log s proporzionale a **s^−α tra 8 e 320 px** (s = √(w·h)): **α = 0,3 per tutte le classi**
+  (utente, 23/10/2026; prima 0,45 per uccelli, aerei ed elicotteri). È una **stima**: il dominio vero non lo
+  conosciamo e non abbiamo dati per misurarlo, quindi è il nostro best guess; la stessa curva per tutte evita che
+  il modello leghi la classe alla grandezza. Più esempi dove gli oggetti sono piccoli: è lì che la torretta deve
   vederli e che le classi si confondono. Ragionamento e grafici in [`distribuzioni.md`](distribuzioni.md).
 - **Priorità**: drone e uccello sono le classi principali (distinguere un drone da un uccello); aereo ed
   elicottero sono secondarie (un aereo o un elicottero che arriva alla base si sa). Il deficit sotto la curva di
@@ -37,10 +41,20 @@ Da `NEW_MASTERPLAN.md` (§2, §5).
   `distribuzioni.md`, perché la fitness di Ultralytics (scelta di `best.pt`) si calcola sul val e deve pesare le
   grandezze come in esercizio; **test piatto** per fascia (~286 per cella; nelle celle sotto il minimo il 30% delle
   istanze), per una precisione per fascia affidabile. In val un minimo per fascia anche dove la curva è bassa
-  (150–200), perché un peggioramento sui grandi resti visibile. **Train con tetto di 4.000 istanze per cella**
-  (sopra si scarta, sotto si tiene tutto). Niente
-  copie ridotte per la fascia 8–16: lo scale lo fa Ultralytics in training (`scale: 0.25`, zoom 0,75–1,25). Stima
-  sui box proposti: train ~60.900, val + test ~14.900.
+  (150–200), perché un peggioramento sui grandi resti visibile. **Train con tetto = curva** (utente, 23/10/2026; prima 4.000 per
+  cella): il 70% della curva, 10.000 per classe, per mezza ottava di grandezza (anche l'obiettivo del val); curva **alzata ×1,2** e minimi di **10.000 / 2.000 /
+  1.000** istanze per classe in train / val / test (utente, 23/10/2026); test **uniforme** in log s; **uccelli sopra i
+  96 px solo nel train** (troppo pochi per val e test); sopra si scarta (e diventa materiale per i mosaici), sotto si
+  tiene tutto. Stima sui box proposti: train ~60.900, val + test ~14.900.
+- **Mosaici ridotti per i piccoli del train** (utente, 23/10/2026; sostituisce "niente copie ridotte, basta lo
+  scale di Ultralytics", che con 0,25 non chiude nessun buco): dopo lo split e il tetto, con le immagini del
+  train rimaste fuori dal tetto si fanno mosaici 640×512 di 2×2, 4×4 o 8×8 ritagli ridotti (×0,5, ×0,25,
+  ×0,125), a turno fra i video, ognuno usato una volta, solo se tutti i box restano ≥ 8 px; label dei ritagli
+  ridotte e spostate; trasformazioni leggere (sfocatura lieve,
+  rumore, JPEG) perché l'oggetto ridotto non sia più nitido di uno vero; un CSV con sorgenti, fattore e
+  trasformazioni. **Solo nel train**, fino alla curva; val e test solo reali. Non il ritaglio più largo dal frame
+  originale (zone mai riviste, oggetti senza box) né la sola immagine ridotta (Ultralytics la ingrandirebbe di
+  nuovo a `imgsz`).
 
 ## Annotazione
 
@@ -112,9 +126,8 @@ da tenere pulito è il **drone e la sua traiettoria** (lo stesso volo mai in due
 | cosa | dettaglio |
 |---|---|
 | `all/` | train, val, test, `calib` (512 immagini di train), `dataset.yaml` |
-| sottoinsiemi per fascia | val e test, per la mAP per fascia con il `val` standard |
-| `val_480p`, `val_720p`, `val_1080p` | mosaici, ingressi 864×480, 1280×736, 1920×1088 |
-| `test_480p`, `test_720p`, `test_1080p` | come sopra, chiusi fino alla fase 5 |
+| mAP per fascia | in yoloeval, non qui (utente, 23/10/2026) |
+| mosaici di deploy | in yoloeval, non qui (utente, 23/10/2026); regole sotto |
 | report | matrice classe × fascia per split (istanze e video), quota per fonte, background, oggetti < 16 px, larghezza dei box originali di Svanström |
 | `manifest.json` | fonti, parametri, frame, hash; poi il dataset si congela |
 
