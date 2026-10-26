@@ -11,7 +11,7 @@ tight (seen on 19/10/2026), class 1.
     python tools/extra_sources.py --fonte fbd --step frame        # zip in data/fbd_sv/0_raw -> 1_frame
     python tools/extra_sources.py --fonte fbd --step catena       # annotati, dedup, crop, proposals
     python tools/extra_sources.py --fonte fbd --step sessioni     # DINOv2 clip groups -> 6_sessioni
-    python tools/extra_sources.py --fonte fbd --step conta        # -> 7_conteggio, then tools/buchi.py
+    python tools/extra_sources.py --fonte fbd --step conta        # -> 7_conteggio
     python tools/extra_sources.py --fonte fbd --step cvat
 
 DVIDS (military airplanes and helicopters, PUBLIC DOMAIN videos only): page URLs
@@ -173,6 +173,74 @@ def download_image_frames(src: Path, every: int = 25, workers: int = 16) -> None
         if not any((d / "labels").iterdir()):
             shutil.rmtree(d)
     print(f"auav: {n} frame, scaricati {sum(res)} su {len(jobs)}")
+
+
+def antiuav_extra(offset: int = 12, every: int = 25, smin: float = 32, per_video: int = 30, seed: int = 0) -> None:
+    """More drones in the sky (user, 26/10/2026: the drone class must be complete): Anti-UAV300 frames with index
+    = `offset` mod `every` (between the frames already used), a drone above `smin` px, at most `per_video` per video
+    (evenly spread; all the frames above 128 px first, they are rare), from the Hugging Face
+    mirror (MIT), cropped 640x512 around the drone without resizing. Original Anti-UAV labels (hand-made, one drone
+    per frame), not reviewed in CVAT: to be checked on a sample. Writes `input/anti_uav/8_extra/{images,labels}`
+    and `extra.csv` (video, sessione, immagine, label)."""
+    import cv2
+
+    import math
+    from collections import defaultdict
+
+    rng = np.random.default_rng(seed)
+    src = INPUT / "anti_uav"
+    W, H = 640, 512
+    out = src / "8_extra"
+    for d in ("full", "images", "labels"):
+        (out / d).mkdir(parents=True, exist_ok=True)
+    ses = {r["clip"].split("/")[0]: r["sessione"] for r in csv.DictReader(open(src / "6_sessioni" / "sessioni.csv"))}
+    jobs, lab = [], {}
+    for ln in open(src / "0_raw" / "all_labels.txt"):
+        f, b = ln.rstrip("\n").split("|||")
+        p = b.split()
+        vid, i = Path(f).stem.rsplit("_", 1)
+        if len(p) < 5 or int(i) % every != offset or f"AUAV_{vid}" not in ses:
+            continue
+        x, y, w, h = (float(v) for v in p[1:5])
+        if math.sqrt(w * 1920 * h * 1080) <= smin:
+            continue
+        stem = f"AUAV_{vid}_f{int(i):05d}"
+        lab[stem] = (vid, x, y, w, h, f, math.sqrt(w * 1920 * h * 1080))
+    by_v = defaultdict(list)
+    for stem, v in sorted(lab.items()):
+        by_v[v[0]].append(stem)
+    keep = set()
+    for vid, stems in by_v.items():
+        big = [t for t in stems if lab[t][6] > 128]
+        rest = [t for t in stems if lab[t][6] <= 128]
+        k = max(0, per_video - len(big))
+        keep |= set(big) | {rest[j] for j in np.linspace(0, len(rest) - 1, min(k, len(rest))).astype(int)} if rest else set(big)
+    lab = {t: v[:5] + (v[5],) for t, v in lab.items() if t in keep}
+    for stem, v in lab.items():
+        if not (out / "full" / f"{stem}.jpg").exists():
+            jobs.append((ANTIUAV_URL + v[5].replace(".txt", ".jpg"), out / "full" / f"{stem}.jpg"))
+    with ThreadPoolExecutor(16) as ex:
+        list(ex.map(_get_image, jobs))
+    rows = []
+    for stem, (vid, x, y, w, h, _) in sorted(lab.items()):
+        im = cv2.imread(str(out / "full" / f"{stem}.jpg"))
+        if im is None:
+            continue
+        Hh, Ww = im.shape[:2]
+        x1, y1 = max(0.0, (x - w / 2) * Ww), max(0.0, (y - h / 2) * Hh)  # boxes cut by the frame border: visible part
+        x2, y2 = min(float(Ww), (x + w / 2) * Ww), min(float(Hh), (y + h / 2) * Hh)
+        if x2 - x1 > W or y2 - y1 > H or Ww < W or Hh < H:
+            continue
+        x0 = int(rng.uniform(max(0, x2 - W), min(x1, Ww - W) + 1e-6))
+        y0 = int(rng.uniform(max(0, y2 - H), min(y1, Hh - H) + 1e-6))
+        cv2.imwrite(str(out / "images" / f"{stem}.jpg"), im[y0:y0 + H, x0:x0 + W], [cv2.IMWRITE_JPEG_QUALITY, 95])
+        (out / "labels" / f"{stem}.txt").write_text(f"2 {((x1 + x2) / 2 - x0) / W:.6f} {((y1 + y2) / 2 - y0) / H:.6f} "
+                                                    f"{(x2 - x1) / W:.6f} {(y2 - y1) / H:.6f}\n")
+        rows.append((f"AUAV_{vid}", ses[f"AUAV_{vid}"], f"input/anti_uav/8_extra/images/{stem}.jpg",
+                     f"input/anti_uav/8_extra/labels/{stem}.txt"))
+    with open(out / "extra.csv", "w", newline="") as fh:
+        csv.writer(fh).writerows([("video", "sessione", "immagine", "label")] + rows)
+    print(f"antiuav: {len(rows)} frame con drone > {smin:g} px -> {out}")
 
 
 # --- DVIDS -----------------------------------------------------------------------
@@ -753,7 +821,7 @@ def sessions(src: Path, thr: float = 0.9) -> None:
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--fonte", choices=list(SOURCES), required=True)
-    p.add_argument("--step", required=True, choices=["frame", "escludi", "fogli_fumo", "fumo", "fogli_grigi", "grigi", "fogli_verdi", "verdi", "cerca", "info", "anteprima", "doppioni", "scegli", "fogli", "catena", "sessioni",
+    p.add_argument("--step", required=True, choices=["frame", "frame_extra", "escludi", "fogli_fumo", "fumo", "fogli_grigi", "grigi", "fogli_verdi", "verdi", "cerca", "info", "anteprima", "doppioni", "scegli", "fogli", "catena", "sessioni",
                                                      "conta", "cvat", "cvat_import"])
     p.add_argument("--seq", nargs="+", default=[], help="sequenze (vuoto: tutte quelle in 1_frame)")
     p.add_argument("--secondi", type=float, default=0, help="DVIDS frame: secondi nuovi per classe in questo giro (0: tutti)")
@@ -771,6 +839,8 @@ def main(argv=None) -> int:
             download_image_frames(src)
         else:
             video_frames(src, a.seq, a.secondi, a.grandezza, a.classe, min_size=a.minimo)
+    if a.step == "frame_extra":  # Anti-UAV: more drones in the sky, between the frames already used (26/10/2026)
+        antiuav_extra()
     if a.step == "cerca":
         search_videos(src, cls=a.classe)
     if a.step == "escludi":

@@ -15,7 +15,11 @@ data/intermediate/*
 data/output/*
 !data/output/.gitkeep
 
+# pesi dei modelli (.pt): solo la cartella; il detector delle proposte e' privato e non va mai in git
+models/*
+!models/.gitkeep
+
 # impostazioni e appunti locali
 .env
-STATUS.md
 docs/procedura.md
+TODO.md

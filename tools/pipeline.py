@@ -334,7 +334,7 @@ def count(src: Path) -> None:
     """Step 7: instances, frames, clips, videos and sessions per class x
     band cell on the boxes of `5_box/manuale/` (from CVAT) for the reviewed sequences, of
     `5_box/proposte/` for the others, for the sequences in `6_sessioni/sessioni.csv` ->
-    `7_conteggio/conteggio.csv`, same format as Svanstrom (for tools/buchi.py)."""
+    `7_conteggio/conteggio.csv`, same format as Svanstrom."""
     from collections import defaultdict
 
     from tools.common import NAMES

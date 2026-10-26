@@ -1,37 +1,54 @@
-# Single plot style: plt.style.use(tools.plots.STYLE).
-# Sizes meant for 1:1 printing in the thesis (figure.figsize = text width):
-# the fonts stay the ones written here even inside the final PDF.
+# Single plot style of the thesis and the papers: tools.plots.use(lang) (decimal comma in Italian).
+# Two-column page (user, 26/10/2026): figures at full page width, 7.16 in (tools.plots.WIDTH), printed 1:1, so the
+# sizes written here are the ones in the PDF. One text size for everything (8 pt), 7 pt for ticks, legends and notes.
 
-figure.figsize: 5.9, 3.6
+figure.figsize: 7.16, 2.6
 figure.dpi: 120
 figure.constrained_layout.use: True
 savefig.dpi: 300
 savefig.bbox: tight
-savefig.pad_inches: 0.03
+savefig.pad_inches: 0.02
 pdf.fonttype: 42
 ps.fonttype: 42
 
-font.size: 9
-axes.titlesize: 10
-axes.labelsize: 9
-xtick.labelsize: 8
-ytick.labelsize: 8
-legend.fontsize: 8
+font.size: 8
+text.color: 222222
+mathtext.default: regular
+axes.titlesize: 8
+axes.titlelocation: left
+axes.titlepad: 4
+axes.labelsize: 8
+axes.labelpad: 3
+xtick.labelsize: 7
+ytick.labelsize: 7
+legend.fontsize: 7
 legend.frameon: False
+legend.handlelength: 1.6
+legend.columnspacing: 1.4
 
 axes.spines.top: False
 axes.spines.right: False
-axes.edgecolor: 666666
-axes.labelcolor: 333333
-xtick.color: 666666
-ytick.color: 666666
+axes.linewidth: 0.6
+axes.edgecolor: 555555
+axes.labelcolor: 222222
+xtick.color: 555555
+ytick.color: 555555
+xtick.labelcolor: 333333
+ytick.labelcolor: 333333
+xtick.major.width: 0.6
+ytick.major.width: 0.6
+xtick.minor.width: 0.4
+ytick.minor.width: 0.4
+xtick.major.size: 3
+ytick.major.size: 3
 axes.grid: True
 axes.axisbelow: True
-grid.color: e5e5e5
-grid.linewidth: 0.6
+grid.color: e6e6e6
+grid.linewidth: 0.5
 
-lines.linewidth: 2
-lines.markersize: 5
+lines.linewidth: 1.2
+lines.markersize: 4
+patch.linewidth: 0.6
 image.cmap: Blues
 
 # validated categorical palette (colorblind-safe on adjacent pairs), in

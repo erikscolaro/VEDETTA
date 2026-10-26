@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Continuous distribution of the size sqrt(w*h) per class on the final labels (same frames as
-tools/buchi.py: Svanström on the kept frames, additions from 5_box/manuale), boxes >= 8 px at origin.
+"""Continuous distribution of the size sqrt(w*h) per class on the final labels
+(Svanström on the kept frames, the other sources from 5_box/manuale), boxes >= 8 px at origin.
 
 Two figures in docs/figure/ (rationale in README, Rules), with the ideal curve (TOTAL raised per class with SCALE)
 as a continuous line and the same vertical axis in the 4 plots:
-- distribuzioni.png: histogram per class with the instances per band (red: below the per-cell minimum);
-- distribuzioni_scale.png: the same with the Ultralytics scale (s = 0.25 and 0.5) computed exactly.
+- it_size_review.png: histogram per class with the instances per band (red: below the per-cell minimum);
+- it_size_scale.png: the same with the Ultralytics scale (s = 0.25 and 0.5) computed exactly.
 
     python tools/distributions.py
 """
@@ -22,7 +22,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.common import INPUT, NAMES  # noqa: E402
-from tools.plots import _P, STYLE, WIDTH, save  # noqa: E402
+from tools.plots import _P, WIDTH, save, use  # noqa: E402
 
 OUT = ROOT / "docs" / "figure"
 W, H = 640, 512
@@ -110,74 +110,72 @@ def curve(n: int, alpha: float, smax: float = SMAX) -> tuple[np.ndarray, np.ndar
     return s, n * s ** -alpha * dlog * alpha / (SMIN ** -alpha - smax ** -alpha)
 
 
-def _axes(ax, c: str, n: int) -> None:
+ORDER = ["drone", "airplane", "helicopter", "bird"]  # class order of the dataset and of the other figures
+CLASS_IT = {"drone": "Drone", "airplane": "Aereo", "helicopter": "Elicottero", "bird": "Uccello"}
+
+
+def _axes(ax, k: int, c: str, n: int) -> None:
     from matplotlib.ticker import NullLocator
 
-    ax.axvspan(2, 8, color="0.92", zorder=0)
+    ax.axvspan(2, 8, color="0.93", lw=0, zorder=0, label="Escluse (< 8 px)")
     ax.set_xscale("log")
     ax.set_xlim(2, 512)
     ticks = [4, 8, 16, 32, 64, 128, 256, 512]  # powers of 2
-    ax.set_xticks(ticks)
-    ax.set_xticklabels([str(v) for v in ticks])
+    ax.set_xticks(ticks, [str(v) for v in ticks])
     ax.xaxis.set_minor_locator(NullLocator())  # the base-10 minor ticks do not fall on the powers of 2
-    ax.set_title(f"{c} ({n:,} box)".replace(",", "."), fontsize=8)
+    ax.set_title(f"({'abcd'[k]}) {CLASS_IT[c]}, " + f"{n:,}".replace(",", ".") + " box")
+
+
+def _labels(f, axs, y: str) -> None:
+    for ax in axs[1]:
+        ax.set_xlabel("Lato della box √(w·h) [px]")
+    for ax in axs[:, 0]:
+        ax.set_ylabel(y)
+    hs, ls = axs[0, 0].get_legend_handles_labels()
+    f.legend(hs, ls, loc="outside lower center", ncol=len(hs))
 
 
 def fig_current(size: dict, plt) -> Path:
-    f, axs = plt.subplots(2, 2, figsize=(WIDTH, WIDTH * 0.72), sharex=True, sharey=True)
+    """Sizes after the CVAT review, with the boxes per band (red: under the per-cell minimum) and the ideal curve."""
+    f, axs = plt.subplots(2, 2, figsize=(WIDTH, 4.6), sharex=True, sharey=True)
     hs = {c: expected(size[c], 0, BINS) for c in CLASSES}
     top = max(max(hs[c].max(), curve(TOT[c], ALPHA[c], CUT[c])[1].max()) for c in CLASSES) * 1.3  # same axis for all 4
-    for ax, c in zip(axs.flat, CLASSES):
+    for k, (ax, c) in enumerate(zip(axs.flat, ORDER)):
         x = size[c]
-        ax.bar(BINS[:-1], hs[c], width=np.diff(BINS), align="edge", color=_P[0], alpha=.85, lw=0)
+        _axes(ax, k, c, len(x))
+        ax.bar(BINS[:-1], hs[c], width=np.diff(BINS), align="edge", color=_P[0], alpha=.85, lw=0, label="Box")
         for e in EDGES[:-1]:  # without the line at 96 px: the axis is in powers of 2 (user)
-            ax.axvline(e, color="0.55", lw=.6, ls="--")
-        ax.plot(*curve(TOT[c], ALPHA[c], CUT[c]), color="k", lw=.8)
+            ax.axvline(e, color="0.55", lw=.5, ls="--")
+        ax.plot(*curve(TOT[c], ALPHA[c], CUT[c]), color="0.1", lw=1, label="Ideale (alzata per classe)")
         for j, (a, b) in enumerate(BANDS):
             n = int(((x >= a) & (x < b)).sum())
             ax.text(np.sqrt(a * min(b, 300)), top * (.97 if j % 2 == 0 else .87), f"{n:,}".replace(",", "."),
-                    ha="center", va="top", fontsize=6.5, color=_P[7] if n < TARGET else "0.2",
+                    ha="center", va="top", fontsize=7, color=_P[7] if n < TARGET else "0.2",
                     weight="bold" if n < TARGET else "normal")
         ax.set_ylim(0, top)
-        _axes(ax, c, len(x))
-    for ax in axs[1]:
-        ax.set_xlabel(r"grandezza $\sqrt{w\,h}$ (px)")
-    for ax in axs[:, 0]:
-        ax.set_ylabel("istanze per intervallo")
-    f.suptitle(f"Box >= 8 px dopo la revisione CVAT — in rosso le fasce sotto {TARGET:,}".replace(",", ".")
-               + "; in nero l'ideale (curva alzata per classe)", fontsize=8.5)
-    f.tight_layout()
-    return save(f, OUT / "distribuzioni", pdf=False)
+    axs[0, 0].plot([], [], ls="none", marker="$n$", color=_P[7], label="Fascia sotto il minimo per cella")
+    _labels(f, axs, "Istanze per intervallo")
+    return save(f, OUT / "size_review", pdf=False)
 
 
 def fig_scale(size: dict, plt) -> Path:
-    f, axs = plt.subplots(2, 2, figsize=(WIDTH, WIDTH * 0.78), sharex=True, sharey=True)
-    scales = [(0, _P[0], "senza scale"), (.25, _P[1], "scale 0,25 (×0,75–1,25)"), (.5, _P[2], "scale 0,5 (×0,5–1,5)")]
+    """The same sizes with the Ultralytics scale augmentation (s = 0.25 and 0.5, uniform in ±s), computed exactly."""
+    f, axs = plt.subplots(2, 2, figsize=(WIDTH, 4.6), sharex=True, sharey=True)
+    scales = [(0, _P[0], "Senza scale"), (.25, _P[1], "Scale 0,25 (×0,75–1,25)"), (.5, _P[2], "Scale 0,5 (×0,5–1,5)")]
     ymax = 0
-    for ax, c in zip(axs.flat, CLASSES):
+    for k, (ax, c) in enumerate(zip(axs.flat, ORDER)):
         x = size[c]
+        _axes(ax, k, c, len(x))
         for s, col, lab in scales:
             h = expected(x, s, BINS)
-            ax.stairs(h, BINS, color=col, lw=1.2, label=lab, fill=s == 0, alpha=.35 if s == 0 else 1)
+            ax.stairs(h, BINS, color=col, lw=0 if s == 0 else 1.2, label=lab, fill=s == 0, alpha=.35 if s == 0 else 1)
             ymax = max(ymax, h.max())
         sc, hi = curve(TOT[c], ALPHA[c], CUT[c])
-        ax.plot(sc, hi, color="k", lw=.8, label="ideale (alzata per classe)")
+        ax.plot(sc, hi, color="0.1", lw=1, label="Ideale (alzata per classe)")
         ymax = max(ymax, hi.max())
-        ax.text(.98, .95, f"ideale ∝ $s^{{-{ALPHA[c]:g}}}$, ×{SCALE[c]:g}", transform=ax.transAxes, ha="right", va="top", fontsize=6.5)
-        for e in EDGES[:-1]:
-            ax.axvline(e, color="0.8", lw=.5)
-        _axes(ax, c, len(x))
     axs[0, 0].set_ylim(0, ymax * 1.1)  # sharey: same axis for all 4
-    for ax in axs[1]:
-        ax.set_xlabel(r"grandezza $\sqrt{w\,h}$ (px)")
-    for ax in axs[:, 0]:
-        ax.set_ylabel("istanze attese per epoca")
-    hs, ls = axs[0, 0].get_legend_handles_labels()
-    f.legend(hs, ls, loc="lower center", ncol=4, fontsize=6.5, frameon=False, bbox_to_anchor=(.5, -.01))
-    f.suptitle("Box >= 8 px: attuale, con scale (uniforme in ±s·px) e distribuzione ideale (alzata per classe)",
-               fontsize=8.5)
-    f.tight_layout(rect=(0, .04, 1, 1))
-    return save(f, OUT / "distribuzioni_scale", pdf=False)
+    _labels(f, axs, "Istanze attese per epoca")
+    return save(f, OUT / "size_scale", pdf=False)
 
 
 def main() -> int:
@@ -187,7 +185,7 @@ def main() -> int:
 
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.parse_args()
-    plt.style.use(STYLE)
+    use("it")
     size = sizes()
     print(fig_current(size, plt))
     print(fig_scale(size, plt))
