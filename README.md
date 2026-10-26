@@ -16,8 +16,8 @@ non si modifica.
 |---|---|
 | classi | `0 drone`, `1 airplane`, `2 helicopter`, `3 bird` |
 | immagini | 640×512, mai ingrandite |
-| split | train 22.512, val 6.255, test 3.431, più 500 immagini di calibrazione int8 |
-| istanze per classe | circa 11.200–11.900 in train, circa 2.100–2.300 in val, circa 1.070–1.330 in test; uccelli: 3.426, 776, 388 |
+| split | train 22.603, val 6.318, test 3.406, più 492 immagini di calibrazione int8 |
+| istanze per classe | circa 11.570–11.850 in train, circa 2.180–2.310 in val, circa 1.060–1.150 in test; uccelli: 3.356, 778, 390 |
 | grandezza degli oggetti | √(w·h) da 8 a oltre 256 px, più esempi dove l'oggetto è piccolo |
 
 1. [Il dataset](#il-dataset)
@@ -44,17 +44,17 @@ data/output/
 
 | split | immagini | reali | mosaici | background |
 |---|---|---|---|---|
-| train | 22.512 | 18.731 | 731 | 3.050 |
-| val | 6.255 | 5.355 | 0 | 900 |
-| test | 3.431 | 2.915 | 0 | 516 |
-| calib | 500 | 449 | 0 | 51 |
+| train | 22.603 | 18.844 | 709 | 3.050 |
+| val | 6.318 | 5.418 | 0 | 900 |
+| test | 3.406 | 2.890 | 0 | 516 |
+| calib | 492 | 441 | 0 | 51 |
 
 | classe | train | di cui da mosaici | val | test |
 |---|---|---|---|---|
-| drone | 11.208 | 4.227 | 2.120 | 1.324 |
-| airplane | 11.842 | 3.952 | 2.323 | 1.114 |
-| helicopter | 11.859 | 4.417 | 2.124 | 1.074 |
-| bird | 3.426 | 704 | 776 | 388 |
+| drone | 11.573 | 4.413 | 2.185 | 1.059 |
+| airplane | 11.849 | 4.009 | 2.308 | 1.147 |
+| helicopter | 11.844 | 4.386 | 2.193 | 1.060 |
+| bird | 3.356 | 655 | 778 | 390 |
 
 I nomi dei file dicono il tipo di immagine:
 - `R_<gruppo>_<clip>_<n>`: immagine **reale**;
@@ -459,8 +459,9 @@ Le operazioni fatte, in ordine. Ogni passo ha la sua cartella e legge solo i pas
    - Sopra 0,95: 146 coppie, tutte doppioni (`unire.txt`).
    - Taratura: 160 coppie a campione fra 0,85 e 0,95 (`taratura/`); doppioni solo da 0,92 in su.
    - Revisione completa delle altre 254 coppie fra 0,92 e 0,95 (`fascia_092/`).
+   - Le 26 coppie fra 0,92 e 0,95 di sessioni aggiunte dopo (`fascia_092_b/`): 18 doppioni (13 notturne).
    - In tutto 93 doppioni sotto 0,95, quasi tutti FBD (camere fisse).
-10. `11_gruppi`: sessioni note, doppioni rivisti e ogni altra coppia ≥ 0,95 → **1.572 gruppi** (da 1.751 sessioni).
+10. `11_gruppi`: sessioni note, doppioni rivisti e ogni altra coppia ≥ 0,95 → **1.566 gruppi** (da 1.751 sessioni).
 11. `12_scenario`: scenario di ogni clip **[operatore]**.
     - Provini di 5 frame per clip.
     - Proposte in `proposte/`, correzioni dell'utente in `correzioni.csv`, controllo con la tessitura dello sfondo
@@ -481,7 +482,7 @@ Le operazioni fatte, in ordine. Ogni passo ha la sua cartella e legge solo i pas
 15. `16_cvat`: revisione completa in CVAT **[operatore]** (`tools/cvat_output.py`).
     - Tutte le immagini reali del primo export (26/10/2026): 655 box cambiati, 1.000 frame notturni di Anti-UAV
       cancellati, 213 frame rimasti senza box.
-    - Poi, a ogni nuovo split, i frame non ancora rivisti (`nuovi_<giro>.csv`): 2.597 e 1.400 frame.
+    - Poi, a ogni nuovo split, i frame non ancora rivisti (`nuovi_<giro>.csv`): 2.597, 1.400 e 893 frame.
     - Label corrette in `label/`, copie: le label delle fonti restano quelle originali.
 16. `17_dataset`: il dataset.
     - `rivisti`: le label della revisione; via i frame cancellati o vuoti, il gruppo notturno, i frame bui
@@ -614,6 +615,7 @@ python tools/split.py --step taratura            # campione per fascia 0,85-0,95
 python tools/split.py --step esito_taratura      # fogli colorati con i giudizi degli operatori
 python tools/split.py --step stima_soglia        # quota di doppioni per fascia -> taratura/stima.csv
 python tools/split.py --step revisione_fascia    # tutte le coppie 0,92-0,95 non giudicate -> 10_doppioni/fascia_092  [operatore]
+python tools/split.py --step revisione_nuove     # coppie 0,92-0,95 delle sessioni aggiunte -> 10_doppioni/fascia_092_b  [operatore]
 python tools/split.py --step gruppi              # -> 11_gruppi/gruppi.csv
 python tools/split.py --step somiglianze_gruppi  # figura somiglianze -> docs/figure (nomi it_<nome>, en_<nome>)
 python tools/split.py --step soglia              # pannello delle coppie per fascia -> docs/figure

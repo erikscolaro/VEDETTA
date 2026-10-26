@@ -16,8 +16,8 @@ not regenerated or modified.
 |---|---|
 | classes | `0 drone`, `1 airplane`, `2 helicopter`, `3 bird` |
 | images | 640×512, never upscaled |
-| splits | train 22,512, val 6,255, test 3,431, plus 500 int8 calibration images |
-| instances per class | about 11,200–11,900 in train, about 2,100–2,300 in val, about 1,070–1,330 in test; birds: 3,426, 776, 388 |
+| splits | train 22,603, val 6,318, test 3,406, plus 492 int8 calibration images |
+| instances per class | about 11,570–11,850 in train, about 2,180–2,310 in val, about 1,060–1,150 in test; birds: 3,356, 778, 390 |
 | object size | √(w·h) from 8 to over 256 px, with extra examples where the object is small |
 
 1. [The dataset](#the-dataset)
@@ -44,17 +44,17 @@ data/output/
 
 | split | images | real | mosaics | background |
 |---|---|---|---|---|
-| train | 22,512 | 18,731 | 731 | 3,050 |
-| val | 6,255 | 5,355 | 0 | 900 |
-| test | 3,431 | 2,915 | 0 | 516 |
-| calib | 500 | 449 | 0 | 51 |
+| train | 22,603 | 18,844 | 709 | 3,050 |
+| val | 6,318 | 5,418 | 0 | 900 |
+| test | 3,406 | 2,890 | 0 | 516 |
+| calib | 492 | 441 | 0 | 51 |
 
 | class | train | of which from mosaics | val | test |
 |---|---|---|---|---|
-| drone | 11,208 | 4,227 | 2,120 | 1,324 |
-| airplane | 11,842 | 3,952 | 2,323 | 1,114 |
-| helicopter | 11,859 | 4,417 | 2,124 | 1,074 |
-| bird | 3,426 | 704 | 776 | 388 |
+| drone | 11,573 | 4,413 | 2,185 | 1,059 |
+| airplane | 11,849 | 4,009 | 2,308 | 1,147 |
+| helicopter | 11,844 | 4,386 | 2,193 | 1,060 |
+| bird | 3,356 | 655 | 778 | 390 |
 
 File names tell the image type:
 - `R_<group>_<clip>_<n>`: **real** image;
@@ -453,8 +453,9 @@ The operations done, in order. Each step has its own folder and reads only the p
    - Above 0.95: 146 pairs, all duplicates (`unire.txt`).
    - Tuning: 160 sampled pairs between 0.85 and 0.95 (`taratura/`); duplicates only from 0.92 up.
    - Full review of the other 254 pairs between 0.92 and 0.95 (`fascia_092/`).
+   - The 26 pairs between 0.92 and 0.95 of sessions added later (`fascia_092_b/`): 18 duplicates (13 at night).
    - In total 93 duplicates below 0.95, almost all FBD (fixed cameras).
-10. `11_gruppi`: known sessions, reviewed duplicates and every other pair ≥ 0.95 → **1,572 groups** (from 1,751
+10. `11_gruppi`: known sessions, reviewed duplicates and every other pair ≥ 0.95 → **1,566 groups** (from 1,751
     sessions).
 11. `12_scenario`: scenario of each clip **[operator]**.
     - Contact sheets of 5 frames per clip.
@@ -477,7 +478,7 @@ The operations done, in order. Each step has its own folder and reads only the p
 15. `16_cvat`: full review in CVAT **[operator]** (`tools/cvat_output.py`).
     - Every real image of the first export (26/10/2026): 655 boxes changed, 1,000 Anti-UAV night frames deleted,
       213 frames left without boxes.
-    - Then, at every new split, the frames not reviewed yet (`nuovi_<round>.csv`): 2,597 and 1,400 frames.
+    - Then, at every new split, the frames not reviewed yet (`nuovi_<round>.csv`): 2,597, 1,400 and 893 frames.
     - Corrected labels in `label/`, as copies: the labels of the sources stay the original ones.
 16. `17_dataset`: the dataset.
     - `rivisti`: the labels of the review; out the deleted or empty frames, the night group, dark frames (mean grey
@@ -610,6 +611,7 @@ python tools/split.py --step taratura            # sample per band 0.85-0.95 -> 
 python tools/split.py --step esito_taratura      # colored sheets with the operators' judgments
 python tools/split.py --step stima_soglia        # share of duplicates per band -> taratura/stima.csv
 python tools/split.py --step revisione_fascia    # all unjudged pairs 0.92-0.95 -> 10_doppioni/fascia_092  [operator]
+python tools/split.py --step revisione_nuove     # pairs 0.92-0.95 of the added sessions -> 10_doppioni/fascia_092_b  [operator]
 python tools/split.py --step gruppi              # -> 11_gruppi/gruppi.csv
 python tools/split.py --step somiglianze_gruppi  # similarity figure -> docs/figure (names it_<name>, en_<name>)
 python tools/split.py --step soglia              # panel of pairs per band -> docs/figure
