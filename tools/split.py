@@ -578,6 +578,23 @@ def band_review_sheets(lo: float = 0.92, hi: float = 0.95) -> None:
           f"{-(-len(order) // 12)} sheets -> {dst}")
 
 
+def band_review_new(lo: float = 0.92, hi: float = 0.95) -> None:
+    """The session pairs in [lo, hi) never reviewed (sessions added after `fascia_092`, 26/10/2026; user 26/10/2026):
+    not in `taratura/` nor `fascia_092/`, not already in the same group. Own folder, so the numbers of `fascia_092`
+    stay valid: `10_doppioni/fascia_092_b/` (`coppie.csv`, `fogli/RNN.jpg`); the operator writes the numbers of the
+    duplicates in `fascia_092_b/stessa_sessione.txt`, then `--step gruppi`."""
+    dup = INTERMEDIATE / "10_doppioni"
+    dst = dup / "fascia_092_b"
+    rows, e, sess, by_ses, best, cnt = _session_pairs(lo)
+    done = {tuple(sorted((r["sessione_a"], r["sessione_b"]))) for d in ("taratura", "fascia_092")
+            for r in csv.DictReader(open(dup / d / "coppie.csv"))}
+    grp = {r["sessione"]: r["gruppo"] for r in csv.DictReader(open(INTERMEDIATE / "11_gruppi" / "gruppi.csv"))}
+    order = sorted((k for k in best if best[k][0] < hi and tuple(sorted((sess[k[0]], sess[k[1]]))) not in done
+                    and grp[sess[k[0]]] != grp[sess[k[1]]]), key=lambda k: -best[k][0])
+    _pair_sheets(dst, order, rows, e, sess, by_ses, best, cnt, lo, "R")
+    print(f"{lo}-{hi}: {len(order)} session pairs never reviewed, {-(-len(order) // 12)} sheets -> {dst}")
+
+
 def threshold_marks(per_sheet: int = 12) -> None:
     """Operators' judgements on the tuning sheets, at a glance (user, 23/10/2026): reads
     `taratura/giudizi_*.txt` (lines `N S|D[?] reason`) and redraws the sheets in `taratura/fogli_esito/` with a frame
@@ -665,7 +682,7 @@ def groups() -> None:
         a, b = pairs[k]
         parent[find(a)] = find(b)
     # duplicates confirmed by hand below 0.95 (user, 23/10/2026): tuning sample and full review of 0.92-0.95
-    for d in ("taratura", "fascia_092"):
+    for d in ("taratura", "fascia_092", "fascia_092_b"):  # fascia_092_b: sessions added after the review (26/10/2026)
         if (dup / d / "stessa_sessione.txt").exists():
             pairs = {int(r["n"]): (r["sessione_a"], r["sessione_b"]) for r in csv.DictReader(open(dup / d / "coppie.csv"))}
             for k in _merges(dup / d / "stessa_sessione.txt"):
@@ -1011,7 +1028,7 @@ def threshold_panel(edges=(0.85, 0.90, 0.92, 0.95, 0.98, 1.01), per: int = 3, se
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--fasce", type=float, nargs="+", default=[0.6, 0.7, 0.8, 0.9, 1.01], help="anteprima: soglie")
-    p.add_argument("--step", choices=["frame", "embedding", "somiglianze", "somiglianze_tutte", "anteprima", "doppioni", "gruppi", "somiglianze_gruppi", "figure", "soglia", "taratura", "esito_taratura", "stima_soglia", "revisione_fascia"], required=True)
+    p.add_argument("--step", choices=["frame", "embedding", "somiglianze", "somiglianze_tutte", "anteprima", "doppioni", "gruppi", "somiglianze_gruppi", "figure", "soglia", "taratura", "esito_taratura", "stima_soglia", "revisione_fascia", "revisione_nuove"], required=True)
     a = p.parse_args(argv)
     if a.step == "frame":
         frame_table()
@@ -1031,6 +1048,8 @@ def main(argv=None) -> int:
         threshold_marks()
     elif a.step == "revisione_fascia":
         band_review_sheets()
+    elif a.step == "revisione_nuove":
+        band_review_new()
     elif a.step == "stima_soglia":
         threshold_estimate()
     elif a.step == "gruppi":
