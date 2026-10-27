@@ -9,15 +9,15 @@ camera pointed at the sky and the horizon. It is built for the thesis (repo `yol
 - **aligned with the domain**: val and test are sky and horizon only;
 - split by recording and balanced by object size and by source.
 
-The dataset is in `data/output/`, in Ultralytics YOLO format, and has been **frozen** since October 26, 2026: it is
+The dataset is in `data/output/`, in Ultralytics YOLO format, and has been **frozen** since October 27, 2026: it is
 not regenerated or modified.
 
 | | |
 |---|---|
 | classes | `0 drone`, `1 airplane`, `2 helicopter`, `3 bird` |
 | images | 640×512, never upscaled |
-| splits | train 22,603, val 6,318, test 3,406, plus 492 int8 calibration images |
-| instances per class | about 11,570–11,850 in train, about 2,180–2,310 in val, about 1,060–1,150 in test; birds: 3,356, 778, 390 |
+| splits | train 21,899, val 6,648, test 3,263, plus 492 int8 calibration images |
+| instances per class | about 9,620–11,920 in train, about 1,940–2,310 in val, about 960–1,120 in test; birds: 3,535, 802, 387 |
 | object size | √(w·h) from 8 to over 256 px, with extra examples where the object is small |
 
 1. [The dataset](#the-dataset)
@@ -44,17 +44,17 @@ data/output/
 
 | split | images | real | mosaics | background |
 |---|---|---|---|---|
-| train | 22,603 | 18,844 | 709 | 3,050 |
-| val | 6,318 | 5,418 | 0 | 900 |
-| test | 3,406 | 2,890 | 0 | 516 |
+| train | 21,899 | 18,161 | 688 | 3,050 |
+| val | 6,648 | 5,748 | 0 | 900 |
+| test | 3,263 | 2,747 | 0 | 516 |
 | calib | 492 | 441 | 0 | 51 |
 
 | class | train | of which from mosaics | val | test |
 |---|---|---|---|---|
-| drone | 11,573 | 4,413 | 2,185 | 1,059 |
-| airplane | 11,849 | 4,009 | 2,308 | 1,147 |
-| helicopter | 11,844 | 4,386 | 2,193 | 1,060 |
-| bird | 3,356 | 655 | 778 | 390 |
+| drone | 9,622 | 3,343 | 1,942 | 961 |
+| airplane | 11,921 | 4,079 | 2,309 | 1,122 |
+| helicopter | 11,766 | 4,454 | 2,183 | 1,066 |
+| bird | 3,535 | 703 | 802 | 387 |
 
 File names tell the image type:
 - `R_<group>_<clip>_<n>`: **real** image;
@@ -82,7 +82,7 @@ File names tell the image type:
   - Airplanes, helicopters and drones follow the training target up to about 181 px. Above that, the sources have
     few examples and Anti-UAV stops at about 256 px.
   - Below 32 px the curve is reached thanks to the mosaics, which shrink large objects.
-  - Birds are well below the training target (3,100 boxes against about 12,000 for the other classes); their
+  - Birds are well below the training target (3,535 boxes against 9,600–11,900 for the other classes); their
     targets stop at 96 px. Validation is also below its target and follows the uniform test target.
 
 ### Sources per split
@@ -96,9 +96,9 @@ File names tell the image type:
   - The three columns have similar shares by construction: the split has a term on the source mix, and training a
     cap per source.
   - Airplanes come almost only from DVIDS (93%), helicopters about 80%.
-  - Drones come from three sources: Anti-UAV (39–50%), DVIDS (26–45%) and Svanström (16–24%). FRED (about 6%) is
+  - Drones come from three sources: Anti-UAV (28–53%), DVIDS (17–53%) and Svanström (19–25%). FRED (about 9%) is
     only in training.
-  - Half of the val and test birds come from Open Images (52–54%). In training FBD-SV weighs more (39%).
+  - Half of the val and test birds come from Open Images (55–58%). In training FBD-SV and Open Images weigh the same (38–39%).
 
 ### Context
 
@@ -112,8 +112,8 @@ File names tell the image type:
   - **ground**: trees, fields, buildings;
   - **wall**: a wall as background.
 - **Results.**
-  - Val and test are sky and horizon only, the turret domain, with 13–22% horizon per class; birds are at 46%.
-  - In training, ground and wall are at most 25% per class. They are 19% for birds (FBD-SV), about 8% for drones,
+  - Val and test are sky and horizon only, the turret domain, with 6–28% horizon per class; birds are at 56–63%.
+  - In training, ground and wall are at most 25% per class. They are 25% for birds (FBD-SV), about 8% for drones,
     almost nothing for airplanes and helicopters.
   - When the weather is annotated (`meteo` column of the manifest), it will appear as a second row.
 
@@ -127,11 +127,11 @@ nearest real training image. The axis is stretched towards 1 (−log₁₀(1 −
 - **(b) Tail.** The share of images above each threshold, in log scale. The vertical line is the duplicate threshold,
   0.95.
 - **References**, taken inside training:
-  - "same group, other clip": what a real leakage looks like, median 0.944;
-  - "different groups": the floor, because sky always looks like sky; median 0.805.
+  - "same group, other clip": what a real leakage looks like, median 0.919;
+  - "different groups": the floor, because sky always looks like sky; median 0.799.
 - **Reading.** If val or test had leakage, their curves would move towards the dashed one.
 - **Results.**
-  - Validation (median 0.817) and test (0.786) match the floor, also in the tail between 0.85 and 0.95.
+  - Validation (median 0.823) and test (0.795) match the floor, also in the tail between 0.85 and 0.95.
   - No image exceeds 0.95. That is partly by construction, because pairs above 0.95 are in the same group. The match
     with the floor below 0.95 is not.
 
@@ -207,8 +207,8 @@ accepted background leakage.
   FBD-SV-2024 is almost all vegetation, so it is only in train and within the out-of-domain share.
 - **Fixed-wing drones excluded**: too few to be in all the splits.
 - **Objects above 181 px** are under the train curve, for all classes.
-- **Drones in val** are below the target (2,257 against 2,673): the large Anti-UAV groups give only a part of their
-  frames, so as not to exceed 75% of a cell.
+- **Drones in val and test** are below the target (1,942 against 2,531 and 961 against 1,265), mostly between 16 and
+  32 px: there are few independent drone videos, and a group cannot exceed 15% of a class or 75% of a cell.
 - **Labels of the Anti-UAV drones added on October 26, 2026**: they are the original ones of the dataset.
 - **Accepted background leakage**: the sources with sky have a background that repeats across different recordings,
   and it is accepted because in operation the turret is fixed.
@@ -284,7 +284,8 @@ Set before touching the data and updated with the decisions taken during constru
   become a **group**: duplicates confirmed by hand among the pairs with DINOv2 ≥ 0.92, plus every other pair ≥ 0.95.
 - A group is entirely in one split: the same recording is never in two splits.
 - In val and test a group gives only the in-domain frames and, if it is large, a random subset that does not exceed 75%
-  of any cell of the target. The rest of the group is not used: it cannot go in train.
+  of any cell of the target or 15% of the target of a class (October 27, 2026: before, one Anti-UAV group had 41% of
+  the val drones). The rest of the group is not used: it cannot go in train.
 - The assignment minimizes the distance from the targets, with at least 2,000 instances per class in val and 1,000 in
   test (and never above 20% of the in-domain material).
 
@@ -478,12 +479,13 @@ The operations done, in order. Each step has its own folder and reads only the p
 15. `16_cvat`: full review in CVAT **[operator]** (`tools/cvat_output.py`).
     - Every real image of the first export (26/10/2026): 655 boxes changed, 1,000 Anti-UAV night frames deleted,
       213 frames left without boxes.
-    - Then, at every new split, the frames not reviewed yet (`nuovi_<round>.csv`): 2,597, 1,400 and 893 frames.
+    - Then, at every new split, the frames not reviewed yet (`nuovi_<round>.csv`): 2,597, 1,400 and 893 frames; on October 27, 2026
+      785 frames reviewed on sheets (round `17d`), with 19 frames of one recording changed from drone to helicopter.
     - Corrected labels in `label/`, as copies: the labels of the sources stay the original ones.
 16. `17_dataset`: the dataset.
     - `rivisti`: the labels of the review; out the deleted or empty frames, the night group, dark frames (mean grey
       < 30) and the clips where the review removed a box.
-    - `split`: groups into train, val and test (400 random orders in parallel, the best is kept). Reviewed frames
+    - `split`: groups into train, val and test (1,000 random orders in parallel, the best is kept). Reviewed frames
       first; test at most half of the validation per class; horizon share and sources as in the pool.
     - `train`: shares and caps; frames not reviewed are removed first.
     - `mosaici`: from the same half octave, only from reviewed frames, with the source cap of the train.

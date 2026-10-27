@@ -9,15 +9,15 @@ rivolta al cielo e all'orizzonte. È costruito per la tesi (repo `yoloeval`):
 - **allineato al dominio**: val e test solo cielo e orizzonte;
 - diviso per ripresa e bilanciato per grandezza dell'oggetto e per fonte.
 
-Il dataset è in `data/output/`, in formato Ultralytics YOLO, ed è **congelato** dal 26/10/2026: non si rigenera e
+Il dataset è in `data/output/`, in formato Ultralytics YOLO, ed è **congelato** dal 27/10/2026: non si rigenera e
 non si modifica.
 
 | | |
 |---|---|
 | classi | `0 drone`, `1 airplane`, `2 helicopter`, `3 bird` |
 | immagini | 640×512, mai ingrandite |
-| split | train 22.603, val 6.318, test 3.406, più 492 immagini di calibrazione int8 |
-| istanze per classe | circa 11.570–11.850 in train, circa 2.180–2.310 in val, circa 1.060–1.150 in test; uccelli: 3.356, 778, 390 |
+| split | train 21.899, val 6.648, test 3.263, più 492 immagini di calibrazione int8 |
+| istanze per classe | circa 9.620–11.920 in train, circa 1.940–2.310 in val, circa 960–1.120 in test; uccelli: 3.535, 802, 387 |
 | grandezza degli oggetti | √(w·h) da 8 a oltre 256 px, più esempi dove l'oggetto è piccolo |
 
 1. [Il dataset](#il-dataset)
@@ -44,17 +44,17 @@ data/output/
 
 | split | immagini | reali | mosaici | background |
 |---|---|---|---|---|
-| train | 22.603 | 18.844 | 709 | 3.050 |
-| val | 6.318 | 5.418 | 0 | 900 |
-| test | 3.406 | 2.890 | 0 | 516 |
+| train | 21.899 | 18.161 | 688 | 3.050 |
+| val | 6.648 | 5.748 | 0 | 900 |
+| test | 3.263 | 2.747 | 0 | 516 |
 | calib | 492 | 441 | 0 | 51 |
 
 | classe | train | di cui da mosaici | val | test |
 |---|---|---|---|---|
-| drone | 11.573 | 4.413 | 2.185 | 1.059 |
-| airplane | 11.849 | 4.009 | 2.308 | 1.147 |
-| helicopter | 11.844 | 4.386 | 2.193 | 1.060 |
-| bird | 3.356 | 655 | 778 | 390 |
+| drone | 9.622 | 3.343 | 1.942 | 961 |
+| airplane | 11.921 | 4.079 | 2.309 | 1.122 |
+| helicopter | 11.766 | 4.454 | 2.183 | 1.066 |
+| bird | 3.535 | 703 | 802 | 387 |
 
 I nomi dei file dicono il tipo di immagine:
 - `R_<gruppo>_<clip>_<n>`: immagine **reale**;
@@ -82,7 +82,7 @@ il file da cui viene l'immagine, relativo a `data/`.
   - Aerei, elicotteri e droni seguono l'obiettivo del train fino a circa 181 px. Sopra, le fonti hanno pochi
     esempi e Anti-UAV si ferma a circa 256 px.
   - Sotto 32 px l'obiettivo del train si raggiunge con i mosaici, che rimpiccioliscono oggetti grandi.
-  - Gli uccelli stanno molto sotto l'obiettivo del train (3.100 box contro circa 12.000 delle altre classi); i loro
+  - Gli uccelli stanno molto sotto l'obiettivo del train (3.535 box contro 9.600–11.900 delle altre classi); i loro
     obiettivi si fermano a 96 px. Anche la validazione sta sotto il suo obiettivo e segue quello uniforme del test.
 
 ### Fonti per split
@@ -96,9 +96,9 @@ il file da cui viene l'immagine, relativo a `data/`.
   - Le quote dei tre pannelli si somigliano per costruzione: lo split tiene conto del mix di fonti e il train ha
     un tetto per fonte.
   - Gli aerei vengono quasi tutti da DVIDS (93%), gli elicotteri per circa l'80%.
-  - I droni vengono da tre fonti: Anti-UAV (39–50%), DVIDS (26–45%) e Svanström (16–24%). FRED (circa il 6%) è
+  - I droni vengono da tre fonti: Anti-UAV (28–53%), DVIDS (17–53%) e Svanström (19–25%). FRED (circa il 9%) è
     solo nel train.
-  - Gli uccelli di val e test vengono per metà da Open Images (52–54%). Nel train pesa di più FBD-SV (39%).
+  - Gli uccelli di val e test vengono per metà da Open Images (55–58%). Nel train FBD-SV e Open Images pesano uguale (38–39%).
 
 ### Contesto
 
@@ -112,9 +112,9 @@ il file da cui viene l'immagine, relativo a `data/`.
   - **terra**: alberi, campi, edifici;
   - **muro**: una parete come sfondo.
 - **Risultati.**
-  - Val e test contengono solo cielo e orizzonte, il dominio della torretta. L'orizzonte vale il 13–22% per
-    classe, il 46% per gli uccelli.
-  - Nel train terra e muro restano sotto il 25% per classe: 19% per gli uccelli (FBD-SV), circa 8% per i droni,
+  - Val e test contengono solo cielo e orizzonte, il dominio della torretta. L'orizzonte vale il 6–28% per
+    classe, il 56–63% per gli uccelli.
+  - Nel train terra e muro restano sotto il 25% per classe: 25% per gli uccelli (FBD-SV), circa 8% per i droni,
     quasi zero per aerei ed elicotteri.
   - Quando il meteo sarà annotato (colonna `meteo` del manifest) comparirà come seconda riga.
 
@@ -129,12 +129,12 @@ l'immagine reale più vicina del train. L'asse x è in scala −log₁₀(1 − 
 - **(b) Coda.** La quota di immagini sopra ogni soglia di somiglianza, su scala logaritmica. La linea verticale è la soglia dei
   doppioni, 0,95.
 - **Riferimenti**, presi dentro il train:
-  - "stesso gruppo, altra clip": com'è fatto un leakage vero, mediana 0,944;
+  - "stesso gruppo, altra clip": com'è fatto un leakage vero, mediana 0,919;
   - "gruppi diversi": il fondo, cioè la somiglianza che c'è comunque perché il cielo somiglia al cielo;
-    mediana 0,805.
+    mediana 0,799.
 - **Lettura.** Con un leakage, le curve di val e test si sposterebbero verso quella tratteggiata.
 - **Risultati.**
-  - Validazione (mediana 0,817) e test (0,786) coincidono con il fondo, anche nella coda fra 0,85 e 0,95.
+  - Validazione (mediana 0,823) e test (0,795) coincidono con il fondo, anche nella coda fra 0,85 e 0,95.
   - Nessuna immagine supera 0,95. In parte è per costruzione, perché le coppie sopra 0,95 stanno nello stesso
     gruppo; la coincidenza con il fondo sotto 0,95 invece no.
 
@@ -212,8 +212,8 @@ dello sfondo accettato.
   FBD-SV-2024 è quasi tutto vegetazione, quindi sta solo nel train e dentro la quota fuori dominio.
 - **Droni ad ala fissa esclusi**: troppo pochi per stare in tutti gli split.
 - **Oggetti sopra i 181 px** sotto la curva del train, per tutte le classi.
-- **Droni in val** sotto l'obiettivo (2.257 contro 2.673): i gruppi grandi di Anti-UAV danno solo una parte dei loro
-  frame, per non superare il 75% di una cella.
+- **Droni in val e test** sotto l'obiettivo (1.942 contro 2.531 e 961 contro 1.265), soprattutto fra 16 e 32 px: i
+  video di droni indipendenti sono pochi, e un gruppo non può superare il 15% di una classe né il 75% di una cella.
 - **Label dei droni Anti-UAV aggiunti il 26/10/2026**: sono quelle originali del dataset.
 - **Leakage dello sfondo accettato**: le fonti con il cielo hanno uno sfondo che si ripete fra riprese diverse, ed è
   accettato perché in esercizio la torretta è fissa.
@@ -290,7 +290,8 @@ Fissate prima di toccare i dati e aggiornate con le decisioni prese durante la c
   diventano un **gruppo**: doppioni confermati a mano fra le coppie con DINOv2 ≥ 0,92, più ogni altra coppia ≥ 0,95.
 - Un gruppo sta tutto in uno split: la stessa ripresa non è mai in due split.
 - In val e test un gruppo dà solo i frame in dominio e, se è grande, un sottoinsieme casuale che non superi il 75%
-  di nessuna cella dell'obiettivo. Il resto del gruppo non si usa: non può andare nel train.
+  di nessuna cella dell'obiettivo né il 15% dell'obiettivo di una classe (27/10/2026: prima un gruppo di Anti-UAV
+  aveva il 41% dei droni del val). Il resto del gruppo non si usa: non può andare nel train.
 - L'assegnazione minimizza la distanza dagli obiettivi, con almeno 2.000 istanze per classe in val e 1.000 in test
   (e mai oltre il 20% del materiale in dominio).
 
@@ -482,12 +483,13 @@ Le operazioni fatte, in ordine. Ogni passo ha la sua cartella e legge solo i pas
 15. `16_cvat`: revisione completa in CVAT **[operatore]** (`tools/cvat_output.py`).
     - Tutte le immagini reali del primo export (26/10/2026): 655 box cambiati, 1.000 frame notturni di Anti-UAV
       cancellati, 213 frame rimasti senza box.
-    - Poi, a ogni nuovo split, i frame non ancora rivisti (`nuovi_<giro>.csv`): 2.597, 1.400 e 893 frame.
+    - Poi, a ogni nuovo split, i frame non ancora rivisti (`nuovi_<giro>.csv`): 2.597, 1.400 e 893 frame; il 27/10/2026
+      785 frame rivisti su fogli (giro `17d`), con 19 frame di una ripresa passati da drone a helicopter.
     - Label corrette in `label/`, copie: le label delle fonti restano quelle originali.
 16. `17_dataset`: il dataset.
     - `rivisti`: le label della revisione; via i frame cancellati o vuoti, il gruppo notturno, i frame bui
       (grigio medio < 30) e le clip dove la revisione ha tolto un box.
-    - `split`: gruppi in train, val e test (400 ordini casuali in parallelo, si tiene il migliore). Prima i frame
+    - `split`: gruppi in train, val e test (1.000 ordini casuali in parallelo, si tiene il migliore). Prima i frame
       rivisti; test al massimo metà della validazione per classe; quota di orizzonte e fonti come nel bacino.
     - `train`: quote e tetti; si tolgono prima i frame non rivisti.
     - `mosaici`: dalla stessa mezza ottava, solo da frame rivisti, con il tetto per fonte del train.

@@ -40,6 +40,8 @@ NAMES = ["airplane", "bird", "drone", "helicopter"]  # intermediate label order
 DOMAIN = ("cielo", "orizzonte")  # the only scenarios of val and test
 OFF_DOMAIN_MAX = 0.25  # train: at most this share of each class on ground or wall (0.10 left 1,767 birds, 26/10)
 SESSION_MAX = 0.06  # train: at most this share of the boxes of a class from one session (0.03 removed 5,641 frames)
+GROUP_MAX = 0.15  # val, test: at most this share of the class target from one group (user, 27/10/2026: one Anti-UAV
+# group was 41% of the val drones; 5% would drop most of the drones, too few independent drone groups)
 # split: weight of the source mix per class (airplane, bird, drone, helicopter): 3 left Anti-UAV at 7% of its drones in
 # val; 10 for every class left the val without birds (the first group always worsens the mix), 26/10/2026
 SOURCE_WEIGHT = np.array([3, 3, 10, 3])
@@ -267,9 +269,12 @@ def _obj(s: str, x, t, xs, ps, xh) -> float:
     mn = _ST["MIN"][s]  # per class: the frozen minimum, but never more than 20% of what is in domain
     short = np.maximum(0, mn * 1.02 - x.sum(1)) / mn
     n = x.sum(1, keepdims=True)
-    src = SOURCE_WEIGHT @ (((xs - ps * n) / np.maximum(ps * n, 1)) ** 2 * (ps > 0.02)).sum(1)
+    T = t.sum(1, keepdims=True)
+    # source and horizon errors scaled to the class target, not to the boxes already in: else an empty class costs 0
+    # and its first group (one source) costs a lot, and with `GROUP_MAX` the val stayed without drones (27/10/2026)
+    src = SOURCE_WEIGHT @ (((xs - ps * n) / np.maximum(ps * T, 1)) ** 2 * (ps > 0.02)).sum(1)
     ph = _ST["PH"]
-    hor = (((xh / np.maximum(n[:, 0], 1)) - ph) / np.maximum(ph, 0.01)) ** 2
+    hor = (((xh / np.maximum(n[:, 0], 1)) - ph) / np.maximum(ph, 0.01)) ** 2 * (n[:, 0] / np.maximum(T[:, 0], 1)) ** 2
     return _err(x, t) + 100 * (short ** 2).sum() + src + 0.5 * hor.sum()
 
 
@@ -314,12 +319,13 @@ def _trial(seed: int) -> tuple:
     return sum(tot(s, cur[s]) for s in tg), lab
 
 
-def split(trials: int = 400, share: float = 0.75, seed: int = 0) -> None:
+def split(trials: int = 1000, share: float = 0.75, seed: int = 0) -> None:
     """Split by groups as `split.py` (targets: val 20% of the curve over half octaves, test uniform in log s, at
     most 20%/25% of what is in domain), with these differences:
     - val and test count and keep only the in-domain frames (`DOMAIN`);
     - a group sent to val or test gives only a random subset of its frames (in turn across its sessions), as large as
-      possible while no cell gets more than `share` of its target (variety); the rest of the group is dropped, never
+      possible while no cell gets more than `share` of its target and no class more than `GROUP_MAX` of its target
+      (variety); the rest of the group is dropped, never
       moved to the train (leakage). Large groups (the Anti-UAV recordings of the same afternoon, merged by `gruppi`)
       can then go to val and test too;
     - extra terms: source mix per class and horizon share (both against the in-domain pool).
@@ -370,13 +376,14 @@ def split(trials: int = 400, share: float = 0.75, seed: int = 0) -> None:
             q = [v for v in q if v]
             order += [v.pop() for v in q]
         for s in tg:
-            lim = share * tg[s]
+            lim, glim = share * tg[s], GROUP_MAX * tg[s].sum(1)
             take = []
             for i in order:
                 cs = cells[i]
                 if any(tg[s][c, b] == 0 for c, b in cs):
                     continue
-                if all(X[s][g][c, b] + sum(1 for x in cs if x == (c, b)) <= lim[c, b] for c, b in set(cs)):
+                if all(X[s][g][c, b] + sum(1 for x in cs if x == (c, b)) <= lim[c, b] for c, b in set(cs)) and \
+                        all(X[s][g][c].sum() + n <= glim[c] for c, n in Counter(c for c, _ in cs).items()):
                     take.append(i)
                     for c, b in cs:
                         X[s][g][c, b] += 1
