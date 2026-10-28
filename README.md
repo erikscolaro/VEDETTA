@@ -4,7 +4,7 @@
 
 Dataset per rilevare **droni, aerei, elicotteri e uccelli** da una torretta anti-drone a terra, con una camera RGB
 rivolta al cielo e all'orizzonte. È costruito per la tesi (repo `yoloeval`):
-- sette fonti pubbliche di oggetti, più due di solo sfondo;
+- sei fonti pubbliche di oggetti, più due di solo sfondo;
 - label riviste a mano in CVAT e poi con una revisione per candidati;
 - **allineato al dominio**: val e test solo cielo e orizzonte;
 - diviso per ripresa e bilanciato per grandezza dell'oggetto e per fonte.
@@ -16,8 +16,8 @@ non si modifica.
 |---|---|
 | classi | `0 drone`, `1 airplane`, `2 helicopter`, `3 bird` |
 | immagini | 640×512, mai ingrandite |
-| split | train 21.899, val 6.648, test 3.263, più 492 immagini di calibrazione int8 |
-| istanze per classe | circa 9.620–11.920 in train, circa 1.940–2.310 in val, circa 960–1.120 in test; uccelli: 3.535, 802, 387 |
+| split | train 23.062, val 6.132, test 3.469, più 511 immagini di calibrazione int8 |
+| istanze per classe | circa 11.700–11.880 in train, circa 1.900–2.260 in val, circa 940–1.120 in test; uccelli: 4.444, 751, 375 |
 | grandezza degli oggetti | √(w·h) da 8 a oltre 256 px, più esempi dove l'oggetto è piccolo |
 
 1. [Il dataset](#il-dataset)
@@ -44,17 +44,17 @@ data/output/
 
 | split | immagini | reali | mosaici | background |
 |---|---|---|---|---|
-| train | 21.899 | 18.161 | 688 | 3.050 |
-| val | 6.648 | 5.748 | 0 | 900 |
-| test | 3.263 | 2.747 | 0 | 516 |
-| calib | 492 | 441 | 0 | 51 |
+| train | 23.062 | 19.486 | 526 | 3.050 |
+| val | 6.132 | 5.232 | 0 | 900 |
+| test | 3.469 | 2.953 | 0 | 516 |
+| calib | 511 | 460 | 0 | 51 |
 
 | classe | train | di cui da mosaici | val | test |
 |---|---|---|---|---|
-| drone | 9.622 | 3.343 | 1.942 | 961 |
-| airplane | 11.921 | 4.079 | 2.309 | 1.122 |
-| helicopter | 11.766 | 4.454 | 2.183 | 1.066 |
-| bird | 3.535 | 703 | 802 | 387 |
+| drone | 11.706 | 3.160 | 1.896 | 940 |
+| airplane | 11.869 | 3.983 | 2.259 | 1.116 |
+| helicopter | 11.879 | 4.427 | 2.201 | 1.061 |
+| bird | 4.444 | 1.052 | 751 | 375 |
 
 I nomi dei file dicono il tipo di immagine:
 - `R_<gruppo>_<clip>_<n>`: immagine **reale**;
@@ -82,7 +82,7 @@ il file da cui viene l'immagine, relativo a `data/`.
   - Aerei, elicotteri e droni seguono l'obiettivo del train fino a circa 181 px. Sopra, le fonti hanno pochi
     esempi e Anti-UAV si ferma a circa 256 px.
   - Sotto 32 px l'obiettivo del train si raggiunge con i mosaici, che rimpiccioliscono oggetti grandi.
-  - Gli uccelli stanno molto sotto l'obiettivo del train (3.535 box contro 9.600–11.900 delle altre classi); i loro
+  - Gli uccelli stanno molto sotto l'obiettivo del train (4.444 box contro 11.700–11.900 delle altre classi); i loro
     obiettivi si fermano a 96 px. Anche la validazione sta sotto il suo obiettivo e segue quello uniforme del test.
 
 ### Fonti per split
@@ -96,9 +96,10 @@ il file da cui viene l'immagine, relativo a `data/`.
   - Le quote dei tre pannelli si somigliano per costruzione: lo split tiene conto del mix di fonti e il train ha
     un tetto per fonte.
   - Gli aerei vengono quasi tutti da DVIDS (93%), gli elicotteri per circa l'80%.
-  - I droni vengono da tre fonti: Anti-UAV (28–53%), DVIDS (17–53%) e Svanström (19–25%). FRED (circa il 9%) è
-    solo nel train.
-  - Gli uccelli di val e test vengono per metà da Open Images (55–58%). Nel train FBD-SV e Open Images pesano uguale (38–39%).
+  - I droni di val e test vengono da DVIDS (44–61%), Anti-UAV (20–37%) e Svanström (19%). Nel train, sui box reali:
+    Anti-UAV 34%, DVIDS 31%, Svanström 26% e FRED 9%. FRED è solo nel train, e con i mosaici pesa il 6,7%.
+  - Gli uccelli di val e test vengono per circa il 60% da Open Images, solo uccelli in volo (filtro SigLIP). Nel train,
+    sui box reali: Open Images 52%, FBD-SV 25%, Svanström 18%.
 
 ### Contesto
 
@@ -112,10 +113,10 @@ il file da cui viene l'immagine, relativo a `data/`.
   - **terra**: alberi, campi, edifici;
   - **muro**: una parete come sfondo.
 - **Risultati.**
-  - Val e test contengono solo cielo e orizzonte, il dominio della torretta. L'orizzonte vale il 6–28% per
-    classe, il 56–63% per gli uccelli.
-  - Nel train terra e muro restano sotto il 25% per classe: 25% per gli uccelli (FBD-SV), circa 8% per i droni,
-    quasi zero per aerei ed elicotteri.
+  - Val e test contengono solo cielo e orizzonte, il dominio della torretta. L'orizzonte vale il 6–30% per
+    classe, il 56–58% per gli uccelli.
+  - Nel train terra e muro restano sotto il 25% per classe: 22% per gli uccelli (FBD-SV) e per i droni (FRED e
+    terra), circa 2% per aerei ed elicotteri.
   - Quando il meteo sarà annotato (colonna `meteo` del manifest) comparirà come seconda riga.
 
 ### Leakage fra gli split
@@ -129,12 +130,12 @@ l'immagine reale più vicina del train. L'asse x è in scala −log₁₀(1 − 
 - **(b) Coda.** La quota di immagini sopra ogni soglia di somiglianza, su scala logaritmica. La linea verticale è la soglia dei
   doppioni, 0,95.
 - **Riferimenti**, presi dentro il train:
-  - "stesso gruppo, altra clip": com'è fatto un leakage vero, mediana 0,919;
+  - "stesso gruppo, altra clip": com'è fatto un leakage vero, mediana 0,935;
   - "gruppi diversi": il fondo, cioè la somiglianza che c'è comunque perché il cielo somiglia al cielo;
-    mediana 0,799.
+    mediana 0,804.
 - **Lettura.** Con un leakage, le curve di val e test si sposterebbero verso quella tratteggiata.
 - **Risultati.**
-  - Validazione (mediana 0,823) e test (0,795) coincidono con il fondo, anche nella coda fra 0,85 e 0,95.
+  - Validazione (mediana 0,806) e test (0,777) coincidono con il fondo, anche nella coda fra 0,85 e 0,95.
   - Nessuna immagine supera 0,95. In parte è per costruzione, perché le coppie sopra 0,95 stanno nello stesso
     gruppo; la coincidenza con il fondo sotto 0,95 invece no.
 
@@ -145,7 +146,7 @@ l'immagine reale più vicina del train. L'asse x è in scala −log₁₀(1 − 
 **Figura 5.** *Somiglianza DINOv2 fra tutti i 68.368 frame annotati.*
 - **(a) Matrice.** La somiglianza media fra blocchi di frame consecutivi, in ordine di fonte, sessione e clip.
   - Le righe rosse separano le fonti; fra parentesi il numero di frame.
-  - L'area di ogni fonte è proporzionale alla radice dei suoi frame, così anche Open Images (623) resta visibile.
+  - L'area di ogni fonte è proporzionale alla radice dei suoi frame, così anche Open Images (1.059) resta visibile.
   - Un blocco scuro sulla diagonale è una ripresa i cui frame si somigliano molto.
 - **(b) Coppie di frame.** La distribuzione della somiglianza di tutte le coppie, per tipo:
   - stessa clip;
@@ -212,7 +213,7 @@ dello sfondo accettato.
   FBD-SV-2024 è quasi tutto vegetazione, quindi sta solo nel train e dentro la quota fuori dominio.
 - **Droni ad ala fissa esclusi**: troppo pochi per stare in tutti gli split.
 - **Oggetti sopra i 181 px** sotto la curva del train, per tutte le classi.
-- **Droni in val e test** sotto l'obiettivo (1.942 contro 2.531 e 961 contro 1.265), soprattutto fra 16 e 32 px: i
+- **Droni in val e test** sotto l'obiettivo (1.896 contro 2.547 e 940 contro 1.273), soprattutto fra 16 e 32 px: i
   video di droni indipendenti sono pochi, e un gruppo non può superare il 15% di una classe né il 75% di una cella.
 - **Label dei droni Anti-UAV aggiunti il 26/10/2026**: sono quelle originali del dataset.
 - **Leakage dello sfondo accettato**: le fonti con il cielo hanno uno sfondo che si ripete fra riprese diverse, ed è
@@ -294,6 +295,8 @@ Fissate prima di toccare i dati e aggiornate con le decisioni prese durante la c
   aveva il 41% dei droni del val). Il resto del gruppo non si usa: non può andare nel train.
 - L'assegnazione minimizza la distanza dagli obiettivi, con almeno 2.000 istanze per classe in val e 1.000 in test
   (e mai oltre il 20% del materiale in dominio).
+- Un termine di **spreco** (28/10/2026) fa costare i box che un gruppo perde quando va in val o test, con i droni ×4.
+  Senza questo termine lo split sceglieva gruppi grandi e buttava 7.846 droni; con il termine ne butta 530 (2%).
 
 **Fonti**
 - Solo licenze aperte (pubblico dominio, CC0, CC BY, Apache, MIT), verificate prima del download.
@@ -333,7 +336,7 @@ Il dataset esiste grazie a queste fonti. Chi lo usa deve citare gli articoli e r
 | Svanström, Alonso-Fernandez, Englund | 284 video RGB 640×512 | `svanstrom2021dataset`; dati CC0 1.0 (DOI dei dati 10.5281/zenodo.5500576), articolo CC BY 4.0 |
 | FRED, Magrini et al. | 10 sequenze RGB di droni | `magrini2025fred`; Apache 2.0, riportare la licenza |
 | Anti-UAV, Jiang et al. | registrazioni RGB di Anti-UAV300 | `jiang2023antiuav` (online 2021, vol. 25 del 2023); MIT, riportare copyright e licenza |
-| Open Images, Kuznetsova et al. | 623 ritagli con uccelli in cielo | `kuznetsova2020openimages`; annotazioni CC BY 4.0 (Google), immagini CC BY 2.0: autore e link in `data/output/fonti_openimages.csv` |
+| Open Images, Kuznetsova et al. | 1.059 ritagli con uccelli in volo | `kuznetsova2020openimages`; annotazioni CC BY 4.0 (Google), immagini CC BY 2.0: autore e link in `data/output/fonti_openimages.csv` |
 | FBD-SV-2024, Sun et al. | 483 video di uccelli | `sun2025fbdsv`; dati su figshare (DOI 10.6084/m9.figshare.27377595, CC BY 4.0 secondo DataCite), ma il readme del dataset dice "for learning and research purposes only, not for commercial use" ⚠ |
 | Clouds-1500, Arrais et al. | immagini di background | `arrais2023clouds1500`; CC BY 4.0 |
 | SkyFinder, Mihail et al. | immagini di background | `mihail2016sky`; scaricate dalla copia di Nice e Wijnands (2019), "Dataset for: Sky pixel detection in outdoor imagery using an adaptive algorithm and machine learning", Zenodo, doi:10.5281/zenodo.2562396, CC BY 4.0 (cartella `GSV` esclusa); immagini da webcam AMOS, termini di AMOS non verificati ⚠ |
@@ -435,7 +438,9 @@ Le operazioni fatte, in ordine. Ogni passo ha la sua cartella e legge solo i pas
    - DVIDS: tratti di ±5 s dove il detector vede un velivolo. Fuori le riprese da bordo, aria-aria e a terra, poi
      fumo, scala di grigi e visori notturni; scarti in `0_raw/esclusi.txt`, `fumo.txt`, `grigi.txt`, `verdi.txt`.
    - Open Images: solo foto con uccelli individuali (niente box di gruppo, raffigurazioni o "aircraft" generico),
-     uccelli piccoli, sfondo di cielo o orizzonte.
+     classi Bird, Eagle, Falcon, Raven e Magpie, sfondo di cielo o orizzonte. Un filtro SigLIP tiene solo gli
+     uccelli in volo (probabilità ≥ 0,7 o scena più probabile); 10 scarti a mano in `5_box/scarti_volo.txt`.
+   - DVIDS, dal giro 12 (28/10/2026): al massimo 40 frame per video, 1 al secondo (`frame --per-video 40`).
 3. **Frame e ritagli 640×512** attorno agli oggetti (FRED, DVIDS, Anti-UAV, FBD, Open Images); Svanström è già
    640×512. Anti-UAV: un frame ogni 25, più quelli a metà strada per i droni sopra i 32 px (26/10/2026, al massimo
    30 per video).
@@ -590,7 +595,11 @@ data/input/openimages/0_raw/scarica.sh              # annotazioni e liste, con s
 python tools/openimages.py --step candidati         # foto con uccelli individuali e piccoli -> 1_candidati.csv
 python tools/openimages.py --step immagini          # bucket pubblico CVDF -> 2_immagini
 python tools/openimages.py --step ritagli           # 640x512 sul cielo -> 4_ritagli, 5_box/manuale, 5_box/ritagli.csv
+python tools/openimages.py --step volo              # SigLIP: solo uccelli in volo, box doppi tolti -> 5_box/volo.csv
 ```
+
+Giro 2 (28/10/2026): `candidati --lato 0.3`, `ritagli --max-px 256`, poi `volo`. Se il proxy dà errore verso Hugging
+Face, `HF_HUB_OFFLINE=1` usa il modello in cache.
 
 ### Background: `tools/background.py`
 

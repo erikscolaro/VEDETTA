@@ -4,7 +4,7 @@
 
 Dataset for detecting **drones, airplanes, helicopters and birds** from a ground-based anti-drone turret, with an RGB
 camera pointed at the sky and the horizon. It is built for the thesis (repo `yoloeval`):
-- seven public sources of objects, plus two of background only;
+- six public sources of objects, plus two of background only;
 - labels reviewed by hand in CVAT and then with a review by candidates;
 - **aligned with the domain**: val and test are sky and horizon only;
 - split by recording and balanced by object size and by source.
@@ -16,8 +16,8 @@ not regenerated or modified.
 |---|---|
 | classes | `0 drone`, `1 airplane`, `2 helicopter`, `3 bird` |
 | images | 640×512, never upscaled |
-| splits | train 21,899, val 6,648, test 3,263, plus 492 int8 calibration images |
-| instances per class | about 9,620–11,920 in train, about 1,940–2,310 in val, about 960–1,120 in test; birds: 3,535, 802, 387 |
+| splits | train 23,062, val 6,132, test 3,469, plus 511 int8 calibration images |
+| instances per class | about 11,700–11,880 in train, about 1,900–2,260 in val, about 940–1,120 in test; birds: 4,444, 751, 375 |
 | object size | √(w·h) from 8 to over 256 px, with extra examples where the object is small |
 
 1. [The dataset](#the-dataset)
@@ -44,17 +44,17 @@ data/output/
 
 | split | images | real | mosaics | background |
 |---|---|---|---|---|
-| train | 21,899 | 18,161 | 688 | 3,050 |
-| val | 6,648 | 5,748 | 0 | 900 |
-| test | 3,263 | 2,747 | 0 | 516 |
-| calib | 492 | 441 | 0 | 51 |
+| train | 23,062 | 19,486 | 526 | 3,050 |
+| val | 6,132 | 5,232 | 0 | 900 |
+| test | 3,469 | 2,953 | 0 | 516 |
+| calib | 511 | 460 | 0 | 51 |
 
 | class | train | of which from mosaics | val | test |
 |---|---|---|---|---|
-| drone | 9,622 | 3,343 | 1,942 | 961 |
-| airplane | 11,921 | 4,079 | 2,309 | 1,122 |
-| helicopter | 11,766 | 4,454 | 2,183 | 1,066 |
-| bird | 3,535 | 703 | 802 | 387 |
+| drone | 11,706 | 3,160 | 1,896 | 940 |
+| airplane | 11,869 | 3,983 | 2,259 | 1,116 |
+| helicopter | 11,879 | 4,427 | 2,201 | 1,061 |
+| bird | 4,444 | 1,052 | 751 | 375 |
 
 File names tell the image type:
 - `R_<group>_<clip>_<n>`: **real** image;
@@ -82,7 +82,7 @@ File names tell the image type:
   - Airplanes, helicopters and drones follow the training target up to about 181 px. Above that, the sources have
     few examples and Anti-UAV stops at about 256 px.
   - Below 32 px the curve is reached thanks to the mosaics, which shrink large objects.
-  - Birds are well below the training target (3,535 boxes against 9,600–11,900 for the other classes); their
+  - Birds are well below the training target (4,444 boxes against 11,700–11,900 for the other classes); their
     targets stop at 96 px. Validation is also below its target and follows the uniform test target.
 
 ### Sources per split
@@ -96,9 +96,10 @@ File names tell the image type:
   - The three columns have similar shares by construction: the split has a term on the source mix, and training a
     cap per source.
   - Airplanes come almost only from DVIDS (93%), helicopters about 80%.
-  - Drones come from three sources: Anti-UAV (28–53%), DVIDS (17–53%) and Svanström (19–25%). FRED (about 9%) is
-    only in training.
-  - Half of the val and test birds come from Open Images (55–58%). In training FBD-SV and Open Images weigh the same (38–39%).
+  - Val and test drones come from DVIDS (44–61%), Anti-UAV (20–37%) and Svanström (19%). In training, on the real
+    boxes: Anti-UAV 34%, DVIDS 31%, Svanström 26% and FRED 9%. FRED is only in training, 6.7% with the mosaics.
+  - About 60% of the val and test birds come from Open Images, birds in flight only (SigLIP filter). In training, on
+    the real boxes: Open Images 52%, FBD-SV 25%, Svanström 18%.
 
 ### Context
 
@@ -112,9 +113,9 @@ File names tell the image type:
   - **ground**: trees, fields, buildings;
   - **wall**: a wall as background.
 - **Results.**
-  - Val and test are sky and horizon only, the turret domain, with 6–28% horizon per class; birds are at 56–63%.
-  - In training, ground and wall are at most 25% per class. They are 25% for birds (FBD-SV), about 8% for drones,
-    almost nothing for airplanes and helicopters.
+  - Val and test are sky and horizon only, the turret domain, with 6–30% horizon per class; birds are at 56–58%.
+  - In training, ground and wall are at most 25% per class. They are 22% for birds (FBD-SV) and for drones (FRED and
+    ground), about 2% for airplanes and helicopters.
   - When the weather is annotated (`meteo` column of the manifest), it will appear as a second row.
 
 ### Leakage between splits
@@ -127,11 +128,11 @@ nearest real training image. The axis is stretched towards 1 (−log₁₀(1 −
 - **(b) Tail.** The share of images above each threshold, in log scale. The vertical line is the duplicate threshold,
   0.95.
 - **References**, taken inside training:
-  - "same group, other clip": what a real leakage looks like, median 0.919;
-  - "different groups": the floor, because sky always looks like sky; median 0.799.
+  - "same group, other clip": what a real leakage looks like, median 0.935;
+  - "different groups": the floor, because sky always looks like sky; median 0.804.
 - **Reading.** If val or test had leakage, their curves would move towards the dashed one.
 - **Results.**
-  - Validation (median 0.823) and test (0.795) match the floor, also in the tail between 0.85 and 0.95.
+  - Validation (median 0.806) and test (0.777) match the floor, also in the tail between 0.85 and 0.95.
   - No image exceeds 0.95. That is partly by construction, because pairs above 0.95 are in the same group. The match
     with the floor below 0.95 is not.
 
@@ -142,7 +143,7 @@ nearest real training image. The axis is stretched towards 1 (−log₁₀(1 −
 **Figure 5.** *DINOv2 similarity between all 68,368 annotated frames.*
 - **(a) Matrix.** The mean similarity between blocks of consecutive frames, in order of source, session and clip.
   - Red lines separate the sources; the number of frames is in parentheses.
-  - The area of each source is proportional to the square root of its frames, so Open Images (623) stays visible.
+  - The area of each source is proportional to the square root of its frames, so Open Images (1,059) stays visible.
   - Dark blocks on the diagonal are recordings that are similar inside.
 - **(b) Frame pairs.** The density of the similarity of all pairs, by type:
   - same clip;
@@ -207,7 +208,7 @@ accepted background leakage.
   FBD-SV-2024 is almost all vegetation, so it is only in train and within the out-of-domain share.
 - **Fixed-wing drones excluded**: too few to be in all the splits.
 - **Objects above 181 px** are under the train curve, for all classes.
-- **Drones in val and test** are below the target (1,942 against 2,531 and 961 against 1,265), mostly between 16 and
+- **Drones in val and test** are below the target (1,896 against 2,547 and 940 against 1,273), mostly between 16 and
   32 px: there are few independent drone videos, and a group cannot exceed 15% of a class or 75% of a cell.
 - **Labels of the Anti-UAV drones added on October 26, 2026**: they are the original ones of the dataset.
 - **Accepted background leakage**: the sources with sky have a background that repeats across different recordings,
@@ -288,6 +289,8 @@ Set before touching the data and updated with the decisions taken during constru
   the val drones). The rest of the group is not used: it cannot go in train.
 - The assignment minimizes the distance from the targets, with at least 2,000 instances per class in val and 1,000 in
   test (and never above 20% of the in-domain material).
+- A **waste** term (28/10/2026) makes the boxes that a group loses when it goes to val or test cost, drones ×4.
+  Without it the split chose big groups and dropped 7,846 drones; with it, it drops 530 (2%).
 
 **Sources**
 - Open licenses only (public domain, CC0, CC BY, Apache, MIT), verified before download.
@@ -327,7 +330,7 @@ The dataset exists thanks to these sources. Anyone who uses it must cite the pap
 | Svanström, Alonso-Fernandez, Englund | 284 RGB 640×512 videos | `svanstrom2021dataset`; data CC0 1.0 (data DOI 10.5281/zenodo.5500576), paper CC BY 4.0 |
 | FRED, Magrini et al. | 10 RGB drone sequences | `magrini2025fred`; Apache 2.0, include the license |
 | Anti-UAV, Jiang et al. | RGB recordings of Anti-UAV300 | `jiang2023antiuav` (online 2021, vol. 25 of 2023); MIT, include the copyright and the license |
-| Open Images, Kuznetsova et al. | 623 crops with birds in the sky | `kuznetsova2020openimages`; annotations CC BY 4.0 (Google), images CC BY 2.0: author and link in `data/output/fonti_openimages.csv` |
+| Open Images, Kuznetsova et al. | 1,059 crops with birds in flight | `kuznetsova2020openimages`; annotations CC BY 4.0 (Google), images CC BY 2.0: author and link in `data/output/fonti_openimages.csv` |
 | FBD-SV-2024, Sun et al. | 483 bird videos | `sun2025fbdsv`; data on figshare (DOI 10.6084/m9.figshare.27377595, CC BY 4.0 according to DataCite), but the dataset readme says "for learning and research purposes only, not for commercial use" ⚠ |
 | Clouds-1500, Arrais et al. | background images | `arrais2023clouds1500`; CC BY 4.0 |
 | SkyFinder, Mihail et al. | background images | `mihail2016sky`; downloaded from the copy by Nice and Wijnands (2019), "Dataset for: Sky pixel detection in outdoor imagery using an adaptive algorithm and machine learning", Zenodo, doi:10.5281/zenodo.2562396, CC BY 4.0 (`GSV` folder excluded); images from AMOS webcams, AMOS terms not verified ⚠ |
@@ -428,8 +431,10 @@ The operations done, in order. Each step has its own folder and reads only the p
    - FRED: indoor and night sequences out.
    - DVIDS: stretches of ±5 s where the detector sees an aircraft. Out: onboard, air-to-air and ground footage, then
      smoke, grayscale and night vision; discards in `0_raw/esclusi.txt`, `fumo.txt`, `grigi.txt`, `verdi.txt`.
-   - Open Images: only photos with individual birds (no group boxes, depictions or generic "aircraft"), small birds,
-     sky or horizon background.
+   - Open Images: only photos with individual birds (no group boxes, depictions or generic "aircraft"), classes Bird,
+     Eagle, Falcon, Raven and Magpie, sky or horizon background. A SigLIP filter keeps only the birds in flight
+     (probability ≥ 0.7 or most probable scene); 10 rejects by hand in `5_box/scarti_volo.txt`.
+   - DVIDS, from round 12 (28/10/2026): at most 40 frames per video, 1 per second (`frame --per-video 40`).
 3. **640×512 frames and crops** around the objects (FRED, DVIDS, Anti-UAV, FBD, Open Images); Svanström is already
    640×512. Anti-UAV: one frame every 25, plus the halfway ones for drones above 32 px (October 26, 2026, at most 30
    per video).
@@ -586,7 +591,11 @@ data/input/openimages/0_raw/scarica.sh              # annotations and lists, wit
 python tools/openimages.py --step candidati         # photos with individual and small birds -> 1_candidati.csv
 python tools/openimages.py --step immagini          # public CVDF bucket -> 2_immagini
 python tools/openimages.py --step ritagli           # 640x512 on the sky -> 4_ritagli, 5_box/manuale, 5_box/ritagli.csv
+python tools/openimages.py --step volo              # SigLIP: birds in flight only, double boxes out -> 5_box/volo.csv
 ```
+
+Round 2 (28/10/2026): `candidati --lato 0.3`, `ritagli --max-px 256`, then `volo`. If the proxy fails towards Hugging
+Face, `HF_HUB_OFFLINE=1` uses the cached model.
 
 ### Background: `tools/background.py`
 

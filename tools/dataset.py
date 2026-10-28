@@ -194,7 +194,7 @@ DARK = 30  # mean grey level (0-255) under which a frame not reviewed is night (
 def reviewed() -> None:
     """Frames after the full CVAT review of the 26/10 dataset (user, 26/10/2026). The reviewed real images
     (`16_cvat/frame.csv`) keep their corrected labels, without the deleted ones and those left without boxes. The other
-    frames of the table stay as candidates, without: the groups of the deleted frames (night Anti-UAV), frames darker
+    frames of the table stay as candidates. Out: all the frames of the groups of the deleted frames (night Anti-UAV, reviewed or not), and among the others frames darker
     than `DARK`, clips where the review removed a box. Column `rivisto` (1: reviewed or approved in CVAT): split and
     train take them first, mosaics only use them. Writes `17_dataset/frame.csv` and `17_dataset/esclusi.csv`."""
     from concurrent.futures import ThreadPoolExecutor
@@ -214,6 +214,8 @@ def reviewed() -> None:
 
     removed = {r["immagine"] for f in ["modifiche.csv"] + sorted(f.name for f in cv.glob("modifiche_nuovi_*.csv"))
                for r in csv.DictReader(open(cv / f)) if r["modifica"] == "tolto"}
+    rev = {i: r for i, r in rev.items() if i in by_img}  # reviewed frames no longer in the table (Open Images out by `volo`)
+    removed &= set(by_img)
     risky = {by_img[i]["clip"] for i in removed} | {by_img[i]["clip"] for i, r in rev.items() if r["stato"] == "vuota"}
     night = {group(i) for i, r in rev.items() if r["stato"] == "cancellata"}
     lum_f = WORK / "luminosita.csv"  # cache: mean grey level of the frames not reviewed
@@ -232,13 +234,13 @@ def reviewed() -> None:
     rows, gone = [], []
     for r in base:
         i = r["immagine"]
-        if i in rev:
+        if group(i) in night:  # also the reviewed frames: 81 night frames had stayed in test (user, 27/10/2026)
+            gone.append((i, "gruppo notturno"))
+        elif i in rev:
             if rev[i]["stato"] in ("cancellata", "vuota"):
                 gone.append((i, f"revisione: {rev[i]['stato']}"))
             else:
                 rows.append(dict(r, label=rev[i]["label"], rivisto=1))
-        elif group(i) in night:
-            gone.append((i, "gruppo notturno"))
         elif lum[i] < DARK:
             gone.append((i, "buio"))
         elif r["clip"] in risky:
@@ -258,9 +260,12 @@ def reviewed() -> None:
 # --- step split ------------------------------------------------------------------------------------------------------
 
 _ST: dict = {}
+WASTE = 10.0  # weight of the boxes dropped from a group sent to val or test, per class share, drones x4 (user, 28/10/2026:
+# a split without it dropped 7,822 drone boxes of big Anti-UAV and Svanstrom groups, the train fell from 6,924 to 4,785)
+WASTE_W = np.array([1, 1, 4, 1])  # airplane, bird, drone, helicopter
 
 
-def _obj(s: str, x, t, xs, ps, xh) -> float:
+def _obj(s: str, x, t, xs, ps, xh, ws) -> float:
     """Error of a split: cells (relative, drones x4 as in `split.py`), minimum per class, source mix (per class,
     against the share of each source in the in-domain pool) and share of horizon boxes per class (against the
     in-domain pool: a fixed 20% sent almost every sky bird to val and test, user 26/10/2026)."""
@@ -275,19 +280,19 @@ def _obj(s: str, x, t, xs, ps, xh) -> float:
     src = SOURCE_WEIGHT @ (((xs - ps * n) / np.maximum(ps * T, 1)) ** 2 * (ps > 0.02)).sum(1)
     ph = _ST["PH"]
     hor = (((xh / np.maximum(n[:, 0], 1)) - ph) / np.maximum(ph, 0.01)) ** 2 * (n[:, 0] / np.maximum(T[:, 0], 1)) ** 2
-    return _err(x, t) + 100 * (short ** 2).sum() + src + 0.5 * hor.sum()
+    return _err(x, t) + 100 * (short ** 2).sum() + src + 0.5 * hor.sum() + WASTE * (WASTE_W * ws / _ST["POOL"]).sum()
 
 
 def _trial(seed: int) -> tuple:
-    free, tg, ok, X, XS, XH, PS = (_ST[k] for k in ("free", "tg", "ok", "X", "XS", "XH", "PS"))
+    free, tg, ok, X, XS, XH, PS, XW = (_ST[k] for k in ("free", "tg", "ok", "X", "XS", "XH", "PS", "XW"))
     rng = np.random.default_rng(seed)
-    cur = {s: [np.zeros_like(tg[s]), np.zeros_like(PS), np.zeros(4)] for s in tg}
+    cur = {s: [np.zeros_like(tg[s]), np.zeros_like(PS), np.zeros(4), np.zeros(4)] for s in tg}
 
     def tot(s, c):
-        return _obj(s, c[0], tg[s], c[1], PS, c[2])
+        return _obj(s, c[0], tg[s], c[1], PS, c[2], c[3])
 
     def add(c, s, g, k):
-        return [c[0] + k * X[s][g], c[1] + k * XS[s][g], c[2] + k * XH[s][g]]
+        return [c[0] + k * X[s][g], c[1] + k * XS[s][g], c[2] + k * XH[s][g], c[3] + k * XW[s][g]]
 
     lab = {}
     for g in rng.permutation(free):
@@ -394,7 +399,13 @@ def split(trials: int = 1000, share: float = 0.75, seed: int = 0) -> None:
     PS = XSall / np.maximum(XSall.sum(1, keepdims=True), 1)
     free = [g for g in range(len(gids)) if g in by_g]
     ok = {s: {g for g in free if X[s][g].sum() > 0} for s in tg}
-    _ST.update(free=free, tg=tg, ok=ok, X=X, XS=XS, XH=XH, PS=PS, MIN=mins, PH=hor / np.maximum(avail.sum(1), 1))
+    G = np.zeros((len(gids), 4))  # all the boxes of each group, in domain or not
+    for r, g in zip(rows, fg):
+        for c, *_ in _boxes(DATA / r["label"]):
+            G[g, c] += 1
+    XW = {s: G - X[s].sum(2) for s in tg}  # boxes lost if the group goes to s
+    _ST.update(free=free, tg=tg, ok=ok, X=X, XS=XS, XH=XH, PS=PS, MIN=mins, PH=hor / np.maximum(avail.sum(1), 1),
+               XW=XW, POOL=np.maximum(G.sum(0), 1))
     with mp.get_context("fork").Pool(20) as pool:
         best = min(pool.map(_trial, [seed * 100_000 + k for k in range(trials)]), key=lambda x: x[0])
     lab = {g: "train" for g in range(len(gids))} | best[1]
@@ -408,6 +419,8 @@ def split(trials: int = 1000, share: float = 0.75, seed: int = 0) -> None:
         csv.writer(fh).writerows([("immagine", "split")] + out)
     c = Counter(s for _, s in out)
     print(f"split: errore {best[0]:.2f}; " + ", ".join(f"{k} {v}" for k, v in c.most_common()))
+    lost = sum(XW[s][g] for g, x in lab.items() if x in tg for s in [x])
+    print("  box persi per eccesso: " + ", ".join(f"{n} {int(lost[k])} ({lost[k] / _ST['POOL'][k]:.0%})" for k, n in enumerate(NAMES)))
     for s in ("val", "test"):
         S = sum(X[s][g] for g, x in lab.items() if x == s)
         SS = sum(XS[s][g] for g, x in lab.items() if x == s)

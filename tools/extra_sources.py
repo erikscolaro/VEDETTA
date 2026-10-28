@@ -299,12 +299,16 @@ def page_info(row: dict) -> list:
 # queries per class (quoted phrases, sorted by relevance); chosen for distant aircraft and drones in flight
 QUERY = {
     "drone": ['"counter-UAS"', '"C-UAS"', '"counter-drone"', '"counter unmanned"', '"small UAS"', '"sUAS"',
-              "quadcopter", '"drone swarm"', '"FPV drone"', "Skydio", '"Raven UAS"', '"Puma UAS"',
+              "quadcopter", '"drone swarm"', '"FPV drone"', "Skydio",
               '"Black Hornet"', '"drone training"', '"UAS operations"', '"unmanned aircraft system"',
-              "Dronebuster", '"drone defense"', '"drone demonstration"', '"one-way attack drone"',
+              "Dronebuster", '"drone defense"', '"drone demonstration"',
               '"UAS demonstration"', '"drone range"', '"UAS flight"', '"Group 1 UAS"', '"Group 2 UAS"',
               '"drone pilot"', '"drone course"', '"drone competition"', '"drone flight"', '"quadcopters"',
-              '"drone lethality"', '"drone strike"', '"Anduril"', '"Coyote"', '"Switchblade"'],
+              '"drone lethality"', '"drone strike"', '"Anduril"',
+              # round 12 (28/10/2026): multirotors only, no fixed wing (Raven, Puma, Coyote, Switchblade: user, 27/10/2026)
+              "hexacopter", "multirotor", '"Skydio X2"', '"Parrot Anafi"', '"Short Range Reconnaissance"',
+              '"Teal drone"', "DJI", "Mavic", "Matrice", '"FPV"', '"drone racing"', '"drone obstacle course"',
+              '"counter-sUAS"', '"drone detection"', '"drone jammer"', '"UAS defeat"'],
     "helicopter": ['"air assault"', '"helicopter formation"', '"sling load"', '"UH-60"', '"AH-64"', '"CH-47"',
                    '"HH-60"', '"MH-60"', '"UH-72"', '"CH-53"', '"AH-1Z"', '"UH-1Y"', "medevac hoist",
                    '"aerial gunnery"', "FARP", '"air movement"', '"helicopter flyover"', '"helicopters"',
@@ -321,7 +325,8 @@ QUERY = {
                    '"National Guard helicopter"', '"helicopter support team"'],
     "bird": ['"bird strike"', '"BASH"', '"bird aircraft strike hazard"', "falconry", "falconer", '"bald eagle"',
              "seagulls", "pelicans", '"migratory birds"', "geese", '"red-tailed hawk"', "vultures", '"wildlife biologist"',
-             '"bird watching"', "birds", '"bird survey"', "albatross", "egrets", "cranes migration"],
+             '"bird watching"', "birds", '"bird survey"', "albatross", "egrets", "cranes migration",
+             '"wildlife hazard"', '"bird control"', '"flock of birds"', "gulls", "herons", "starlings"],
     "airplane": ['"flyover"', '"air show"', '"airdrop"', '"touch and go"', '"F-16"', '"F-35"', '"A-10"', '"C-17"',
                  '"KC-135"', '"B-52"', "Thunderbirds", '"Blue Angels"', '"formation flight"', '"flypast"',
                  '"C-130"', '"F-22"', '"F-15"', '"T-38"',
@@ -494,17 +499,21 @@ def _sky(gray: np.ndarray, x1, y1, x2, y2) -> bool:
     return band.size > 0 and float(np.abs(np.diff(band.astype(np.int16), axis=1)).mean()) < 4
 
 
-def choose_segments(src: Path, conf: float = 0.3, half: float = 5.0) -> None:
+def choose_segments(src: Path, conf: float = 0.3, half: float = 5.0, cls: str = "") -> None:
     """YOLO on the previews: a preview counts if it has an airplane or helicopter (conf
     >= `conf`); segment = +-`half` s around it, nearby segments merged -> `0_raw/tratti.csv`
     (id, inizio, fine, cielo = previews with the object on the sky, valid previews, grandezza = the smallest
-    sqrt(w*h) of the aircraft in the segment previews, in frame pixels: it is the size in the crop)."""
+    sqrt(w*h) of the aircraft in the segment previews, in frame pixels: it is the size in the crop).
+    With `cls`: only the videos of that class without segments, added to the file (28/10/2026: the old segments
+    stay as they are, because `esclusi.txt` and the extracted frames refer to their start)."""
     import cv2
     model = detector()
-    rows = []
+    f = src / "0_raw" / "tratti.csv"
+    rows = [tuple(r.values()) for r in csv.DictReader(open(f))] if cls else []
+    have = {r[0] for r in rows}
     for r in csv.DictReader(open(src / "0_raw" / "video.csv")):
         d = src / "0_raw" / "anteprima" / r["id"]
-        if not _ok(r) or not d.exists():
+        if not _ok(r) or not d.exists() or (cls and (r["classe"] != cls or r["id"] in have)):
             continue
         hit = []
         for p in sorted(d.glob("*.jpg")):
@@ -528,7 +537,7 @@ def choose_segments(src: Path, conf: float = 0.3, half: float = 5.0) -> None:
         rows += [(r["id"], *s) for s in segs]
         print(f"dvids: {r['id']} {r['classe']} {len(hit)} anteprime con velivolo, {sum(s for _, s, _ in hit)} sul cielo, "
               f"{len(segs)} tratti", flush=True)
-    with open(src / "0_raw" / "tratti.csv", "w", newline="") as fh:
+    with open(f, "w", newline="") as fh:
         w = csv.writer(fh)
         w.writerow(["id", "inizio", "fine", "cielo", "anteprime", "grandezza"])
         w.writerows(rows)
@@ -694,11 +703,12 @@ def exclude_smoke(src: Path, sheets: str, rejects: Path, name: str = "fumo") -> 
 
 
 def video_frames(src: Path, ids: list[str], seconds: float = 0, size: float = 0, cls: str = "",
-                 conf: float = 0.25, workers: int = 8, min_size: float = 0) -> None:
+                 conf: float = 0.25, workers: int = 8, min_size: float = 0, per_video: int = 0) -> None:
     """The segments of `tratti.csv` (with at least one preview on the sky) at `FPS` frames
     per second -> `1_frame/DVIDS_<id>/images/DVIDS_<id>_f<k>.jpg`, k = round(t*FPS)
     (stable: no re-downloads), and YOLO labels from the proposals detector on the whole
-    frame (proposals, to be reviewed in CVAT)."""
+    frame (proposals, to be reviewed in CVAT). With `per_video`: 1 frame per second and at most
+    `per_video` frames per video, over its segments (user, 28/10/2026: no long videos to review)."""
     import shutil
     import tempfile
 
@@ -712,7 +722,7 @@ def video_frames(src: Path, ids: list[str], seconds: float = 0, size: float = 0,
             by.setdefault(r["id"], []).append(r)
     # in rounds over the videos (1st segment of each video, then the 2nd...): stopping early gives variety
     segs = [s for k in range(max(map(len, by.values()), default=0)) for v in by.values() if k < len(v) for s in v[k:k + 1]]
-    spent, todo = {}, []
+    spent, todo, left = {}, [], {}
     for r in segs:
         v = f"DVIDS_{r['id']}"
         k0 = round(float(r["inizio"]) * FPS)
@@ -721,6 +731,12 @@ def video_frames(src: Path, ids: list[str], seconds: float = 0, size: float = 0,
         c = info[r["id"]]["classe"]
         if seconds and spent.get(c, 0) >= seconds:
             continue
+        if per_video:
+            n = min(left.setdefault(r["id"], per_video), int(float(r["fine"]) - float(r["inizio"])))
+            if n <= 0:
+                continue
+            left[r["id"]] -= n
+            r = dict(r, fine=float(r["inizio"]) + n)
         spent[c] = spent.get(c, 0) + float(r["fine"]) - float(r["inizio"])
         todo.append(r)
 
@@ -730,7 +746,7 @@ def video_frames(src: Path, ids: list[str], seconds: float = 0, size: float = 0,
         for _ in range(3):
             try:
                 if subprocess.run(["ffmpeg", "-v", "error", "-y", "-rw_timeout", "30000000", "-ss", str(a), "-i",
-                                   info[r["id"]]["mp4"], "-t", str(b - a), "-vf", f"fps={FPS}", "-q:v", "3",
+                                   info[r["id"]]["mp4"], "-t", str(b - a), "-vf", f"fps={1 if per_video else FPS}", "-q:v", "3",
                                    f"{tmp}/%05d.jpg"], timeout=900).returncode == 0:
                     break
             except subprocess.TimeoutExpired:
@@ -746,7 +762,7 @@ def video_frames(src: Path, ids: list[str], seconds: float = 0, size: float = 0,
             k0 = round(float(r["inizio"]) * FPS)
             n, frames = 0, sorted(Path(tmp).glob("*.jpg"))
             for j, p in enumerate(frames):
-                stem = f"{v}_f{k0 + j:05d}"
+                stem = f"{v}_f{k0 + j * (FPS if per_video else 1):05d}"
                 im = cv2.imread(str(p))
                 if im is None:
                     continue
@@ -827,6 +843,8 @@ def main(argv=None) -> int:
     p.add_argument("--secondi", type=float, default=0, help="DVIDS frame: secondi nuovi per classe in questo giro (0: tutti)")
     p.add_argument("--fogli", default="", help="DVIDS escludi: cartella dei fogli rivisti (fogli_tratti<N>)")
     p.add_argument("--scarti", type=Path, help="DVIDS escludi: file con le righe `n codice` della revisione")
+    p.add_argument("--per-video", type=int, default=0, help="DVIDS frame: 1 frame al secondo, al massimo N frame per video")
+    p.add_argument("--pagine", type=int, default=4, help="DVIDS cerca: pagine da 50 risultati per query")
     p.add_argument("--classe", default="", help="DVIDS fogli e frame: solo i video di questa classe")
     p.add_argument("--grandezza", type=float, default=0, help="DVIDS fogli e frame: solo i tratti con un velivolo di grandezza sqrt(w*h) sotto questa (px)")
     p.add_argument("--minimo", type=float, default=0, help="DVIDS fogli e frame: solo i tratti con il velivolo piu' piccolo almeno di questa grandezza (px)")
@@ -838,11 +856,11 @@ def main(argv=None) -> int:
         elif a.fonte == "antiuav":
             download_image_frames(src)
         else:
-            video_frames(src, a.seq, a.secondi, a.grandezza, a.classe, min_size=a.minimo)
+            video_frames(src, a.seq, a.secondi, a.grandezza, a.classe, min_size=a.minimo, per_video=a.per_video)
     if a.step == "frame_extra":  # Anti-UAV: more drones in the sky, between the frames already used (26/10/2026)
         antiuav_extra()
     if a.step == "cerca":
-        search_videos(src, cls=a.classe)
+        search_videos(src, pages=a.pagine, cls=a.classe)
     if a.step == "escludi":
         exclude_segments(src, a.fogli, a.scarti)
     if a.step == "fogli_fumo":
@@ -864,7 +882,7 @@ def main(argv=None) -> int:
     if a.step == "anteprima":
         video_previews(src, a.classe)
     if a.step == "scegli":
-        choose_segments(src)
+        choose_segments(src, cls=a.classe)
     if a.step == "fogli":
         segment_sheets(src, cls=a.classe, size=a.grandezza, min_size=a.minimo)
     if a.step == "catena":
