@@ -188,7 +188,7 @@ def similarity_plot(per_clip: int = 10, n_pairs: int = 100_000, seed: int = 0) -
         emb = np.load(out / f"embedding_{name}.npy").astype(np.float32)
         S = emb[idx] @ emb[idx].T
         f, (ax, ax2) = plt.subplots(1, 2, figsize=(WIDTH, 3.9), width_ratios=[1.15, 1])
-        im = ax.imshow(S, cmap="Blues", vmin=0, vmax=1, interpolation="nearest", aspect="auto")  # titles aligned
+        im = ax.imshow(S, cmap="Blues", vmin=0, vmax=1, interpolation="nearest", aspect="equal")  # square (user, 28/10/2026)
         for k in range(1, len(clips)):
             ax.axhline(k * per_clip - .5, color="w", lw=.4)
             ax.axvline(k * per_clip - .5, color="w", lw=.4)
@@ -211,6 +211,7 @@ def similarity_plot(per_clip: int = 10, n_pairs: int = 100_000, seed: int = 0) -
         ax2.set_title("(b) Coppie di frame a caso")
         ax2.text(.02, .7, "AUC stessa sessione\ncontro diverse: " + f"{auc:.3f}".replace(".", ","), transform=ax2.transAxes,
                  fontsize=7, color="0.3", va="top")
+        f.align_titles()  # the square matrix is shorter than the other panel: titles on one line
         print(f"{name}: AUC {auc:.4f}, mediane " + ", ".join(f"{k} {np.median(v):.3f}" for k, v in sims.items()),
               save(f, out / f"somiglianze_{name}", pdf=False, name="similarity_sample"))
 
@@ -303,7 +304,7 @@ def similarity_all(by_group: bool = False, lo: float = -0.2, bins: int = 240, bl
         f, axs = plt.subplots(1, 3 if by_group else 2, figsize=(WIDTH, 2.7),
                               width_ratios=[1.2, 1.25, .85] if by_group else [1, 1.2])
         ax, ax2 = axs[0], axs[1]
-        im = ax.imshow(Sc, cmap="Blues", vmin=0, vmax=1, interpolation="nearest", aspect="auto")  # fills the panel height
+        im = ax.imshow(Sc, cmap="Blues", vmin=0, vmax=1, interpolation="nearest", aspect="equal")  # square (user, 28/10/2026)
         first = {x: float(start[x]) for x in srcs}
         starts = sorted(first.values()) + [px]
         for b in starts[1:-1]:
@@ -353,6 +354,7 @@ def similarity_all(by_group: bool = False, lo: float = -0.2, bins: int = 240, bl
             ax3.set_ylabel(t["ytail"])
             ax3.set_title(t["tail"])
         f.legend(*ax2.get_legend_handles_labels(), loc="outside lower center", ncol=len(t["kinds"][:len(h)]))
+        f.align_titles()  # the square matrix is shorter than the other panels: titles on one line
         if by_group:  # summary figure of the README (user, 23/10/2026)
             save(f, FIG / "similarity")
         else:
@@ -682,7 +684,8 @@ def groups() -> None:
         a, b = pairs[k]
         parent[find(a)] = find(b)
     # duplicates confirmed by hand below 0.95 (user, 23/10/2026): tuning sample and full review of 0.92-0.95
-    for d in ("taratura", "fascia_092", "fascia_092_b"):  # fascia_092_b: sessions added after the review (26/10/2026)
+    # fascia_092_b: sessions added after the review (26/10/2026); fascia_092_c: DVIDS round 12 (28/10/2026)
+    for d in ("taratura", "fascia_092", "fascia_092_b", "fascia_092_c"):
         if (dup / d / "stessa_sessione.txt").exists():
             pairs = {int(r["n"]): (r["sessione_a"], r["sessione_b"]) for r in csv.DictReader(open(dup / d / "coppie.csv"))}
             for k in _merges(dup / d / "stessa_sessione.txt"):
@@ -883,9 +886,11 @@ FIG = ROOT / "docs" / "figure"  # README figures, in Italian and English
 
 
 def _threshold_plot(dst: Path, lang: str = "it") -> None:
-    """Share of true duplicates per similarity band, judged by hand (user, 23/10/2026), with the 95% Wilson interval:
-    tuning sample (`taratura/`) and full review of 0.92-0.95 (`fascia_092/`); above 0.95 the 146 pairs of step 10,
-    all merged -> `docs/figure/{it,en}_threshold_tuning`."""
+    """Duplicates threshold, two panels with a shared x (user, 28/10/2026: the single bar chart was "asettico e poco
+    informativo"): (a) per band of maximum similarity, the session pairs of the current data, those judged by hand
+    (tuning sample `taratura/`, full review of 0.92-0.95 `fascia_092/`, the 146 pairs >= 0.95 of step 10) and the
+    confirmed duplicates, log scale; (b) share of duplicates with the 95% Wilson interval over the three zones of the
+    rule (ignored, review by hand, automatic merge), colours as `threshold_examples` -> `{it,en}_threshold_tuning`."""
     import matplotlib.pyplot as plt
 
     from tools.plots import WIDTH, _P, save, use
@@ -899,27 +904,62 @@ def _threshold_plot(dst: Path, lang: str = "it") -> None:
             same.append(int(r["n"]) in yes)
     top = sum(1 for _ in csv.DictReader(open(dup / "coppie.csv")))
     sim, same = np.array(sim + [2.0] * top), np.array(same + [True] * top)  # 2.0: the reviewed pairs of step 10
-    bands = [(0.85, 0.90), (0.90, 0.92), (0.92, 0.93), (0.93, 0.94), (0.94, 0.95), (1.5, 2.5)]
+    allp = np.array([v[0] for v in _session_pairs(0.85)[4].values()])  # every session pair, current data
+    bands = [(0.85, 0.90), (0.90, 0.92), (0.92, 0.93), (0.93, 0.94), (0.94, 0.95), (0.95, 1.01)]
     it = lang == "it"
     use(lang)
-    f, ax = plt.subplots(figsize=(WIDTH, 2.3))
-    for i, (lo, hi) in enumerate(bands):
-        m = (sim >= lo) & ((sim < hi) | ((hi == 0.95) & (sim <= 0.9504)))  # 0.950 rounded in coppie.csv
+    f, (a1, a2) = plt.subplots(2, 1, figsize=(WIDTH, 3.9), sharex=True, height_ratios=[1, 1.15])
+    x = np.arange(len(bands))
+    tot, rev, k_, c_, h_ = [], [], [], [], []
+    for lo, hi in bands:
+        m = (sim >= lo) & ((sim < hi) | ((hi == 0.95) & (sim <= 0.9504))) if hi < 1 else sim > 1.5  # 0.950 rounded
         n, k = int(m.sum()), int(same[m].sum())
         z = 1.96
         c, h = (k + z * z / 2) / (n + z * z), z * np.sqrt(k * (n - k) / n + z * z / 4) / (n + z * z)
-        ax.bar(i, k / n, color=_P[0], width=.6)
-        ax.errorbar(i, c, yerr=h, color="0.15", lw=.8, capsize=2.5, capthick=.8)
-        ax.text(i, c + h + .03, f"{k}/{n}", ha="center", fontsize=7)
+        tot.append(int(((allp >= lo) & (allp < hi)).sum()))
+        rev.append(n)
+        k_.append(k)
+        c_.append(c)
+        h_.append(h)
+    sep = "." if it else ","
+    fmt = lambda v: f"{v:,}".replace(",", sep)  # noqa: E731
+    w = .62
+    a1.bar(x, tot, w, color="0.85", label="Coppie di sessioni nei dati" if it else "Session pairs in the data")
+    a1.bar(x, rev, w * .66, color=_P[0], alpha=.35, label="Riviste a mano" if it else "Reviewed by hand")
+    a1.bar(x, k_, w * .33, color=_P[0], label="Doppioni confermati" if it else "Confirmed duplicates")
+    for i in x:
+        a1.text(i, tot[i] * 1.25, fmt(tot[i]), ha="center", fontsize=7, color="0.35")
+    a1.set_yscale("log")
+    a1.set_ylim(.8, max(tot) * 6)
+    a1.set_ylabel("Coppie" if it else "Pairs")
+    a1.grid(axis="x", visible=False)
+    a1.legend(loc="upper right", ncol=3, frameon=False)
+    a1.set_title("(a) Coppie per fascia" if it else "(a) Pairs per band", loc="left")
+    zones = [(-.5, 1.5, "0.6", "si ignora" if it else "ignored"),
+             (1.5, 4.5, _P[3], "revisione a mano" if it else "review by hand"),
+             (4.5, 5.5, _P[0], "unione automatica" if it else "automatic merge")]
+    for lo, hi, col, name in zones:
+        a2.axvspan(lo, hi, color=col, alpha=.12, lw=0)
+        a2.text((lo + hi) / 2, 1.13, name, ha="center", va="top", fontsize=7, color="0.25")
+    a2.plot(x, [k / n for k, n in zip(k_, rev)], color=_P[0], lw=1, zorder=2)
+    a2.errorbar(x, c_, yerr=h_, fmt="none", ecolor="0.2", lw=.8, capsize=2.5, capthick=.8, zorder=3)
+    a2.scatter(x, [k / n for k, n in zip(k_, rev)], s=18, color=_P[0], zorder=4)
+    for i in x:  # the last point is at 100%, under the zone name: its label goes to the left, below
+        last = i == x[-1]
+        a2.text(i + (-.09 if last else .09), k_[i] / rev[i] + (-.05 if last else .03), f"{k_[i]}/{rev[i]}", fontsize=7,
+                va="top" if last else "bottom", ha="right" if last else "left")
+    a2.set_ylim(-.04, 1.16)
+    a2.set_xlim(-.5, len(bands) - .5)
+    a2.set_ylabel("Quota di doppioni" if it else "Share of duplicates")
+    a2.set_yticks([0, .25, .5, .75, 1], ["0", "25%", "50%", "75%", "100%"])
+    a2.grid(axis="x", visible=False)
+    a2.set_title("(b) Doppioni fra le coppie riviste, IC di Wilson al 95%" if it else
+                 "(b) Duplicates among the reviewed pairs, 95% Wilson CI", loc="left")
     lab = [f"{lo:.2f}–{hi:.2f}" if hi < 1 else "≥ 0.95" for lo, hi in bands]
-    ax.set_xticks(range(len(bands)), [x.replace(".", ",") for x in lab] if it else lab)
-    ax.grid(axis="x", visible=False)
-    ax.axvline(len(bands) - 1.5, color="0.15", ls="--", lw=.8)
-    ax.set_ylim(0, 1.15)
-    ax.set_ylabel("Quota di doppioni" if it else "Share of duplicates")
-    ax.set_yticks([0, .25, .5, .75, 1], ["0", "25%", "50%", "75%", "100%"])
-    ax.set_xlabel("Somiglianza massima fra due sessioni (DINOv2)" if it else
+    a2.set_xticks(x, [v.replace(".", ",") for v in lab] if it else lab)
+    a2.set_xlabel("Somiglianza massima fra due sessioni (DINOv2)" if it else
                   "Maximum similarity between two sessions (DINOv2)")
+    f.align_ylabels()
     save(f, dst / "threshold_tuning")
 
 
@@ -934,18 +974,15 @@ def figures() -> None:
 def threshold_panel(edges=(0.85, 0.90, 0.92, 0.95, 0.98, 1.01), per: int = 3, seed: int = 0, dark: float = 60) -> None:
     """Panel for the thesis on the 0.95 threshold of duplicates between sessions (`docs/figure/{it,en}_threshold_examples`):
     one row per DINOv2 similarity band with `per` random pairs (fixed seed) of frames from
-    different sessions, boxes in red, and at the bottom same-clip pairs as reference. Below 0.95 different shots
-    with the same kind of sky; above, the same shot or the same footage republished (the 146 session pairs
-    above 0.95 reviewed by hand and merged, step 10). Reference: the same-clip pairs at the 25th, 50th and 75th
-    percentile of their similarity (random ones would be too scattered: a DVIDS clip changes framing).
-    Highlighted (user, 26/10/2026): the band reviewed by hand (0.92-0.95, every pair) and the automatic merge (>= 0.95);
+    different sessions, boxes in red. Below 0.95 different shots with the same kind of sky; above, the same shot or
+    the same footage republished (the 146 session pairs above 0.95 reviewed by hand and merged, step 10). The
+    same-clip reference row was removed (user, 28/10/2026). Highlighted (user, 26/10/2026): the band reviewed by hand (0.92-0.95, every pair) and the automatic merge (>= 0.95);
     pairs with a frame darker than `dark` (mean gray, 0-255: black backgrounds) are not shown."""
     import matplotlib.pyplot as plt
 
     from tools.plots import WIDTH, _P, save, use
 
     rows, cand, n_pairs, _ = _pairs_by_band(edges, seed)
-    _, ref, n_ref, _ = _pairs_by_band((-1, 1.01), seed, same_clip=True)
     # session pairs per band by their maximum similarity, as in the review (10_doppioni) and the tuning figure
     n_ses = np.histogram([v[0] for v in _session_pairs(edges[0])[4].values()], edges)[0]
     import cv2
@@ -964,24 +1001,22 @@ def threshold_panel(edges=(0.85, 0.90, 0.92, 0.95, 0.98, 1.01), per: int = 3, se
             if bright(c[x][1]) and bright(c[x][2]):
                 pk.append(c[x])
         picks.append(pk)
-    r0 = sorted(x for x in ref[0] if bright(x[1]) and bright(x[2]))
-    picks.append([r0[int(q * (len(r0) - 1))] for q in np.linspace(.25, .75, per)])
     tiles = [[(sv, _tile(rows[i], None, lw=6)[:, :, ::-1], _tile(rows[j], None, lw=6)[:, :, ::-1]) for sv, i, j in pk]
              for pk in picks]
     nb = len(edges) - 1
-    txt = {"it": dict(dec=",", band="Sessioni diverse", ref="Stessa clip\n(riferimento)", pairs="coppie di sessioni",
+    txt = {"it": dict(dec=",", band="Sessioni diverse", pairs="coppie di sessioni",
                       thr="Unione automatica", rev="Rivista a mano"),
-           "en": dict(dec=".", band="Different sessions", ref="Same clip\n(reference)", pairs="session pairs",
+           "en": dict(dec=".", band="Different sessions", pairs="session pairs",
                       thr="Merged automatically", rev="Reviewed by hand")}
     from matplotlib.patches import Rectangle
 
     # fixed layout in inches, full page width (user, 26/10/2026): label column, then `per` pairs of images
-    lab_w, g_in, g_out, t_h, r_gap, sep = 1.42, .04, .14, .17, .07, .1
+    lab_w, g_in, g_out, t_h, r_gap = 1.42, .04, .14, .17, .07
     img_w = (WIDTH - lab_w - per * g_in - (per - 1) * g_out) / (2 * per)
     img_h = img_w * tiles[0][0][1].shape[0] / tiles[0][0][1].shape[1]
     row_h = t_h + img_h + r_gap
-    H = (nb + 1) * row_h + sep
-    tops = [H - r * row_h - (sep if r == nb else 0) for r in range(nb + 1)]  # top of each row (title included)
+    H = nb * row_h
+    tops = [H - r * row_h for r in range(nb)]  # top of each row (title included)
     lab_col = {"rev": "#9a6a00", "thr": _P[0]}
     for lang, T in txt.items():
         use(lang)
@@ -995,13 +1030,11 @@ def threshold_panel(edges=(0.85, 0.90, 0.92, 0.95, 0.98, 1.01), per: int = 3, se
         # background behind the rows, adjacent bands touching, the meaning also written in the row label
         bands = [(e_ := list(edges)).index(0.92), e_.index(0.95), nb]
         for (r0, r1), color in zip(zip(bands, bands[1:]), (_P[3], _P[0])):
-            y0 = tops[nb] + sep / 2 if r1 == nb else tops[r1] + r_gap / 2
+            y0 = 0 if r1 == nb else tops[r1] + r_gap / 2
             y1 = tops[r0] + r_gap / 2 if r0 else H
             f.add_artist(Rectangle((0, y0 / H), 1, (y1 - y0) / H, transform=f.transFigure, color=color, alpha=.12,
                                    lw=0, zorder=-5))
-        y = tops[nb] + sep / 2
-        f.add_artist(plt.Line2D([0, 1], [y / H, y / H], transform=f.transFigure, color="0.6", lw=.5))
-        for r in range(nb + 1):
+        for r in range(nb):
             y_img = tops[r] - t_h - img_h
             for k, (sv, a, b) in enumerate(tiles[r]):
                 x = lab_w + k * (2 * img_w + g_in + g_out)
@@ -1010,19 +1043,17 @@ def threshold_panel(edges=(0.85, 0.90, 0.92, 0.95, 0.98, 1.01), per: int = 3, se
                     ax.imshow(im, interpolation="lanczos")
                     ax.set_axis_off()
                 f.text(x / WIDTH, (y_img + img_h + .03) / H, f"s = {num(sv, 3)}", fontsize=7, va="bottom")
-            col, lab = "0.13", T["ref"]
-            if r < nb:
-                lab = (f"{T['band']}\n{num(edges[r])}–{num(min(edges[r + 1], 1))}\n"
-                       + f"{n_ses[r]:,}".replace(",", "." if T["dec"] == "," else ",") + f" {T['pairs']}")
-                kind = "rev" if 0.92 <= edges[r] < 0.95 else "thr" if edges[r] >= 0.95 else None
-                if kind:
-                    lab, col = f"{T[kind]}\n" + lab, lab_col[kind]
+            col = "0.13"
+            lab = (f"{T['band']}\n{num(edges[r])}–{num(min(edges[r + 1], 1))}\n"
+                   + f"{n_ses[r]:,}".replace(",", "." if T["dec"] == "," else ",") + f" {T['pairs']}")
+            kind = "rev" if 0.92 <= edges[r] < 0.95 else "thr" if edges[r] >= 0.95 else None
+            if kind:
+                lab, col = f"{T[kind]}\n" + lab, lab_col[kind]
             f.text((lab_w - .1) / WIDTH, (y_img + img_h / 2) / H, lab, ha="right", va="center", fontsize=7, color=col,
                    linespacing=1.3)
         print(save(f, FIG / "threshold_examples", pdf=True))
     for b in range(nb):
         print(f"{edges[b]:g}-{min(edges[b + 1], 1):g}: {n_pairs[b]:,} coppie di frame, {n_ses[b]} coppie di sessioni (per massimo)")
-    print(f"stessa clip: {n_ref[0]:,} coppie di frame")
 
 
 def main(argv=None) -> int:

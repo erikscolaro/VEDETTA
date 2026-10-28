@@ -39,9 +39,9 @@ TOTAL = round(10_000 / 0.7)  # boxes per class of the ideal curve: 10,000 in tra
 # curve shifted up acts as the cap (above) and as the mosaics target (below), so the shape stays s^-alpha
 SCALE = dict.fromkeys(["airplane", "bird", "drone", "helicopter"], 1.2)
 TOT = {c: TOTAL * k for c, k in SCALE.items()}
-# end of the curve per class (user, 23/10/2026): birds above 96 px are too few, they are only in train
-# and their curve stops at 96
-CUT = {"airplane": SMAX, "bird": 96, "drone": SMAX, "helicopter": SMAX}
+# end of the curve per class: on 23/10/2026 the birds stopped at 96 px (too few above); from 28/10/2026 the Open
+# Images birds in flight reach 256 px and the bird curve is the same as the others (user)
+CUT = {"airplane": SMAX, "bird": SMAX, "drone": SMAX, "helicopter": SMAX}
 BINS = np.geomspace(2, 640, 70)
 
 

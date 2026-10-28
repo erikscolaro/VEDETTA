@@ -9,15 +9,15 @@ rivolta al cielo e all'orizzonte. È costruito per la tesi (repo `yoloeval`):
 - **allineato al dominio**: val e test solo cielo e orizzonte;
 - diviso per ripresa e bilanciato per grandezza dell'oggetto e per fonte.
 
-Il dataset è in `data/output/`, in formato Ultralytics YOLO, ed è **congelato** dal 27/10/2026: non si rigenera e
+Il dataset è in `data/output/`, in formato Ultralytics YOLO, ed è **congelato** dal 28/10/2026: non si rigenera e
 non si modifica.
 
 | | |
 |---|---|
 | classi | `0 drone`, `1 airplane`, `2 helicopter`, `3 bird` |
 | immagini | 640×512, mai ingrandite |
-| split | train 23.062, val 6.132, test 3.469, più 511 immagini di calibrazione int8 |
-| istanze per classe | circa 11.700–11.880 in train, circa 1.900–2.260 in val, circa 940–1.120 in test; uccelli: 4.444, 751, 375 |
+| split | train 22.097, val 6.569, test 3.427, più 511 immagini di calibrazione int8 |
+| istanze per classe | circa 11.650–11.950 in train, circa 1.960–2.330 in val, circa 950–1.140 in test; uccelli: 3.481, 908, 433 |
 | grandezza degli oggetti | √(w·h) da 8 a oltre 256 px, più esempi dove l'oggetto è piccolo |
 
 1. [Il dataset](#il-dataset)
@@ -44,17 +44,17 @@ data/output/
 
 | split | immagini | reali | mosaici | background |
 |---|---|---|---|---|
-| train | 23.062 | 19.486 | 526 | 3.050 |
-| val | 6.132 | 5.232 | 0 | 900 |
-| test | 3.469 | 2.953 | 0 | 516 |
+| train | 22.097 | 18.542 | 505 | 3.050 |
+| val | 6.569 | 5.669 | 0 | 900 |
+| test | 3.427 | 2.911 | 0 | 516 |
 | calib | 511 | 460 | 0 | 51 |
 
 | classe | train | di cui da mosaici | val | test |
 |---|---|---|---|---|
-| drone | 11.706 | 3.160 | 1.896 | 940 |
-| airplane | 11.869 | 3.983 | 2.259 | 1.116 |
-| helicopter | 11.879 | 4.427 | 2.201 | 1.061 |
-| bird | 4.444 | 1.052 | 751 | 375 |
+| drone | 11.649 | 3.301 | 1.963 | 946 |
+| airplane | 11.941 | 4.047 | 2.334 | 1.139 |
+| helicopter | 11.944 | 4.545 | 2.181 | 1.056 |
+| bird | 3.481 | 770 | 908 | 433 |
 
 I nomi dei file dicono il tipo di immagine:
 - `R_<gruppo>_<clip>_<n>`: immagine **reale**;
@@ -79,11 +79,11 @@ il file da cui viene l'immagine, relativo a `data/`.
   - Dove l'area sta sotto la linea continua mancano esempi.
   - Dove una linea di val o test oscilla attorno al suo obiettivo, la fascia è coperta.
 - **Risultati.**
-  - Aerei, elicotteri e droni seguono l'obiettivo del train fino a circa 181 px. Sopra, le fonti hanno pochi
-    esempi e Anti-UAV si ferma a circa 256 px.
+  - Aerei ed elicotteri seguono l'obiettivo del train fino a 256 px, i droni fino a circa 181 px. Sopra 256 px
+    tutte le classi stanno sotto la curva, perché le fonti hanno pochi esempi così grandi.
   - Sotto 32 px l'obiettivo del train si raggiunge con i mosaici, che rimpiccioliscono oggetti grandi.
-  - Gli uccelli stanno molto sotto l'obiettivo del train (4.444 box contro 11.700–11.900 delle altre classi); i loro
-    obiettivi si fermano a 96 px. Anche la validazione sta sotto il suo obiettivo e segue quello uniforme del test.
+  - Gli uccelli stanno molto sotto l'obiettivo del train (3.481 box contro 11.650–11.950 delle altre classi) e non
+    hanno box sopra 256 px. Anche la validazione sta sotto il suo obiettivo; il test oscilla attorno al suo.
 
 ### Fonti per split
 
@@ -93,13 +93,18 @@ il file da cui viene l'immagine, relativo a `data/`.
 - **Lettura.** Ogni barra è una classe, divisa secondo la quota di box di ogni fonte. I numeri sono percentuali,
   scritte sui segmenti di almeno il 12%. I mosaici contano la fonte delle loro caselle.
 - **Risultati.**
-  - Le quote dei tre pannelli si somigliano per costruzione: lo split tiene conto del mix di fonti e il train ha
-    un tetto per fonte.
-  - Gli aerei vengono quasi tutti da DVIDS (93%), gli elicotteri per circa l'80%.
-  - I droni di val e test vengono da DVIDS (44–61%), Anti-UAV (20–37%) e Svanström (19%). Nel train, sui box reali:
-    Anti-UAV 34%, DVIDS 31%, Svanström 26% e FRED 9%. FRED è solo nel train, e con i mosaici pesa il 6,7%.
-  - Gli uccelli di val e test vengono per circa il 60% da Open Images, solo uccelli in volo (filtro SigLIP). Nel train,
-    sui box reali: Open Images 52%, FBD-SV 25%, Svanström 18%.
+  - Per aerei, elicotteri e uccelli le quote dei tre pannelli si somigliano: lo split tiene conto del mix di fonti
+    e il train ha un tetto per fonte.
+  - Gli aerei vengono quasi tutti da DVIDS (91–93%), gli elicotteri per circa l'80%.
+  - I droni sono l'eccezione. Nel train, sui box reali: Anti-UAV 34%, DVIDS 33%, Svanström 24% e FRED 9%; FRED è
+    solo nel train, e con i mosaici pesa il 6,7%. In val: DVIDS 40%, Anti-UAV 36%, Svanström 24%. Nel test: DVIDS
+    60%, Anti-UAV 20%, Svanström 20%.
+    - Anti-UAV ha solo 8 gruppi, tutti più grandi del tetto di un gruppo nel test (15% dell'obiettivo, 190 box).
+      Il test prende un solo gruppo Anti-UAV; DVIDS ha oltre 160 gruppi piccoli.
+    - Uno split con il test bilanciato costa circa 950 droni reali al train. Si è scelto di tenere i dati
+      **[operatore]**.
+  - Gli uccelli di val e test vengono per il 67–70% da Open Images, solo uccelli in volo (filtro SigLIP). Nel
+    train, sui box reali: Open Images 57%, FBD-SV 21%, Svanström 16%.
 
 ### Contesto
 
@@ -113,10 +118,10 @@ il file da cui viene l'immagine, relativo a `data/`.
   - **terra**: alberi, campi, edifici;
   - **muro**: una parete come sfondo.
 - **Risultati.**
-  - Val e test contengono solo cielo e orizzonte, il dominio della torretta. L'orizzonte vale il 6–30% per
-    classe, il 56–58% per gli uccelli.
-  - Nel train terra e muro restano sotto il 25% per classe: 22% per gli uccelli (FBD-SV) e per i droni (FRED e
-    terra), circa 2% per aerei ed elicotteri.
+  - Val e test contengono solo cielo e orizzonte, il dominio della torretta. L'orizzonte vale il 7–27% per
+    classe, il 51–52% per gli uccelli.
+  - Nel train terra e muro restano sotto il 25% per classe: 19% per gli uccelli (FBD-SV), 23% per i droni (FRED e
+    terra), 2–3% per aerei ed elicotteri.
   - Quando il meteo sarà annotato (colonna `meteo` del manifest) comparirà come seconda riga.
 
 ### Leakage fra gli split
@@ -130,12 +135,12 @@ l'immagine reale più vicina del train. L'asse x è in scala −log₁₀(1 − 
 - **(b) Coda.** La quota di immagini sopra ogni soglia di somiglianza, su scala logaritmica. La linea verticale è la soglia dei
   doppioni, 0,95.
 - **Riferimenti**, presi dentro il train:
-  - "stesso gruppo, altra clip": com'è fatto un leakage vero, mediana 0,935;
+  - "stesso gruppo, altra clip": com'è fatto un leakage vero, mediana 0,931;
   - "gruppi diversi": il fondo, cioè la somiglianza che c'è comunque perché il cielo somiglia al cielo;
-    mediana 0,804.
+    mediana 0,802.
 - **Lettura.** Con un leakage, le curve di val e test si sposterebbero verso quella tratteggiata.
 - **Risultati.**
-  - Validazione (mediana 0,806) e test (0,777) coincidono con il fondo, anche nella coda fra 0,85 e 0,95.
+  - Validazione (mediana 0,800) e test (0,790) coincidono con il fondo, anche nella coda fra 0,85 e 0,95.
   - Nessuna immagine supera 0,95. In parte è per costruzione, perché le coppie sopra 0,95 stanno nello stesso
     gruppo; la coincidenza con il fondo sotto 0,95 invece no.
 
@@ -143,7 +148,7 @@ l'immagine reale più vicina del train. L'asse x è in scala −log₁₀(1 − 
 
 ![somiglianze](docs/figure/it_similarity.png)
 
-**Figura 5.** *Somiglianza DINOv2 fra tutti i 68.368 frame annotati.*
+**Figura 5.** *Somiglianza DINOv2 fra tutti i 69.096 frame annotati.*
 - **(a) Matrice.** La somiglianza media fra blocchi di frame consecutivi, in ordine di fonte, sessione e clip.
   - Le righe rosse separano le fonti; fra parentesi il numero di frame.
   - L'area di ogni fonte è proporzionale alla radice dei suoi frame, così anche Open Images (1.059) resta visibile.
@@ -159,7 +164,7 @@ l'immagine reale più vicina del train. L'asse x è in scala −log₁₀(1 − 
 - **Risultati.**
   - Le coppie della stessa sessione (mediana 0,84–0,85) si distinguono bene da quelle di sessioni diverse (0,17):
     l'AUC è 0,979.
-  - Le coppie dello stesso gruppo (mediana 0,66) stanno in mezzo: sono riprese ripubblicate o girate di seguito.
+  - Le coppie dello stesso gruppo (mediana 0,61) stanno in mezzo: sono riprese ripubblicate o girate di seguito.
   - Fra sessioni diverse ci sono coppie fino a 0,99. Fra gruppi diversi nessuna supera 0,95, perché le sessioni
     sopra soglia sono state unite: la curva rosa si ferma lì.
   - Nella matrice, FRED e FBD-SV formano blocchi a parte (muro e vegetazione); le fonti di cielo e orizzonte
@@ -169,12 +174,14 @@ l'immagine reale più vicina del train. L'asse x è in scala −log₁₀(1 − 
 
 ![taratura](docs/figure/it_threshold_tuning.png)
 
-**Figura 6.** *Taratura della soglia dei doppioni.*
-- **Lettura.**
-  - Per fascia di somiglianza massima fra due sessioni, la quota di coppie giudicate doppioni a mano
-    **[operatore]**.
-  - Sopra ogni barra, i doppioni sul totale; la barra d'errore è l'intervallo di Wilson al 95%.
-  - A destra della linea tratteggiata, le coppie sopra 0,95.
+**Figura 6.** *Taratura della soglia dei doppioni.* Le fasce sono della somiglianza massima fra due sessioni.
+- **(a) Coppie per fascia**, su scala logaritmica:
+  - grigio: le coppie di sessioni nei dati, con il numero sopra la barra;
+  - azzurro: le coppie riviste a mano **[operatore]**;
+  - blu: i doppioni confermati.
+- **(b) Quota di doppioni** fra le coppie riviste. Accanto a ogni punto, i doppioni sul totale; la barra d'errore è
+  l'intervallo di Wilson al 95%. Lo sfondo mostra la regola: sotto 0,92 si ignora, fra 0,92 e 0,95 revisione a
+  mano, sopra 0,95 unione automatica.
 - **Risultati.** La quota sale da 0/40 sotto 0,90 al 40% fra 0,94 e 0,95; sopra 0,95 è 146/146. Da qui la regola:
   sopra 0,95 le sessioni si uniscono in automatico, fra 0,92 e 0,95 si rivedono.
 
@@ -197,15 +204,12 @@ dello sfondo accettato.
     ogni coppia.
   - A sinistra, quante coppie di sessioni hanno la somiglianza massima nella fascia.
   - In giallo la fascia rivista a mano (0,92–0,95), in blu l'unione automatica (≥ 0,95).
-  - In fondo, coppie della stessa clip come riferimento (25°, 50° e 75° percentile).
   - Le coppie con un frame scuro non sono mostrate.
 - **Risultati.**
   - Sotto 0,92 le coppie sono cieli simili di riprese diverse.
   - Sopra 0,95 c'è la stessa inquadratura, spesso con lo stesso oggetto pochi secondi dopo.
-  - Due frame della stessa clip possono scendere a 0,63 quando l'oggetto o l'inquadratura cambiano: una somiglianza
-    bassa non dimostra che due riprese siano diverse.
-- **Coppie mai riviste.** Fra 0,92 e 0,95 ci sono 379 coppie di sessioni: 330 riviste, 23 già nello stesso gruppo,
-  26 mai riviste. Le 26 vengono tutte dalle sessioni aggiunte dopo la revisione: 22 di Anti-UAV, 4 di Open Images.
+- **Coppie riviste.** Fra 0,92 e 0,95 ci sono 380 coppie di sessioni: 357 riviste e 23 già nello stesso gruppo.
+  Nessuna coppia resta da rivedere.
 
 ### Limiti dichiarati
 
@@ -213,7 +217,7 @@ dello sfondo accettato.
   FBD-SV-2024 è quasi tutto vegetazione, quindi sta solo nel train e dentro la quota fuori dominio.
 - **Droni ad ala fissa esclusi**: troppo pochi per stare in tutti gli split.
 - **Oggetti sopra i 181 px** sotto la curva del train, per tutte le classi.
-- **Droni in val e test** sotto l'obiettivo (1.896 contro 2.547 e 940 contro 1.273), soprattutto fra 16 e 32 px: i
+- **Droni in val e test** sotto l'obiettivo (1.963 contro 2.547 e 946 contro 1.273), soprattutto fra 16 e 32 px: i
   video di droni indipendenti sono pochi, e un gruppo non può superare il 15% di una classe né il 75% di una cella.
 - **Label dei droni Anti-UAV aggiunti il 26/10/2026**: sono quelle originali del dataset.
 - **Leakage dello sfondo accettato**: le fonti con il cielo hanno uno sfondo che si ripete fra riprese diverse, ed è
@@ -265,7 +269,8 @@ Fissate prima di toccare i dati e aggiornate con le decisioni prese durante la c
 - La forma ha due motivi:
   - un bersaglio che si avvicina resta a lungo piccolo, ed è da piccolo che le classi si confondono;
   - con la stessa curva per tutte le classi, il modello non può legare la classe alla grandezza.
-- Gli uccelli si fermano a 96 px: sopra sono troppo pochi.
+- Dal 28/10/2026 vale anche per gli uccelli, che prima si fermavano a 96 px: gli uccelli in volo di Open Images
+  arrivano a 256 px.
 
 **Bilanciamento per split**
 - **Train**, in quest'ordine:
@@ -460,14 +465,15 @@ Le operazioni fatte, in ordine. Ogni passo ha la sua cartella e legge solo i pas
 
 **Su tutte le fonti**, in `data/intermediate/`:
 
-8. `9_split`: tabella dei 68.368 frame annotati (81.980 box) ed embedding DINOv2 ViT-S/14 di ogni frame.
+8. `9_split`: tabella dei 69.096 frame annotati (83.262 box) ed embedding DINOv2 ViT-S/14 di ogni frame.
 9. `10_doppioni`: doppioni fra sessioni, rivisti sui fogli **[operatore]**.
    - Sopra 0,95: 146 coppie, tutte doppioni (`unire.txt`).
    - Taratura: 160 coppie a campione fra 0,85 e 0,95 (`taratura/`); doppioni solo da 0,92 in su.
    - Revisione completa delle altre 254 coppie fra 0,92 e 0,95 (`fascia_092/`).
    - Le 26 coppie fra 0,92 e 0,95 di sessioni aggiunte dopo (`fascia_092_b/`): 18 doppioni (13 notturne).
-   - In tutto 93 doppioni sotto 0,95, quasi tutti FBD (camere fisse).
-10. `11_gruppi`: sessioni note, doppioni rivisti e ogni altra coppia ≥ 0,95 → **1.566 gruppi** (da 1.751 sessioni).
+   - Le 2 coppie fra 0,92 e 0,95 dei video DVIDS del giro 12 (`fascia_092_c/`, 28/10/2026): 1 doppione.
+   - In tutto 94 doppioni sotto 0,95, quasi tutti FBD (camere fisse).
+10. `11_gruppi`: sessioni note, doppioni rivisti e ogni altra coppia ≥ 0,95 → **2.032 gruppi** (da 2.219 sessioni).
 11. `12_scenario`: scenario di ogni clip **[operatore]**.
     - Provini di 5 frame per clip.
     - Proposte in `proposte/`, correzioni dell'utente in `correzioni.csv`, controllo con la tessitura dello sfondo
@@ -489,13 +495,18 @@ Le operazioni fatte, in ordine. Ogni passo ha la sua cartella e legge solo i pas
     - Tutte le immagini reali del primo export (26/10/2026): 655 box cambiati, 1.000 frame notturni di Anti-UAV
       cancellati, 213 frame rimasti senza box.
     - Poi, a ogni nuovo split, i frame non ancora rivisti (`nuovi_<giro>.csv`): 2.597, 1.400 e 893 frame; il 27/10/2026
-      785 frame rivisti su fogli (giro `17d`), con 19 frame di una ripresa passati da drone a helicopter.
+      785 frame rivisti su fogli (giro `17d`), con 19 frame di una ripresa passati da drone a helicopter, poi 292
+      (giro `17e`). Il 28/10/2026: 287 frame DVIDS nuovi (giro `17f`), poi in CVAT tutti i frame non rivisti dei
+      tre split (giri `17g`, `17h`, `17i`: 1.117, 525 e 96 frame; 130 box cambiati, 33 frame rimasti senza box).
+      Dopo lo split con il seme 3: 199 e 18 frame (giri `17j`, `17k`), 4 box cambiati.
     - Label corrette in `label/`, copie: le label delle fonti restano quelle originali.
 16. `17_dataset`: il dataset.
     - `rivisti`: le label della revisione; via i frame cancellati o vuoti, il gruppo notturno, i frame bui
       (grigio medio < 30) e le clip dove la revisione ha tolto un box.
-    - `split`: gruppi in train, val e test (1.000 ordini casuali in parallelo, si tiene il migliore). Prima i frame
-      rivisti; test al massimo metà della validazione per classe; quota di orizzonte e fonti come nel bacino.
+    - `split`: gruppi in train, val e test (1.000 ordini casuali in parallelo, si tiene il migliore; seme 3, il
+      migliore di 4 per i droni del train). Prima i frame rivisti; test al massimo metà della validazione per classe;
+      quota di orizzonte e fonti come nel bacino. Un termine di spreco pesa i box che un gruppo mandato in val o test
+      perde per eccesso (peso 4 per i droni).
     - `train`: quote e tetti; si tolgono prima i frame non rivisti.
     - `mosaici`: dalla stessa mezza ottava, solo da frame rivisti, con il tetto per fonte del train.
     - `export`: in `data/output/`, con hardlink delle immagini, label nel nuovo ordine delle classi, calib, manifest,

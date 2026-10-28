@@ -9,15 +9,15 @@ camera pointed at the sky and the horizon. It is built for the thesis (repo `yol
 - **aligned with the domain**: val and test are sky and horizon only;
 - split by recording and balanced by object size and by source.
 
-The dataset is in `data/output/`, in Ultralytics YOLO format, and has been **frozen** since October 27, 2026: it is
+The dataset is in `data/output/`, in Ultralytics YOLO format, and has been **frozen** since October 28, 2026: it is
 not regenerated or modified.
 
 | | |
 |---|---|
 | classes | `0 drone`, `1 airplane`, `2 helicopter`, `3 bird` |
 | images | 640×512, never upscaled |
-| splits | train 23,062, val 6,132, test 3,469, plus 511 int8 calibration images |
-| instances per class | about 11,700–11,880 in train, about 1,900–2,260 in val, about 940–1,120 in test; birds: 4,444, 751, 375 |
+| splits | train 22,097, val 6,569, test 3,427, plus 511 int8 calibration images |
+| instances per class | about 11,650–11,950 in train, about 1,960–2,330 in val, about 950–1,140 in test; birds: 3,481, 908, 433 |
 | object size | √(w·h) from 8 to over 256 px, with extra examples where the object is small |
 
 1. [The dataset](#the-dataset)
@@ -44,17 +44,17 @@ data/output/
 
 | split | images | real | mosaics | background |
 |---|---|---|---|---|
-| train | 23,062 | 19,486 | 526 | 3,050 |
-| val | 6,132 | 5,232 | 0 | 900 |
-| test | 3,469 | 2,953 | 0 | 516 |
+| train | 22,097 | 18,542 | 505 | 3,050 |
+| val | 6,569 | 5,669 | 0 | 900 |
+| test | 3,427 | 2,911 | 0 | 516 |
 | calib | 511 | 460 | 0 | 51 |
 
 | class | train | of which from mosaics | val | test |
 |---|---|---|---|---|
-| drone | 11,706 | 3,160 | 1,896 | 940 |
-| airplane | 11,869 | 3,983 | 2,259 | 1,116 |
-| helicopter | 11,879 | 4,427 | 2,201 | 1,061 |
-| bird | 4,444 | 1,052 | 751 | 375 |
+| drone | 11,649 | 3,301 | 1,963 | 946 |
+| airplane | 11,941 | 4,047 | 2,334 | 1,139 |
+| helicopter | 11,944 | 4,545 | 2,181 | 1,056 |
+| bird | 3,481 | 770 | 908 | 433 |
 
 File names tell the image type:
 - `R_<group>_<clip>_<n>`: **real** image;
@@ -79,11 +79,11 @@ File names tell the image type:
   - Where the area is below the solid line, examples are missing.
   - Where a val or test line oscillates around its target, the band is covered.
 - **Results.**
-  - Airplanes, helicopters and drones follow the training target up to about 181 px. Above that, the sources have
-    few examples and Anti-UAV stops at about 256 px.
+  - Airplanes and helicopters follow the training target up to 256 px, drones up to about 181 px. Above 256 px all
+    classes are under the curve, because the sources have few examples that large.
   - Below 32 px the curve is reached thanks to the mosaics, which shrink large objects.
-  - Birds are well below the training target (4,444 boxes against 11,700–11,900 for the other classes); their
-    targets stop at 96 px. Validation is also below its target and follows the uniform test target.
+  - Birds are well below the training target (3,481 boxes against 11,650–11,950 for the other classes) and have no
+    boxes above 256 px. Validation is also below its target; the test oscillates around its target.
 
 ### Sources per split
 
@@ -93,13 +93,18 @@ File names tell the image type:
 - **Reading.** Each bar is a class, split into the share of boxes of each source. The numbers are percentages,
   written on segments of at least 12%. Mosaics count the source of their cells.
 - **Results.**
-  - The three columns have similar shares by construction: the split has a term on the source mix, and training a
-    cap per source.
-  - Airplanes come almost only from DVIDS (93%), helicopters about 80%.
-  - Val and test drones come from DVIDS (44–61%), Anti-UAV (20–37%) and Svanström (19%). In training, on the real
-    boxes: Anti-UAV 34%, DVIDS 31%, Svanström 26% and FRED 9%. FRED is only in training, 6.7% with the mosaics.
-  - About 60% of the val and test birds come from Open Images, birds in flight only (SigLIP filter). In training, on
-    the real boxes: Open Images 52%, FBD-SV 25%, Svanström 18%.
+  - For airplanes, helicopters and birds the three columns have similar shares: the split has a term on the source
+    mix, and training a cap per source.
+  - Airplanes come almost only from DVIDS (91–93%), helicopters about 80%.
+  - Drones are the exception. In training, on the real boxes: Anti-UAV 34%, DVIDS 33%, Svanström 24% and FRED 9%;
+    FRED is only in training, 6.7% with the mosaics. In val: DVIDS 40%, Anti-UAV 36%, Svanström 24%. In test: DVIDS
+    60%, Anti-UAV 20%, Svanström 20%.
+    - Anti-UAV has only 8 groups, all larger than the cap of one group in the test (15% of the target, 190 boxes).
+      The test takes a single Anti-UAV group; DVIDS has more than 160 small groups.
+    - A split with a balanced test costs about 950 real drones in training. The choice was to keep the data
+      **[operator]**.
+  - 67–70% of the val and test birds come from Open Images, birds in flight only (SigLIP filter). In training, on
+    the real boxes: Open Images 57%, FBD-SV 21%, Svanström 16%.
 
 ### Context
 
@@ -113,9 +118,9 @@ File names tell the image type:
   - **ground**: trees, fields, buildings;
   - **wall**: a wall as background.
 - **Results.**
-  - Val and test are sky and horizon only, the turret domain, with 6–30% horizon per class; birds are at 56–58%.
-  - In training, ground and wall are at most 25% per class. They are 22% for birds (FBD-SV) and for drones (FRED and
-    ground), about 2% for airplanes and helicopters.
+  - Val and test are sky and horizon only, the turret domain, with 7–27% horizon per class; birds are at 51–52%.
+  - In training, ground and wall are at most 25% per class. They are 19% for birds (FBD-SV), 23% for drones (FRED
+    and ground), 2–3% for airplanes and helicopters.
   - When the weather is annotated (`meteo` column of the manifest), it will appear as a second row.
 
 ### Leakage between splits
@@ -128,11 +133,11 @@ nearest real training image. The axis is stretched towards 1 (−log₁₀(1 −
 - **(b) Tail.** The share of images above each threshold, in log scale. The vertical line is the duplicate threshold,
   0.95.
 - **References**, taken inside training:
-  - "same group, other clip": what a real leakage looks like, median 0.935;
-  - "different groups": the floor, because sky always looks like sky; median 0.804.
+  - "same group, other clip": what a real leakage looks like, median 0.931;
+  - "different groups": the floor, because sky always looks like sky; median 0.802.
 - **Reading.** If val or test had leakage, their curves would move towards the dashed one.
 - **Results.**
-  - Validation (median 0.806) and test (0.777) match the floor, also in the tail between 0.85 and 0.95.
+  - Validation (median 0.800) and test (0.790) match the floor, also in the tail between 0.85 and 0.95.
   - No image exceeds 0.95. That is partly by construction, because pairs above 0.95 are in the same group. The match
     with the floor below 0.95 is not.
 
@@ -140,7 +145,7 @@ nearest real training image. The axis is stretched towards 1 (−log₁₀(1 −
 
 ![similarity](docs/figure/en_similarity.png)
 
-**Figure 5.** *DINOv2 similarity between all 68,368 annotated frames.*
+**Figure 5.** *DINOv2 similarity between all 69,096 annotated frames.*
 - **(a) Matrix.** The mean similarity between blocks of consecutive frames, in order of source, session and clip.
   - Red lines separate the sources; the number of frames is in parentheses.
   - The area of each source is proportional to the square root of its frames, so Open Images (1,059) stays visible.
@@ -154,7 +159,7 @@ nearest real training image. The axis is stretched towards 1 (−log₁₀(1 −
 - **(c) Tail.** The number of pairs above 0.85 between different sessions and between different groups, in log scale.
 - **Results.**
   - DINOv2 separates the same session (median 0.84–0.85) from different sessions (0.17), with AUC 0.979.
-  - Same-group pairs (median 0.66) sit in between: they are republished recordings or recordings shot in sequence.
+  - Same-group pairs (median 0.61) sit in between: they are republished recordings or recordings shot in sequence.
   - Between different sessions the tail reaches 0.99. After the merges, no pair from different groups exceeds 0.95:
     the dashed curve stops at the threshold.
   - In the matrix, FRED and FBD-SV form separate blocks (wall and vegetation). Sky and horizon (Svanström, Anti-UAV,
@@ -164,12 +169,14 @@ nearest real training image. The axis is stretched towards 1 (−log₁₀(1 −
 
 ![threshold tuning](docs/figure/en_threshold_tuning.png)
 
-**Figure 6.** *Tuning of the duplicate threshold.*
-- **Reading.**
-  - For each band of maximum similarity between two sessions, the share of pairs judged duplicates by hand
-    **[operator]**.
-  - Above each bar, duplicates over the total; the error bar is the 95% Wilson interval.
-  - Right of the dashed line, the pairs above 0.95.
+**Figure 6.** *Tuning of the duplicate threshold.* The bands are of the maximum similarity between two sessions.
+- **(a) Pairs per band**, on a log scale:
+  - grey: the session pairs in the data, with the number above the bar;
+  - light blue: the pairs reviewed by hand **[operator]**;
+  - blue: the confirmed duplicates.
+- **(b) Share of duplicates** among the reviewed pairs. Next to each point, duplicates over the total; the error bar
+  is the 95% Wilson interval. The background shows the rule: below 0.92 ignored, between 0.92 and 0.95 review by
+  hand, above 0.95 automatic merge.
 - **Results.** The share rises from 0/40 below 0.90 to 40% between 0.94 and 0.95; above 0.95 it is 146/146. Hence the
   rule: above 0.95 the merge is automatic, between 0.92 and 0.95 a review is needed.
 
@@ -191,16 +198,14 @@ accepted background leakage.
   - Each row is a band: three pairs chosen at random (fixed seed), boxes in red, the similarity above each pair.
   - On the left, how many session pairs have their maximum similarity in the band.
   - In yellow the band reviewed by hand (0.92–0.95), in blue the automatic merge (≥ 0.95).
-  - At the bottom, same-clip pairs as a reference (25th, 50th and 75th percentile).
   - Pairs with a dark frame are not shown.
 - **Results.**
   - Below 0.92 the pairs are similar skies from different recordings.
   - Above 0.95 they are the same framing, often with the same object a few seconds later.
   - Two frames of the same clip can drop to 0.63 when the object or the framing changes: a low similarity does not
     prove that two recordings are different.
-- **Pairs never reviewed.** Between 0.92 and 0.95 there are 379 session pairs: 330 reviewed, 23 already in the same
-  group, 26 never reviewed. All 26 come from the sessions added after the review: 22 from Anti-UAV, 4 from Open
-  Images.
+- **Pairs reviewed.** Between 0.92 and 0.95 there are 380 session pairs: 357 reviewed and 23 already in the same
+  group. No pair is left to review.
 
 ### Declared limits
 
@@ -208,7 +213,7 @@ accepted background leakage.
   FBD-SV-2024 is almost all vegetation, so it is only in train and within the out-of-domain share.
 - **Fixed-wing drones excluded**: too few to be in all the splits.
 - **Objects above 181 px** are under the train curve, for all classes.
-- **Drones in val and test** are below the target (1,896 against 2,547 and 940 against 1,273), mostly between 16 and
+- **Drones in val and test** are below the target (1,963 against 2,547 and 946 against 1,273), mostly between 16 and
   32 px: there are few independent drone videos, and a group cannot exceed 15% of a class or 75% of a cell.
 - **Labels of the Anti-UAV drones added on October 26, 2026**: they are the original ones of the dataset.
 - **Accepted background leakage**: the sources with sky have a background that repeats across different recordings,
@@ -259,7 +264,8 @@ Set before touching the data and updated with the decisions taken during constru
 - The shape has two reasons:
   - an approaching target stays small for a long time, and it is when small that the classes get confused;
   - with the same curve for all classes, the model cannot tie the class to the size.
-- Birds stop at 96 px: above that there are too few.
+- From October 28, 2026 this is true for birds too, which stopped at 96 px before: the Open Images birds in flight
+  reach 256 px.
 
 **Balancing per split**
 - **Train**, in this order:
@@ -454,14 +460,16 @@ The operations done, in order. Each step has its own folder and reads only the p
 
 **On all sources**, in `data/intermediate/`:
 
-8. `9_split`: table of the 68,368 annotated frames (81,980 boxes) and DINOv2 ViT-S/14 embedding of each frame.
+8. `9_split`: table of the 69,096 annotated frames (83,262 boxes) and DINOv2 ViT-S/14 embedding of each frame.
 9. `10_doppioni`: duplicates between sessions, reviewed on the sheets **[operator]**.
    - Above 0.95: 146 pairs, all duplicates (`unire.txt`).
    - Tuning: 160 sampled pairs between 0.85 and 0.95 (`taratura/`); duplicates only from 0.92 up.
    - Full review of the other 254 pairs between 0.92 and 0.95 (`fascia_092/`).
    - The 26 pairs between 0.92 and 0.95 of sessions added later (`fascia_092_b/`): 18 duplicates (13 at night).
-   - In total 93 duplicates below 0.95, almost all FBD (fixed cameras).
-10. `11_gruppi`: known sessions, reviewed duplicates and every other pair ≥ 0.95 → **1,566 groups** (from 1,751
+   - The 2 pairs between 0.92 and 0.95 of the DVIDS videos of round 12 (`fascia_092_c/`, October 28, 2026): 1
+     duplicate.
+   - In total 94 duplicates below 0.95, almost all FBD (fixed cameras).
+10. `11_gruppi`: known sessions, reviewed duplicates and every other pair ≥ 0.95 → **2,032 groups** (from 2,219
     sessions).
 11. `12_scenario`: scenario of each clip **[operator]**.
     - Contact sheets of 5 frames per clip.
@@ -485,13 +493,19 @@ The operations done, in order. Each step has its own folder and reads only the p
     - Every real image of the first export (26/10/2026): 655 boxes changed, 1,000 Anti-UAV night frames deleted,
       213 frames left without boxes.
     - Then, at every new split, the frames not reviewed yet (`nuovi_<round>.csv`): 2,597, 1,400 and 893 frames; on October 27, 2026
-      785 frames reviewed on sheets (round `17d`), with 19 frames of one recording changed from drone to helicopter.
+      785 frames reviewed on sheets (round `17d`), with 19 frames of one recording changed from drone to helicopter,
+      then 292 (round `17e`). On October 28, 2026: 287 new DVIDS frames (round `17f`), then in CVAT all the frames not
+      reviewed yet of the three splits (rounds `17g`, `17h`, `17i`: 1,117, 525 and 96 frames; 130 boxes changed, 33
+      frames left without boxes). After the split with seed 3: 199 and 18 frames (rounds `17j`, `17k`), 4 boxes
+      changed.
     - Corrected labels in `label/`, as copies: the labels of the sources stay the original ones.
 16. `17_dataset`: the dataset.
     - `rivisti`: the labels of the review; out the deleted or empty frames, the night group, dark frames (mean grey
       < 30) and the clips where the review removed a box.
-    - `split`: groups into train, val and test (1,000 random orders in parallel, the best is kept). Reviewed frames
-      first; test at most half of the validation per class; horizon share and sources as in the pool.
+    - `split`: groups into train, val and test (1,000 random orders in parallel, the best is kept; seed 3, the best
+      of 4 for the training drones). Reviewed frames first; test at most half of the validation per class; horizon
+      share and sources as in the pool. A waste term weighs the boxes that a group sent to val or test loses to the
+      excess (weight 4 for drones).
     - `train`: shares and caps; frames not reviewed are removed first.
     - `mosaici`: from the same half octave, only from reviewed frames, with the source cap of the train.
     - `export`: into `data/output/`, with hardlinks of the images, labels in the new class order, calib, manifest,

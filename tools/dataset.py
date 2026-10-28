@@ -324,7 +324,12 @@ def _trial(seed: int) -> tuple:
     return sum(tot(s, cur[s]) for s in tg), lab
 
 
-def split(trials: int = 1000, share: float = 0.75, seed: int = 0) -> None:
+# seed of the split: the search is random; on 28/10/2026 seeds 0-3 gave 8,148, 8,061, 8,116 and 8,343 real train
+# drones, 3 is kept (user: more data before a perfect balance)
+SPLIT_SEED = 3
+
+
+def split(trials: int = 1000, share: float = 0.75, seed: int = SPLIT_SEED) -> None:
     """Split by groups as `split.py` (targets: val 20% of the curve over half octaves, test uniform in log s, at
     most 20%/25% of what is in domain), with these differences:
     - val and test count and keep only the in-domain frames (`DOMAIN`);
