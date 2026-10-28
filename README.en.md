@@ -500,6 +500,7 @@ The operations done, in order. Each step has its own folder and reads only the p
       changed.
       Then a helicopter on the ground without boxes in two Svanström clips of val (round `17l`, 131 frames, 57 boxes
       added with a CVAT track) and 12 frames not reviewed after the new split (round `17m`, 2 boxes changed).
+      In the final dataset, val and test are fully reviewed; train keeps 1 DVIDS frame not reviewed.
     - Corrected labels in `label/`, as copies: the labels of the sources stay the original ones.
 16. `17_dataset`: the dataset.
     - `rivisti`: the labels of the review; out the deleted or empty frames, the night group, dark frames (mean grey

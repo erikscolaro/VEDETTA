@@ -501,6 +501,7 @@ Le operazioni fatte, in ordine. Ogni passo ha la sua cartella e legge solo i pas
       Dopo lo split con il seme 3: 199 e 18 frame (giri `17j`, `17k`), 4 box cambiati.
       Poi un elicottero a terra senza box in due clip Svanström del val (giro `17l`, 131 frame, 57 box aggiunti con
       una traccia CVAT) e 12 frame non rivisti dopo il nuovo split (giro `17m`, 2 box cambiati).
+      Nel dataset finale val e test sono rivisti per intero; nel train resta 1 frame DVIDS non rivisto.
     - Label corrette in `label/`, copie: le label delle fonti restano quelle originali.
 16. `17_dataset`: il dataset.
     - `rivisti`: le label della revisione; via i frame cancellati o vuoti, il gruppo notturno, i frame bui
