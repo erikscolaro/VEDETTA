@@ -118,7 +118,7 @@ il file da cui viene l'immagine, relativo a `data/`.
   - **terra**: alberi, campi, edifici;
   - **muro**: una parete come sfondo.
 - **Risultati.**
-  - Val e test contengono solo cielo e orizzonte, il dominio della torretta. L'orizzonte vale il 7–27% per
+  - Val e test contengono solo cielo e orizzonte, il dominio della torretta. L'orizzonte vale il 7–26% per
     classe, il 51–52% per gli uccelli.
   - Nel train terra e muro restano sotto il 25% per classe: 19% per gli uccelli (FBD-SV), 23% per i droni (FRED e
     terra), 2–3% per aerei ed elicotteri.

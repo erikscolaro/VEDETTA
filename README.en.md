@@ -118,7 +118,7 @@ File names tell the image type:
   - **ground**: trees, fields, buildings;
   - **wall**: a wall as background.
 - **Results.**
-  - Val and test are sky and horizon only, the turret domain, with 7–27% horizon per class; birds are at 51–52%.
+  - Val and test are sky and horizon only, the turret domain, with 7–26% horizon per class; birds are at 51–52%.
   - In training, ground and wall are at most 25% per class. They are 19% for birds (FBD-SV), 23% for drones (FRED
     and ground), 2–3% for airplanes and helicopters.
   - When the weather is annotated (`meteo` column of the manifest), it will appear as a second row.
