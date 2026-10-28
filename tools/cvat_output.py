@@ -169,15 +169,29 @@ def _import(project: str, items: dict, splits: tuple[str, ...], out_frame: str, 
             if task.name.split("_")[0] != prefix or task.name.split("_")[1] not in splits:
                 continue
             info, ann = task.get_frames_info(), task.get_annotations()
-            assert not ann.tracks and all(s.type.value == "rectangle" for s in ann.shapes), task.name
+            assert all(s.type.value == "rectangle" for s in ann.shapes), task.name
             gone = set(task.get_meta().deleted_frames or [])
             boxes = {k: [] for k in range(len(info))}
-            for s in ann.shapes:
-                f = info[s.frame]
-                x1, x2 = sorted(min(max(v, 0), f.width) for v in s.points[0::2])
-                y1, y2 = sorted(min(max(v, 0), f.height) for v in s.points[1::2])
+            shapes = [(s.frame, s.label_id, s.points) for s in ann.shapes]
+            # tracks (user, 28/10/2026: a helicopter on the ground through 51 frames): linear interpolation between
+            # keyframes as in CVAT, the last keyframe held to the end of the task, nothing after an `outside` one
+            for tr in ann.tracks:
+                ks = sorted(tr.shapes, key=lambda s: s.frame)
+                assert all(s.type.value == "rectangle" for s in ks), task.name
+                for a, b in zip(ks, ks[1:] + [None]):
+                    if a.outside:
+                        continue
+                    end = b.frame if b else len(info)
+                    for fr in range(a.frame, end):
+                        t = 0 if b is None or b.outside else (fr - a.frame) / (b.frame - a.frame)
+                        pts = a.points if t == 0 else [p + t * (q - p) for p, q in zip(a.points, b.points)]
+                        shapes.append((fr, tr.label_id, pts))
+            for frame, label_id, points in shapes:
+                f = info[frame]
+                x1, x2 = sorted(min(max(v, 0), f.width) for v in points[0::2])
+                y1, y2 = sorted(min(max(v, 0), f.height) for v in points[1::2])
                 if x2 - x1 >= 1 and y2 - y1 >= 1:
-                    boxes[s.frame].append((label[s.label_id], x1, y1, x2, y2, f.width, f.height))
+                    boxes[frame].append((label[label_id], x1, y1, x2, y2, f.width, f.height))
             for k, f in enumerate(info):
                 if k in gone:
                     deleted.add(Path(f.name).stem)

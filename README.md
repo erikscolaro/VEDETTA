@@ -16,8 +16,8 @@ non si modifica.
 |---|---|
 | classi | `0 drone`, `1 airplane`, `2 helicopter`, `3 bird` |
 | immagini | 640×512, mai ingrandite |
-| split | train 22.097, val 6.569, test 3.427, più 511 immagini di calibrazione int8 |
-| istanze per classe | circa 11.650–11.950 in train, circa 1.960–2.330 in val, circa 950–1.140 in test; uccelli: 3.481, 908, 433 |
+| split | train 21.958, val 6.659, test 3.441, più 511 immagini di calibrazione int8 |
+| istanze per classe | circa 11.640–11.960 in train, circa 1.960–2.350 in val, circa 950–1.120 in test; uccelli: 3.477, 908, 433 |
 | grandezza degli oggetti | √(w·h) da 8 a oltre 256 px, più esempi dove l'oggetto è piccolo |
 
 1. [Il dataset](#il-dataset)
@@ -44,17 +44,17 @@ data/output/
 
 | split | immagini | reali | mosaici | background |
 |---|---|---|---|---|
-| train | 22.097 | 18.542 | 505 | 3.050 |
-| val | 6.569 | 5.669 | 0 | 900 |
-| test | 3.427 | 2.911 | 0 | 516 |
+| train | 21.958 | 18.397 | 511 | 3.050 |
+| val | 6.659 | 5.759 | 0 | 900 |
+| test | 3.441 | 2.925 | 0 | 516 |
 | calib | 511 | 460 | 0 | 51 |
 
 | classe | train | di cui da mosaici | val | test |
 |---|---|---|---|---|
-| drone | 11.649 | 3.301 | 1.963 | 946 |
-| airplane | 11.941 | 4.047 | 2.334 | 1.139 |
-| helicopter | 11.944 | 4.545 | 2.181 | 1.056 |
-| bird | 3.481 | 770 | 908 | 433 |
+| drone | 11.637 | 3.301 | 1.964 | 945 |
+| airplane | 11.959 | 4.065 | 2.352 | 1.123 |
+| helicopter | 11.927 | 4.546 | 2.165 | 1.087 |
+| bird | 3.477 | 763 | 908 | 433 |
 
 I nomi dei file dicono il tipo di immagine:
 - `R_<gruppo>_<clip>_<n>`: immagine **reale**;
@@ -82,7 +82,7 @@ il file da cui viene l'immagine, relativo a `data/`.
   - Aerei ed elicotteri seguono l'obiettivo del train fino a 256 px, i droni fino a circa 181 px. Sopra 256 px
     tutte le classi stanno sotto la curva, perché le fonti hanno pochi esempi così grandi.
   - Sotto 32 px l'obiettivo del train si raggiunge con i mosaici, che rimpiccioliscono oggetti grandi.
-  - Gli uccelli stanno molto sotto l'obiettivo del train (3.481 box contro 11.650–11.950 delle altre classi) e non
+  - Gli uccelli stanno molto sotto l'obiettivo del train (3.477 box contro 11.640–11.960 delle altre classi) e non
     hanno box sopra 256 px. Anche la validazione sta sotto il suo obiettivo; il test oscilla attorno al suo.
 
 ### Fonti per split
@@ -135,12 +135,12 @@ l'immagine reale più vicina del train. L'asse x è in scala −log₁₀(1 − 
 - **(b) Coda.** La quota di immagini sopra ogni soglia di somiglianza, su scala logaritmica. La linea verticale è la soglia dei
   doppioni, 0,95.
 - **Riferimenti**, presi dentro il train:
-  - "stesso gruppo, altra clip": com'è fatto un leakage vero, mediana 0,931;
+  - "stesso gruppo, altra clip": com'è fatto un leakage vero, mediana 0,932;
   - "gruppi diversi": il fondo, cioè la somiglianza che c'è comunque perché il cielo somiglia al cielo;
     mediana 0,802.
 - **Lettura.** Con un leakage, le curve di val e test si sposterebbero verso quella tratteggiata.
 - **Risultati.**
-  - Validazione (mediana 0,800) e test (0,790) coincidono con il fondo, anche nella coda fra 0,85 e 0,95.
+  - Validazione (mediana 0,798) e test (0,790) coincidono con il fondo, anche nella coda fra 0,85 e 0,95.
   - Nessuna immagine supera 0,95. In parte è per costruzione, perché le coppie sopra 0,95 stanno nello stesso
     gruppo; la coincidenza con il fondo sotto 0,95 invece no.
 
@@ -217,7 +217,7 @@ dello sfondo accettato.
   FBD-SV-2024 è quasi tutto vegetazione, quindi sta solo nel train e dentro la quota fuori dominio.
 - **Droni ad ala fissa esclusi**: troppo pochi per stare in tutti gli split.
 - **Oggetti sopra i 181 px** sotto la curva del train, per tutte le classi.
-- **Droni in val e test** sotto l'obiettivo (1.963 contro 2.547 e 946 contro 1.273), soprattutto fra 16 e 32 px: i
+- **Droni in val e test** sotto l'obiettivo (1.964 contro 2.547 e 945 contro 1.273), soprattutto fra 16 e 32 px: i
   video di droni indipendenti sono pochi, e un gruppo non può superare il 15% di una classe né il 75% di una cella.
 - **Label dei droni Anti-UAV aggiunti il 26/10/2026**: sono quelle originali del dataset.
 - **Leakage dello sfondo accettato**: le fonti con il cielo hanno uno sfondo che si ripete fra riprese diverse, ed è
@@ -499,6 +499,8 @@ Le operazioni fatte, in ordine. Ogni passo ha la sua cartella e legge solo i pas
       (giro `17e`). Il 28/10/2026: 287 frame DVIDS nuovi (giro `17f`), poi in CVAT tutti i frame non rivisti dei
       tre split (giri `17g`, `17h`, `17i`: 1.117, 525 e 96 frame; 130 box cambiati, 33 frame rimasti senza box).
       Dopo lo split con il seme 3: 199 e 18 frame (giri `17j`, `17k`), 4 box cambiati.
+      Poi un elicottero a terra senza box in due clip Svanström del val (giro `17l`, 131 frame, 57 box aggiunti con
+      una traccia CVAT) e 12 frame non rivisti dopo il nuovo split (giro `17m`, 2 box cambiati).
     - Label corrette in `label/`, copie: le label delle fonti restano quelle originali.
 16. `17_dataset`: il dataset.
     - `rivisti`: le label della revisione; via i frame cancellati o vuoti, il gruppo notturno, i frame bui

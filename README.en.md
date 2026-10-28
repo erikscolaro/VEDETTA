@@ -16,8 +16,8 @@ not regenerated or modified.
 |---|---|
 | classes | `0 drone`, `1 airplane`, `2 helicopter`, `3 bird` |
 | images | 640×512, never upscaled |
-| splits | train 22,097, val 6,569, test 3,427, plus 511 int8 calibration images |
-| instances per class | about 11,650–11,950 in train, about 1,960–2,330 in val, about 950–1,140 in test; birds: 3,481, 908, 433 |
+| splits | train 21,958, val 6,659, test 3,441, plus 511 int8 calibration images |
+| instances per class | about 11,640–11,960 in train, about 1,960–2,350 in val, about 950–1,120 in test; birds: 3,477, 908, 433 |
 | object size | √(w·h) from 8 to over 256 px, with extra examples where the object is small |
 
 1. [The dataset](#the-dataset)
@@ -44,17 +44,17 @@ data/output/
 
 | split | images | real | mosaics | background |
 |---|---|---|---|---|
-| train | 22,097 | 18,542 | 505 | 3,050 |
-| val | 6,569 | 5,669 | 0 | 900 |
-| test | 3,427 | 2,911 | 0 | 516 |
+| train | 21,958 | 18,397 | 511 | 3,050 |
+| val | 6,659 | 5,759 | 0 | 900 |
+| test | 3,441 | 2,925 | 0 | 516 |
 | calib | 511 | 460 | 0 | 51 |
 
 | class | train | of which from mosaics | val | test |
 |---|---|---|---|---|
-| drone | 11,649 | 3,301 | 1,963 | 946 |
-| airplane | 11,941 | 4,047 | 2,334 | 1,139 |
-| helicopter | 11,944 | 4,545 | 2,181 | 1,056 |
-| bird | 3,481 | 770 | 908 | 433 |
+| drone | 11,637 | 3,301 | 1,964 | 945 |
+| airplane | 11,959 | 4,065 | 2,352 | 1,123 |
+| helicopter | 11,927 | 4,546 | 2,165 | 1,087 |
+| bird | 3,477 | 763 | 908 | 433 |
 
 File names tell the image type:
 - `R_<group>_<clip>_<n>`: **real** image;
@@ -82,7 +82,7 @@ File names tell the image type:
   - Airplanes and helicopters follow the training target up to 256 px, drones up to about 181 px. Above 256 px all
     classes are under the curve, because the sources have few examples that large.
   - Below 32 px the curve is reached thanks to the mosaics, which shrink large objects.
-  - Birds are well below the training target (3,481 boxes against 11,650–11,950 for the other classes) and have no
+  - Birds are well below the training target (3,477 boxes against 11,640–11,960 for the other classes) and have no
     boxes above 256 px. Validation is also below its target; the test oscillates around its target.
 
 ### Sources per split
@@ -133,11 +133,11 @@ nearest real training image. The axis is stretched towards 1 (−log₁₀(1 −
 - **(b) Tail.** The share of images above each threshold, in log scale. The vertical line is the duplicate threshold,
   0.95.
 - **References**, taken inside training:
-  - "same group, other clip": what a real leakage looks like, median 0.931;
+  - "same group, other clip": what a real leakage looks like, median 0.932;
   - "different groups": the floor, because sky always looks like sky; median 0.802.
 - **Reading.** If val or test had leakage, their curves would move towards the dashed one.
 - **Results.**
-  - Validation (median 0.800) and test (0.790) match the floor, also in the tail between 0.85 and 0.95.
+  - Validation (median 0.798) and test (0.790) match the floor, also in the tail between 0.85 and 0.95.
   - No image exceeds 0.95. That is partly by construction, because pairs above 0.95 are in the same group. The match
     with the floor below 0.95 is not.
 
@@ -213,7 +213,7 @@ accepted background leakage.
   FBD-SV-2024 is almost all vegetation, so it is only in train and within the out-of-domain share.
 - **Fixed-wing drones excluded**: too few to be in all the splits.
 - **Objects above 181 px** are under the train curve, for all classes.
-- **Drones in val and test** are below the target (1,963 against 2,547 and 946 against 1,273), mostly between 16 and
+- **Drones in val and test** are below the target (1,964 against 2,547 and 945 against 1,273), mostly between 16 and
   32 px: there are few independent drone videos, and a group cannot exceed 15% of a class or 75% of a cell.
 - **Labels of the Anti-UAV drones added on October 26, 2026**: they are the original ones of the dataset.
 - **Accepted background leakage**: the sources with sky have a background that repeats across different recordings,
@@ -498,6 +498,8 @@ The operations done, in order. Each step has its own folder and reads only the p
       reviewed yet of the three splits (rounds `17g`, `17h`, `17i`: 1,117, 525 and 96 frames; 130 boxes changed, 33
       frames left without boxes). After the split with seed 3: 199 and 18 frames (rounds `17j`, `17k`), 4 boxes
       changed.
+      Then a helicopter on the ground without boxes in two Svanström clips of val (round `17l`, 131 frames, 57 boxes
+      added with a CVAT track) and 12 frames not reviewed after the new split (round `17m`, 2 boxes changed).
     - Corrected labels in `label/`, as copies: the labels of the sources stay the original ones.
 16. `17_dataset`: the dataset.
     - `rivisti`: the labels of the review; out the deleted or empty frames, the night group, dark frames (mean grey
