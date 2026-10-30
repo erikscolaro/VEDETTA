@@ -869,7 +869,7 @@ def _share_plot(rows: list, lang: str, path: Path) -> None:
     save(f, path)
 
 
-def figures() -> None:
+def figures(solo: bool = False) -> None:
     """Standard figures of the dataset (user, 26/10/2026), Italian and English, in `docs/figure/` and next to the
     dataset: `distribuzione` (sizes per class: train real and mosaics, val, test, with the targets), `fonti` (share
     of each source per split and class) and `contesto` (share of each scenario; weather as a second row once the
@@ -914,11 +914,11 @@ def figures() -> None:
                 weather[r["split"], NAMES[c], r["meteo"]] += 1
     fig_dir = Path(__file__).resolve().parents[1] / "docs" / "figure"
     T = {"it": dict(real="Addestramento, reali", mos="Addestramento, mosaici", val="Validazione", test="Test",
-                    ttr="Obiettivo addestramento", tval="Obiettivo validazione", tte="Obiettivo test (uniforme)",
+                    ttr="Obiettivo addestramento", tval="Obiettivo validazione", tte="Obiettivo test (uniforme)", excl="Escluse (< 8 px)",
                     x="Lato della box √(w·h) [px]", y="Istanze", sp={"train": "Addestramento", "val": "Validazione", "test": "Test"},
                     share="quota delle box"),
          "en": dict(real="Training, real", mos="Training, mosaics", val="Validation", test="Test",
-                    ttr="Training target", tval="Validation target", tte="Test target (uniform)",
+                    ttr="Training target", tval="Validation target", tte="Test target (uniform)", excl="Excluded (< 8 px)",
                     x="Box side √(w·h) [px]", y="Instances", sp={"train": "Training", "val": "Validation", "test": "Test"},
                     share="share of boxes")}
     for lang, t in T.items():
@@ -926,6 +926,7 @@ def figures() -> None:
         f, axs = plt.subplots(2, 2, figsize=(WIDTH, 4.6), sharex=True, sharey=True)
         dlog = np.log(BINS[1] / BINS[0])
         for k, (ax, c) in enumerate(zip(axs.flat, OUT_NAMES)):
+            ax.axvspan(4, 8, color="0.93", lw=0, zorder=0, label=t["excl"])  # under the 8 px cut (user, 30/10/2026)
             h_tr = np.histogram(size["train", c], BINS)[0]
             h_mo = np.histogram(size["mosaico", c], BINS)[0]
             ax.stairs(h_tr - h_mo, BINS, fill=True, color=_P[0], alpha=.35, lw=0, label=t["real"])
@@ -938,8 +939,8 @@ def figures() -> None:
             n_t = len(size["test", c])
             ax.plot([8, CUT[c]], [n_t * dlog / np.log(CUT[c] / 8)] * 2, color="0.1", lw=.9, ls=(0, (1, 1.5)), label=t["tte"])
             ax.set_xscale("log")
-            ax.set_xlim(7, 400)  # the boxes start at 8 px
-            ax.set_xticks([8, 16, 32, 64, 128, 256], ["8", "16", "32", "64", "128", "256"])
+            ax.set_xlim(4, 512)  # as the size figures of `distributions.py`; the boxes start at 8 px
+            ax.set_xticks([4, 8, 16, 32, 64, 128, 256, 512], ["4", "8", "16", "32", "64", "128", "256", "512"])
             ax.xaxis.set_minor_locator(NullLocator())  # the base-10 minor ticks do not fall on the powers of 2
             ax.set_title(f"({'abcd'[k]}) {CLASS_TXT[lang][c].capitalize()}")
             ax.tick_params(labelbottom=True)
@@ -959,20 +960,21 @@ def figures() -> None:
         if any(v for k, v in weather.items()):
             rows_ctx.append(("meteo", sorted({(k[2], k[2]) for k in weather}), weather))
         _share_plot(rows_ctx, lang, fig_dir / "context")
-    # leakage: DINOv2 of every real image, nearest training image (as split._leakage_plot)
-    import torch
+    if not solo:
+        # leakage: DINOv2 of every real image, nearest training image (as split._leakage_plot)
+        import torch
 
-    from tools.split import _leakage_plot, embed
+        from tools.split import _leakage_plot, embed
 
-    real = [r for r in csv.DictReader(open(OUT / "manifest.csv")) if r["tipo"] == "reale" and r["split"] != "calib"]
-    e = torch.from_numpy(embed([str(OUT / r["immagine"]) for r in real])).cuda()
-    gi = {x: k for k, x in enumerate(sorted({r["gruppo"] for r in real}))}
-    ci = {x: k for k, x in enumerate(sorted({r["fonte"] + ":" + r["clip"] for r in real}))}
-    g = torch.tensor([gi[r["gruppo"]] for r in real], device="cuda")
-    c = torch.tensor([ci[r["fonte"] + ":" + r["clip"]] for r in real], device="cuda")
-    data = (e, g, c, [r["split"] for r in real])
-    _leakage_plot(OUT, lang="it", data=data)
-    _leakage_plot(fig_dir, lang="en", table=False, data=data)
+        real = [r for r in csv.DictReader(open(OUT / "manifest.csv")) if r["tipo"] == "reale" and r["split"] != "calib"]
+        e = torch.from_numpy(embed([str(OUT / r["immagine"]) for r in real])).cuda()
+        gi = {x: k for k, x in enumerate(sorted({r["gruppo"] for r in real}))}
+        ci = {x: k for k, x in enumerate(sorted({r["fonte"] + ":" + r["clip"] for r in real}))}
+        g = torch.tensor([gi[r["gruppo"]] for r in real], device="cuda")
+        c = torch.tensor([ci[r["fonte"] + ":" + r["clip"]] for r in real], device="cuda")
+        data = (e, g, c, [r["split"] for r in real])
+        _leakage_plot(OUT, lang="it", data=data)
+        _leakage_plot(fig_dir, lang="en", table=False, data=data)
     import shutil
 
     # the Italian figures also next to the dataset, with the names of its README
@@ -985,5 +987,9 @@ def figures() -> None:
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--step", choices=["tabella", "rivisti", "split", "train", "mosaici", "export", "figure"], required=True)
+    p.add_argument("--solo", action="store_true", help="figure: only distribution, sources and context (no leakage)")
     a = p.parse_args()
-    {"tabella": table, "rivisti": reviewed, "split": split, "train": train, "mosaici": mosaics, "export": export, "figure": figures}[a.step]()
+    if a.step == "figure":
+        figures(a.solo)
+    else:
+        {"tabella": table, "rivisti": reviewed, "split": split, "train": train, "mosaici": mosaics, "export": export}[a.step]()

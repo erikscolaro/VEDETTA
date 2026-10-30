@@ -886,11 +886,11 @@ FIG = ROOT / "docs" / "figure"  # README figures, in Italian and English
 
 
 def _threshold_plot(dst: Path, lang: str = "it") -> None:
-    """Duplicates threshold, two panels with a shared x (user, 28/10/2026: the single bar chart was "asettico e poco
-    informativo"): (a) per band of maximum similarity, the session pairs of the current data, those judged by hand
-    (tuning sample `taratura/`, full review of 0.92-0.95 `fascia_092/`, the 146 pairs >= 0.95 of step 10) and the
-    confirmed duplicates, log scale; (b) share of duplicates with the 95% Wilson interval over the three zones of the
-    rule (ignored, review by hand, automatic merge), colours as `threshold_examples` -> `{it,en}_threshold_tuning`."""
+    """Duplicates threshold, one panel (user, 30/10/2026: the upper panel, the session pairs per band in log scale, was
+    removed from the thesis figure): per band of maximum similarity, the share of duplicates among the pairs judged by
+    hand (tuning sample `taratura/`, full review of 0.92-0.95 `fascia_092/`, the 146 pairs >= 0.95 of step 10), without
+    error bars (user, 30/10/2026: Wilson interval removed), over the three zones of the rule (ignored, review by hand, automatic merge), colours as
+    `threshold_examples` -> `{it,en}_threshold_tuning`."""
     import matplotlib.pyplot as plt
 
     from tools.plots import WIDTH, _P, save, use
@@ -904,37 +904,17 @@ def _threshold_plot(dst: Path, lang: str = "it") -> None:
             same.append(int(r["n"]) in yes)
     top = sum(1 for _ in csv.DictReader(open(dup / "coppie.csv")))
     sim, same = np.array(sim + [2.0] * top), np.array(same + [True] * top)  # 2.0: the reviewed pairs of step 10
-    allp = np.array([v[0] for v in _session_pairs(0.85)[4].values()])  # every session pair, current data
     bands = [(0.85, 0.90), (0.90, 0.92), (0.92, 0.93), (0.93, 0.94), (0.94, 0.95), (0.95, 1.01)]
     it = lang == "it"
     use(lang)
-    f, (a1, a2) = plt.subplots(2, 1, figsize=(WIDTH, 3.9), sharex=True, height_ratios=[1, 1.15])
+    f, a2 = plt.subplots(figsize=(WIDTH, 2.4))
     x = np.arange(len(bands))
-    tot, rev, k_, c_, h_ = [], [], [], [], []
+    rev, k_ = [], []
     for lo, hi in bands:
         m = (sim >= lo) & ((sim < hi) | ((hi == 0.95) & (sim <= 0.9504))) if hi < 1 else sim > 1.5  # 0.950 rounded
         n, k = int(m.sum()), int(same[m].sum())
-        z = 1.96
-        c, h = (k + z * z / 2) / (n + z * z), z * np.sqrt(k * (n - k) / n + z * z / 4) / (n + z * z)
-        tot.append(int(((allp >= lo) & (allp < hi)).sum()))
         rev.append(n)
         k_.append(k)
-        c_.append(c)
-        h_.append(h)
-    sep = "." if it else ","
-    fmt = lambda v: f"{v:,}".replace(",", sep)  # noqa: E731
-    w = .62
-    a1.bar(x, tot, w, color="0.85", label="Coppie di sessioni nei dati" if it else "Session pairs in the data")
-    a1.bar(x, rev, w * .66, color=_P[0], alpha=.35, label="Riviste a mano" if it else "Reviewed by hand")
-    a1.bar(x, k_, w * .33, color=_P[0], label="Doppioni confermati" if it else "Confirmed duplicates")
-    for i in x:
-        a1.text(i, tot[i] * 1.25, fmt(tot[i]), ha="center", fontsize=7, color="0.35")
-    a1.set_yscale("log")
-    a1.set_ylim(.8, max(tot) * 6)
-    a1.set_ylabel("Coppie" if it else "Pairs")
-    a1.grid(axis="x", visible=False)
-    a1.legend(loc="upper right", ncol=3, frameon=False)
-    a1.set_title("(a) Coppie per fascia" if it else "(a) Pairs per band", loc="left")
     zones = [(-.5, 1.5, "0.6", "si ignora" if it else "ignored"),
              (1.5, 4.5, _P[3], "revisione a mano" if it else "review by hand"),
              (4.5, 5.5, _P[0], "unione automatica" if it else "automatic merge")]
@@ -942,7 +922,6 @@ def _threshold_plot(dst: Path, lang: str = "it") -> None:
         a2.axvspan(lo, hi, color=col, alpha=.12, lw=0)
         a2.text((lo + hi) / 2, 1.13, name, ha="center", va="top", fontsize=7, color="0.25")
     a2.plot(x, [k / n for k, n in zip(k_, rev)], color=_P[0], lw=1, zorder=2)
-    a2.errorbar(x, c_, yerr=h_, fmt="none", ecolor="0.2", lw=.8, capsize=2.5, capthick=.8, zorder=3)
     a2.scatter(x, [k / n for k, n in zip(k_, rev)], s=18, color=_P[0], zorder=4)
     for i in x:  # the last point is at 100%, under the zone name: its label goes to the left, below
         last = i == x[-1]
@@ -953,8 +932,7 @@ def _threshold_plot(dst: Path, lang: str = "it") -> None:
     a2.set_ylabel("Quota di doppioni" if it else "Share of duplicates")
     a2.set_yticks([0, .25, .5, .75, 1], ["0", "25%", "50%", "75%", "100%"])
     a2.grid(axis="x", visible=False)
-    a2.set_title("(b) Doppioni fra le coppie riviste, IC di Wilson al 95%" if it else
-                 "(b) Duplicates among the reviewed pairs, 95% Wilson CI", loc="left")
+    a2.set_title("Doppioni fra le coppie riviste" if it else "Duplicates among the reviewed pairs", loc="left")
     lab = [f"{lo:.2f}–{hi:.2f}" if hi < 1 else "≥ 0.95" for lo, hi in bands]
     a2.set_xticks(x, [v.replace(".", ",") for v in lab] if it else lab)
     a2.set_xlabel("Somiglianza massima fra due sessioni (DINOv2)" if it else

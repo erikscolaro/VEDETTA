@@ -2,10 +2,12 @@
 """Continuous distribution of the size sqrt(w*h) per class on the final labels
 (Svanström on the kept frames, the other sources from 5_box/manuale), boxes >= 8 px at origin.
 
-Two figures in docs/figure/ (rationale in README, Rules), with the ideal curve (TOTAL raised per class with SCALE)
-as a continuous line and the same vertical axis in the 4 plots:
-- it_size_review.png: histogram per class with the instances per band (red: below the per-cell minimum);
-- it_size_scale.png: the same with the Ultralytics scale (s = 0.25 and 0.5) computed exactly.
+Two figures in docs/figure/ (rationale in README, Rules), with the same
+vertical axis in the 4 plots:
+- it_size_review.{png,pdf}: histogram per class with the instances per band, no ideal curve and no scale lines
+  (user, 30/10/2026: the thesis introduces the curve later and no longer shows the per-cell minimum);
+- it_size_scale.png: the same with the Ultralytics scale (s = 0.25 and 0.5) computed exactly, with the ideal curve
+  (TOTAL raised per class with SCALE) as a continuous line.
 
     python tools/distributions.py
 """
@@ -27,9 +29,8 @@ from tools.plots import _P, WIDTH, save, use  # noqa: E402
 OUT = ROOT / "docs" / "figure"
 W, H = 640, 512
 MIN = 8  # boxes under 8 px at origin are excluded (user, 22/10/2026)
-TARGET = round(2000 / 0.7)  # per-cell minimum (README, Rules)
-EDGES = [8, 16, 32, 64, 96]
-BANDS = [(8, 16), (16, 32), (32, 64), (64, 96), (96, 1e9)]
+EDGES = [8, 16, 32, 64, 128, 256]  # powers of 2, as the axis (user, 30/10/2026: was 96)
+BANDS = [(8, 16), (16, 32), (32, 64), (64, 128), (128, 256), (256, 1e9)]
 CLASSES = ["airplane", "bird", "drone", "helicopter"]
 # ideal distribution: density in log s proportional to s^-alpha on [SMIN, SMAX] (README, Rules)
 ALPHA = dict.fromkeys(["airplane", "bird", "drone", "helicopter"], 0.3)  # same curve for all (user, 23/10/2026)
@@ -114,16 +115,19 @@ ORDER = ["drone", "airplane", "helicopter", "bird"]  # class order of the datase
 CLASS_IT = {"drone": "Drone", "airplane": "Aereo", "helicopter": "Elicottero", "bird": "Uccello"}
 
 
-def _axes(ax, k: int, c: str, n: int) -> None:
+def _axes(ax, k: int, c: str) -> None:
+    """Axes of the size figures (and of the distribution figure of `dataset.py`): log x from 4 px, the zone under the
+    8 px cut in grey (user, 30/10/2026), ticks on the powers of 2."""
     from matplotlib.ticker import NullLocator
 
-    ax.axvspan(2, 8, color="0.93", lw=0, zorder=0, label="Escluse (< 8 px)")
+    ax.axvspan(4, 8, color="0.93", lw=0, zorder=0, label="Escluse (< 8 px)")
     ax.set_xscale("log")
-    ax.set_xlim(2, 512)
-    ticks = [4, 8, 16, 32, 64, 128, 256, 512]  # powers of 2
+    ax.set_xlim(4, 512)
+    ticks = [4, 8, 16, 32, 64, 128, 256, 512]
     ax.set_xticks(ticks, [str(v) for v in ticks])
     ax.xaxis.set_minor_locator(NullLocator())  # the base-10 minor ticks do not fall on the powers of 2
-    ax.set_title(f"({'abcd'[k]}) {CLASS_IT[c]}, " + f"{n:,}".replace(",", ".") + " box")
+    ax.set_title(f"({'abcd'[k]}) {CLASS_IT[c]}")
+    ax.tick_params(labelbottom=True)
 
 
 def _labels(f, axs, y: str) -> None:
@@ -136,26 +140,25 @@ def _labels(f, axs, y: str) -> None:
 
 
 def fig_current(size: dict, plt) -> Path:
-    """Sizes after the CVAT review, with the boxes per band (red: under the per-cell minimum) and the ideal curve."""
+    """Sizes after the CVAT review, with the boxes per band. Same look as
+    `fig_scale` without the scale lines and without the ideal curve, which the thesis introduces later (user,
+    30/10/2026)."""
     f, axs = plt.subplots(2, 2, figsize=(WIDTH, 4.6), sharex=True, sharey=True)
     hs = {c: expected(size[c], 0, BINS) for c in CLASSES}
-    top = max(max(hs[c].max(), curve(TOT[c], ALPHA[c], CUT[c])[1].max()) for c in CLASSES) * 1.3  # same axis for all 4
+    top = max(h.max() for h in hs.values()) * 1.3  # same axis for all 4, room above the bars for the numbers
     for k, (ax, c) in enumerate(zip(axs.flat, ORDER)):
         x = size[c]
-        _axes(ax, k, c, len(x))
-        ax.bar(BINS[:-1], hs[c], width=np.diff(BINS), align="edge", color=_P[0], alpha=.85, lw=0, label="Box")
-        for e in EDGES[:-1]:  # without the line at 96 px: the axis is in powers of 2 (user)
+        _axes(ax, k, c)
+        ax.stairs(hs[c], BINS, fill=True, color=_P[0], alpha=.35, label="Box")
+        for e in EDGES:
             ax.axvline(e, color="0.55", lw=.5, ls="--")
-        ax.plot(*curve(TOT[c], ALPHA[c], CUT[c]), color="0.1", lw=1, label="Ideale (alzata per classe)")
         for j, (a, b) in enumerate(BANDS):
             n = int(((x >= a) & (x < b)).sum())
-            ax.text(np.sqrt(a * min(b, 300)), top * (.97 if j % 2 == 0 else .87), f"{n:,}".replace(",", "."),
-                    ha="center", va="top", fontsize=7, color=_P[7] if n < TARGET else "0.2",
-                    weight="bold" if n < TARGET else "normal")
-        ax.set_ylim(0, top)
-    axs[0, 0].plot([], [], ls="none", marker="$n$", color=_P[7], label="Fascia sotto il minimo per cella")
+            ax.text(np.sqrt(a * min(b, 300)), top * (.97 if j % 2 == 0 else .88), f"{n:,}".replace(",", "."),
+                    ha="center", va="top", fontsize=7, color="0.2")
+    axs[0, 0].set_ylim(0, top)
     _labels(f, axs, "Istanze per intervallo")
-    return save(f, OUT / "size_review", pdf=False)
+    return save(f, OUT / "size_review")
 
 
 def fig_scale(size: dict, plt) -> Path:
@@ -165,7 +168,7 @@ def fig_scale(size: dict, plt) -> Path:
     ymax = 0
     for k, (ax, c) in enumerate(zip(axs.flat, ORDER)):
         x = size[c]
-        _axes(ax, k, c, len(x))
+        _axes(ax, k, c)
         for s, col, lab in scales:
             h = expected(x, s, BINS)
             ax.stairs(h, BINS, color=col, lw=0 if s == 0 else 1.2, label=lab, fill=s == 0, alpha=.35 if s == 0 else 1)
@@ -189,11 +192,11 @@ def main() -> int:
     size = sizes()
     print(fig_current(size, plt))
     print(fig_scale(size, plt))
-    print("ideale droni per fascia:" + "".join(f"{round(v):>8}" for v in ideal(TOT["drone"], ALPHA["drone"], [8, 16, 32, 64, 96, 1e6])))
-    print(f"{'':<11}{'s':>5}" + "".join(f"{a:>8}" for a in ["<8", "8-16", "16-32", "32-64", "64-96", ">96"]))
+    print("ideale droni per fascia:" + "".join(f"{round(v):>8}" for v in ideal(TOT["drone"], ALPHA["drone"], EDGES + [1e6])))
+    print(f"{'':<11}{'s':>5}" + "".join(f"{a:>8}" for a in ["<8", "8-16", "16-32", "32-64", "64-128", "128-256", ">256"]))
     for c in CLASSES:
         for s in (0, .25, .5):
-            n = expected(size[c], s, [0, 8, 16, 32, 64, 96, 1e6])
+            n = expected(size[c], s, [0] + EDGES + [1e6])
             print(f"{c:<11}{s:>5}" + "".join(f"{round(v):>8}" for v in n))
     return 0
 

@@ -55,10 +55,10 @@ def sam():
 NAMES = ["airplane", "bird", "drone", "helicopter"]  # same order as AOD4
 
 
-BANDS = ["<8", "8-16", "16-32", "32-64", "64-96", ">96"]  # sqrt(w*h) in px, README.md, Rules
+BANDS = ["<8", "8-16", "16-32", "32-64", "64-128", "128-256", ">256"]  # sqrt(w*h) in px; powers of 2 (user, 30/10/2026: was 64-96, >96)
 
 
-BAND_EDGES = [8, 16, 32, 64, 96]
+BAND_EDGES = [8, 16, 32, 64, 128, 256]
 
 
 def dhash(gray: np.ndarray) -> np.ndarray:

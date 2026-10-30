@@ -170,12 +170,8 @@ nearest real training image. The axis is stretched towards 1 (−log₁₀(1 −
 ![threshold tuning](docs/figure/en_threshold_tuning.png)
 
 **Figure 6.** *Tuning of the duplicate threshold.* The bands are of the maximum similarity between two sessions.
-- **(a) Pairs per band**, on a log scale:
-  - grey: the session pairs in the data, with the number above the bar;
-  - light blue: the pairs reviewed by hand **[operator]**;
-  - blue: the confirmed duplicates.
-- **(b) Share of duplicates** among the reviewed pairs. Next to each point, duplicates over the total; the error bar
-  is the 95% Wilson interval. The background shows the rule: below 0.92 ignored, between 0.92 and 0.95 review by
+- **Share of duplicates** among the pairs reviewed by hand **[operator]**. Next to each point, duplicates over the
+  total; the error bar is the 95% Wilson interval. The background shows the rule: below 0.92 ignored, between 0.92 and 0.95 review by
   hand, above 0.95 automatic merge.
 - **Results.** The share rises from 0/40 below 0.90 to 40% between 0.94 and 0.95; above 0.95 it is 146/146. Hence the
   rule: above 0.95 the merge is automatic, between 0.92 and 0.95 a review is needed.
@@ -441,11 +437,13 @@ The operations done, in order. Each step has its own folder and reads only the p
      Eagle, Falcon, Raven and Magpie, sky or horizon background. A SigLIP filter keeps only the birds in flight
      (probability ≥ 0.7 or most probable scene); 10 rejects by hand in `5_box/scarti_volo.txt`.
    - DVIDS, from round 12 (28/10/2026): at most 40 frames per video, 1 per second (`frame --per-video 40`).
-3. **640×512 frames and crops** around the objects (FRED, DVIDS, Anti-UAV, FBD, Open Images); Svanström is already
+3. **Near-duplicates** inside each clip, on the frame at its original resolution and before the crop: 16-bit dHash of
+   the area around the boxes, plus number, position and size of the boxes (frames without boxes use the dHash of the
+   whole frame). Svanström is deduplicated after its boxes are redone and reviewed (steps 5 and 6), and 17% of its
+   frames remain; Open Images, made of single photos, skips this step.
+4. **640×512 frames and crops** around the objects (FRED, DVIDS, Anti-UAV, FBD, Open Images); Svanström is already
    640×512. Anti-UAV: one frame every 25, plus the halfway ones for drones above 32 px (October 26, 2026, at most 30
    per video).
-4. **Near-duplicates** inside each clip: 16-bit dHash of the crop on the target, plus box position and size. Of
-   Svanström 17% of the frames remain.
 5. **Proposed boxes**:
    - Svanström: local contrast and SAM 2 with one point;
    - FRED: detector on the sky and still background in the courtyards;
@@ -500,7 +498,7 @@ The operations done, in order. Each step has its own folder and reads only the p
       changed.
       Then a helicopter on the ground without boxes in two Svanström clips of val (round `17l`, 131 frames, 57 boxes
       added with a CVAT track) and 12 frames not reviewed after the new split (round `17m`, 2 boxes changed).
-      In the final dataset, val and test are fully reviewed; train keeps 1 DVIDS frame not reviewed.
+      In the final dataset all real frames are reviewed: the last DVIDS frame of train was reviewed outside CVAT on October 30, 2026 (round `17n`, unchanged).
     - Corrected labels in `label/`, as copies: the labels of the sources stay the original ones.
 16. `17_dataset`: the dataset.
     - `rivisti`: the labels of the review; out the deleted or empty frames, the night group, dark frames (mean grey
@@ -527,7 +525,9 @@ export NO_PROXY=localhost,127.0.0.1      # local CVAT, if there is a system prox
 - `SAM_PESI`: SAM 2.1, downloaded by Ultralytics on first use;
 - `REVIEW_PESI`: the second detector of the review by candidates.
 
-The scripts are run from the repo root with `.venv/bin/python`. The parameters of each step are in `--help`.
+The scripts are run from the repo root with `.venv/bin/python` and `PYTHONPATH=.`. The parameters of each step are
+in `--help`. CVAT credentials missing from `.env` are read from `~/.config/cvat.env`. SigLIP and DINOv2 stay in the
+Hugging Face cache: if the proxy gives an error, `HF_HUB_OFFLINE=1`.
 
 ```
 models/             .pt weights (outside git)
@@ -677,4 +677,5 @@ python tools/distributions.py                    # available sizes and Ultralyti
 | `tools/dataset.py` | final table, split, train, mosaics, export, dataset figures |
 | `tools/distributions.py`, `plots.py` | target curve and plot style |
 | `docs/dataset_readme.md` | template of the `data/output` README (written by the export) |
+| `docs/procedura_ideale.md` | general procedure, drawn from this work, to build a similar dataset from other sources (Italian) |
 | `.env.example` | which models to use and CVAT credentials, to copy into `.env` |
