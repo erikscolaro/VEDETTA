@@ -1,0 +1,7 @@
+# clip scartate in revisione CVAT (16/10/2026), fuori dal dataset
+V_AIRPLANE_054/s0
+V_AIRPLANE_055/s0
+V_HELICOPTER_057/s0
+V_HELICOPTER_058/s0
+V_HELICOPTER_059/s0
+V_HELICOPTER_060/s0

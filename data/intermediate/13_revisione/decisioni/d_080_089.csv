@@ -1,0 +1,241 @@
+id,decisione,nota
+K01920,tieni,
+K01921,tieni,
+K01922,tieni,
+K01923,tieni,
+K01924,tieni,
+K01925,tieni,
+K01926,tieni,
+K01927,tieni,
+K01928,tieni,
+K01929,tieni,
+K01930,tieni,
+K01931,tieni,
+K01932,tieni,
+K01933,tieni,
+K01934,tieni,
+K01935,tieni,
+K01936,tieni,
+K01937,tieni,
+K01938,tieni,
+K01939,tieni,
+K01940,tieni,
+K01941,tieni,
+K01942,tieni,
+K01943,tieni,
+K01944,tieni,
+K01945,tieni,
+K01946,tieni,
+K01947,tieni,
+K01948,tieni,
+K01949,tieni,
+K01950,dubbio,"solo pala del rotore tagliata dal bordo"
+K01951,dubbio,"solo pala del rotore tagliata dal bordo"
+K01952,dubbio,"oggetto allungato sfocato"
+K01953,dubbio,"oggetto allungato sfocato"
+K01954,dubbio,"frammento scuro all'angolo"
+K01955,aggiungi,"elicottero a terra tagliato dal bordo"
+K01956,dubbio,"solo rotore; corpo elicottero tagliato sotto"
+K01957,ignora,"rotore di elicottero che ha gia' la sua box"
+K01958,aggiungi,"elicottero a terra tagliato dal bordo"
+K01959,dubbio,"solo punta del rotore"
+K01960,ignora,"paracadute"
+K01961,ignora,"paracadute"
+K01962,ignora,"paracadute"
+K01963,ignora,"paracadute"
+K01964,tieni,
+K01965,tieni,"piccolo e sfocato"
+K01966,ignora,"palo"
+K01967,ignora,"palo/isolatore"
+K01968,tieni,
+K01969,tieni,
+K01970,tieni,"sagoma sfocata"
+K01971,tieni,
+K01972,tieni,
+K01973,tieni,"sagoma sfocata"
+K01974,tieni,
+K01975,dubbio,"macchia appena visibile"
+K01976,ignora,"logo sull'hangar"
+K01977,ignora,"logo sull'hangar"
+K01978,ignora,"logo sull'hangar"
+K01979,tieni,"quadricottero"
+K01980,tieni,"quadricottero"
+K01981,tieni,"quadricottero"
+K01982,tieni,"quadricottero"
+K01983,tieni,"quadricottero"
+K01984,tieni,"quadricottero"
+K01985,tieni,"drone piccolo visto di lato"
+K01986,togli,"testa di persona e alberi"
+K01987,tieni,"quadricottero"
+K01988,aggiungi,"elicottero con rotore di coda"
+K01989,aggiungi,"elicottero con rotore di coda tagliato"
+K01990,aggiungi,"elicottero con rotore di coda tagliato"
+K01991,aggiungi,"elicottero con rotore di coda"
+K01992,dubbio,"parte di ala/aereo tagliata dal bordo"
+K01993,dubbio,"parte di ala/aereo tagliata dal bordo"
+K01994,dubbio,"macchia bianca sfocata"
+K01995,dubbio,"frammento tagliato in alto"
+K01996,dubbio,"frammento tagliato in alto"
+K01997,dubbio,"frammento tagliato a sinistra"
+K01998,togli,
+K01999,aggiungi,"caccia in primo piano"
+K02000,aggiungi,"aereo a terra tagliato dal bordo"
+K02001,dubbio,"puntino minuscolo"
+K02002,aggiungi,"elicottero sopra erba"
+K02003,tieni,"UAV ad ala fissa"
+K02004,tieni,"UAV ad ala fissa"
+K02005,classe:helicopter,
+K02006,classe:helicopter,
+K02007,classe:helicopter,
+K02008,classe:helicopter,
+K02009,classe:helicopter,
+K02010,aggiungi,"F-35 su ponte"
+K02011,aggiungi,"jet tagliato dal bordo"
+K02012,aggiungi,"jet tagliato dal bordo"
+K02013,aggiungi,"jet tagliato dal bordo"
+K02014,aggiungi,"C-130 tagliato"
+K02015,aggiungi,"C-130 tagliato"
+K02016,aggiungi,"aereo lontano sfocato"
+K02017,classe:airplane,"aereo sfocato"
+K02018,classe:airplane,"aereo sfocato"
+K02019,classe:airplane,"aereo sfocato"
+K02020,aggiungi,"C-130 tagliato"
+K02021,aggiungi,"C-130 tagliato"
+K02022,classe:airplane,"aereo sfocato"
+K02023,aggiungi,"C-130 tagliato"
+K02024,aggiungi,"C-130 tagliato"
+K02025,aggiungi,"C-130 tagliato"
+K02026,dubbio,"strisciata scura allungata"
+K02027,ignora,"logo con stella"
+K02028,aggiungi,"piccolo elicottero tagliato a sinistra"
+K02029,aggiungi,"piccolo elicottero tagliato a sinistra"
+K02030,aggiungi,"piccolo elicottero tagliato a sinistra"
+K02031,aggiungi:bird,
+K02032,ignora,"detrito scuro sulla neve"
+K02033,aggiungi:bird,
+K02034,ignora,"detrito scuro sulla neve"
+K02035,aggiungi:bird,
+K02036,aggiungi:bird,
+K02037,aggiungi:bird,
+K02038,aggiungi:bird,
+K02039,ignora,"maniglia del portello"
+K02040,dubbio,"sagoma molto debole"
+K02041,aggiungi,"V-22 tagliato a sinistra"
+K02042,tieni,"V-22 tiltrotor"
+K02043,tieni,"V-22 tiltrotor"
+K02044,tieni,"V-22 tiltrotor"
+K02045,tieni,"V-22 tiltrotor"
+K02046,tieni,"V-22 tiltrotor"
+K02047,dubbio,"macchia scura piccola"
+K02048,ignora,"fumo/polvere"
+K02049,aggiungi,"jet in formazione"
+K02050,aggiungi,"jet in formazione"
+K02051,ignora,"macchia sfocata"
+K02052,ignora,"macchia sfocata"
+K02053,ignora,"macchia sfocata"
+K02054,ignora,"macchia sfocata"
+K02055,dubbio,"sagoma scura non chiara"
+K02056,ignora,"ramo/albero"
+K02057,aggiungi,"jet tagliato in alto"
+K02058,ignora,"folla con cartello"
+K02059,tieni,
+K02060,tieni,"caccia in virata"
+K02061,tieni,"caccia in virata"
+K02062,dubbio,"sagoma molto debole"
+K02063,togli,"sottile frammento al bordo, niente"
+K02064,togli,"niente nel giallo"
+K02065,dubbio,"macchia debole"
+K02066,ignora,"animale/terreno"
+K02067,aggiungi,"elicottero Apache tagliato a sinistra"
+K02068,aggiungi,"elicottero parzialmente dietro gli alberi"
+K02069,aggiungi,"drone tagliato in alto a destra"
+K02070,ignora,"finestra del muro"
+K02071,ignora,"antenna del palo"
+K02072,ignora,"antenna del palo"
+K02073,ignora,"antenna del palo"
+K02074,togli,"cielo vuoto"
+K02075,togli,"cielo vuoto"
+K02076,aggiungi:drone,"drone grande multirotore; la box verde copre solo un braccio"
+K02077,tieni,"box_stretta: copre solo un braccio del drone"
+K02078,ignora,"logo con aquila"
+K02079,dubbio,"macchia debole"
+K02080,aggiungi:drone,"quadricottero"
+K02081,ignora,"logo con aquila"
+K02082,aggiungi,"Chinook"
+K02083,togli,"luce verde su oggetto scuro"
+K02084,aggiungi,"Chinook"
+K02085,aggiungi,"Chinook tagliato"
+K02086,aggiungi,"Chinook"
+K02087,dubbio,"macchia sfocata"
+K02088,aggiungi,"Chinook"
+K02089,dubbio,"macchia sfocata"
+K02090,togli,"punto di luce"
+K02091,aggiungi,"Chinook"
+K02092,dubbio,"macchia debole"
+K02093,dubbio,"macchia debole"
+K02094,aggiungi,"Chinook"
+K02095,dubbio,"macchia al bordo"
+K02096,aggiungi,"Chinook"
+K02097,dubbio,"macchia sfocata"
+K02098,dubbio,"macchia sfocata"
+K02099,aggiungi,"elicottero lontano"
+K02100,aggiungi,"elicottero lontano"
+K02101,dubbio,"blob pixelato"
+K02102,dubbio,"blob pixelato"
+K02103,dubbio,"blob pixelato"
+K02104,dubbio,"blob pixelato"
+K02105,ignora,"elmetto di persona"
+K02106,aggiungi,"elicottero lontano"
+K02107,dubbio,"molto debole"
+K02108,dubbio,"molto debole"
+K02109,dubbio,"molto debole"
+K02110,dubbio,"molto debole"
+K02111,dubbio,"molto debole"
+K02112,dubbio,"molto debole"
+K02113,dubbio,"molto debole"
+K02114,dubbio,"molto debole"
+K02115,dubbio,"molto debole"
+K02116,classe:drone,"quadricottero scuro"
+K02117,tieni,"drone tenuto in mano"
+K02118,dubbio,"macchia sfocata"
+K02119,aggiungi,"Apache tagliato a sinistra"
+K02120,dubbio,"molto debole"
+K02121,dubbio,"oggetto chiaro non chiaro"
+K02122,dubbio,"oggetto chiaro non chiaro"
+K02123,dubbio,"macchia debole"
+K02124,ignora,"elmetto di persona"
+K02125,aggiungi,"jet tagliato in basso a sinistra"
+K02126,tieni,"oggetto scuro compatto"
+K02127,tieni,"oggetto scuro compatto"
+K02128,aggiungi,"jet tagliato in basso a sinistra"
+K02129,dubbio,"frammento minimo al bordo"
+K02130,classe:airplane,"jet visto di lato"
+K02131,aggiungi,"aereo a terra tagliato"
+K02132,classe:airplane,"jet visto di lato"
+K02133,dubbio,"sagoma debole"
+K02134,dubbio,"macchia scura"
+K02135,classe:airplane,"jet"
+K02136,dubbio,"macchia tonda sfocata"
+K02137,tieni,"UAV ad ala fissa"
+K02138,tieni,"UAV ad ala fissa"
+K02139,aggiungi,"elicottero"
+K02140,classe:airplane,
+K02141,dubbio,"macchia scura"
+K02142,aggiungi,"elicottero lontano"
+K02143,aggiungi,"elicottero lontano"
+K02144,tieni,"elicottero lontano"
+K02145,aggiungi,"elicottero lontano"
+K02146,tieni,"elicottero lontano"
+K02147,tieni,"elicottero lontano"
+K02148,aggiungi,"elicottero lontano"
+K02149,aggiungi,"elicottero lontano"
+K02150,tieni,"elicottero lontano"
+K02151,aggiungi,"elicottero lontano"
+K02152,aggiungi,"elicottero lontano"
+K02153,aggiungi,"elicottero lontano"
+K02154,aggiungi,"elicottero lontano"
+K02155,aggiungi,"elicottero tagliato a sinistra"
+K02156,aggiungi,"elicottero lontano"
+K02157,aggiungi,"elicottero lontano"
+K02158,aggiungi,"elicottero tagliato a sinistra"
+K02159,classe:airplane,"aereo a elica"

@@ -1,0 +1,11 @@
+# Open Images crops dropped by hand after the SigLIP filter (step volo); user, 28/10/2026, sheet dubbi
+OI_608f04ca60c5ab26
+OI_a508854fe3227fe9
+OI_50043272e34fe4dc
+OI_eda879724bb40f10
+OI_47b37a3ee43b7c9c
+OI_6e77a1942d5d9684
+OI_b6719a8f02bfcebe
+OI_5acf02734d481450
+OI_a18f96d68edf0655
+OI_a95828ca6fa62b64

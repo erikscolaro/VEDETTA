@@ -1,0 +1,6 @@
+split,nome,immagine,modifica,classe_prima,classe_dopo,iou,lato_px
+test,DVIDS_1023602_f00639,input/dvids/4_ritagli/DVIDS_1023602/images/DVIDS_1023602_f00639.jpg,spostato,drone,drone,0.328,84.7
+train,DVIDS_964711_f00034,input/dvids/4_ritagli/DVIDS_964711/images/DVIDS_964711_f00034.jpg,classe,drone,airplane,1.0,67.9
+train,DVIDS_972121_f02068,input/dvids/4_ritagli/DVIDS_972121/images/DVIDS_972121_f02068.jpg,tolto,drone,,,59.3
+train,DVIDS_985409_f00254,input/dvids/4_ritagli/DVIDS_985409/images/DVIDS_985409_f00254.jpg,classe,drone,helicopter,1.0,64.1
+train,DVIDS_985409_f00255,input/dvids/4_ritagli/DVIDS_985409/images/DVIDS_985409_f00255.jpg,classe,drone,helicopter,1.0,57.9

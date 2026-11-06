@@ -2,7 +2,7 @@ __pycache__/
 *.pyc
 .venv/
 
-# dati: solo la struttura; input e intermediate restano fuori da git
+# dati: solo la struttura; di input e intermediate solo scelte, liste, log e manuale.tar.gz, aggiunti con git add -f
 data/*
 !data/input/
 !data/intermediate/

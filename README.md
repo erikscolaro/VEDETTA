@@ -539,7 +539,9 @@ data/
 └── output/         il dataset finale (congelato)
 ```
 
-`input/` e `intermediate/` restano fuori da git, `output/` è versionata.
+Di `input/` e `intermediate/` sono in git solo le scelte degli operatori, le liste e i log (file sotto 5 MB) e le
+label riviste in CVAT (`manuale.tar.gz` per fonte); i dati grezzi si riscaricano con i passi di download. `output/`
+va su Hugging Face, in una repo dataset privata.
 
 ### Svanström: `tools/svanstrom.py`
 

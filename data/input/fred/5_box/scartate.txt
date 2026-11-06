@@ -1,0 +1,3 @@
+# sequenze di FRED scartate (16/10/2026)
+FRED_210/s0  # alberi in ombra: drone non visibile nell'RGB
+FRED_111/s0  # notte

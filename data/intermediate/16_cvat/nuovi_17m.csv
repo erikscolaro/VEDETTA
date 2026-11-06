@@ -1,0 +1,13 @@
+immagine,split,nome,label,stato
+input/anti_uav/4_ritagli/AUAV_20190926_103046_1_8/images/AUAV_20190926_103046_1_8_f00350.jpg,train,AUAV_20190926_103046_1_8_f00350,input/anti_uav/5_box/manuale/AUAV_20190926_103046_1_8/AUAV_20190926_103046_1_8_f00350.txt,invariata
+input/dvids/4_ritagli/DVIDS_831340/images/DVIDS_831340_f00128.jpg,val,DVIDS_831340_f00128,intermediate/16_cvat/label/label__DVIDS_831340__DVIDS_831340_f00128.txt,cambiata
+input/dvids/4_ritagli/DVIDS_831340/images/DVIDS_831340_f00129.jpg,val,DVIDS_831340_f00129,input/dvids/5_box/manuale/DVIDS_831340/DVIDS_831340_f00129.txt,invariata
+input/dvids/4_ritagli/DVIDS_831340/images/DVIDS_831340_f00132.jpg,val,DVIDS_831340_f00132,input/dvids/5_box/manuale/DVIDS_831340/DVIDS_831340_f00132.txt,invariata
+input/dvids/4_ritagli/DVIDS_831340/images/DVIDS_831340_f00159.jpg,val,DVIDS_831340_f00159,input/dvids/5_box/manuale/DVIDS_831340/DVIDS_831340_f00159.txt,invariata
+input/dvids/4_ritagli/DVIDS_836039/images/DVIDS_836039_f00301.jpg,train,DVIDS_836039_f00301,input/dvids/5_box/manuale/DVIDS_836039/DVIDS_836039_f00301.txt,invariata
+input/dvids/4_ritagli/DVIDS_866116/images/DVIDS_866116_f00481.jpg,val,DVIDS_866116_f00481,intermediate/16_cvat/label/DVIDS_866116__DVIDS_866116_f00481.txt,cambiata
+input/dvids/4_ritagli/DVIDS_866116/images/DVIDS_866116_f00482.jpg,val,DVIDS_866116_f00482,input/dvids/5_box/manuale/DVIDS_866116/DVIDS_866116_f00482.txt,invariata
+input/dvids/4_ritagli/DVIDS_866116/images/DVIDS_866116_f00484.jpg,val,DVIDS_866116_f00484,intermediate/15_dataset/label/DVIDS_866116__DVIDS_866116_f00484.txt,invariata
+input/dvids/4_ritagli/DVIDS_866116/images/DVIDS_866116_f00500.jpg,val,DVIDS_866116_f00500,input/dvids/5_box/manuale/DVIDS_866116/DVIDS_866116_f00500.txt,invariata
+input/dvids/4_ritagli/DVIDS_882759/images/DVIDS_882759_f01930.jpg,train,DVIDS_882759_f01930,input/dvids/5_box/manuale/DVIDS_882759/DVIDS_882759_f01930.txt,invariata
+input/dvids/4_ritagli/DVIDS_938336/images/DVIDS_938336_f00711.jpg,train,DVIDS_938336_f00711,input/dvids/5_box/manuale/DVIDS_938336/DVIDS_938336_f00711.txt,invariata

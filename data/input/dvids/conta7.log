@@ -1,0 +1,17 @@
+DVIDS: 623 clip in 623 sessioni
+DVIDS: conteggio airplane <8 114, 8-16 810, 16-32 3553, 32-64 8925, 64-96 6280, >96 14634
+DVIDS: conteggio bird <8 349, 8-16 954, 16-32 467, 32-64 188, 64-96 31, >96 6
+DVIDS: conteggio drone <8 39, 8-16 356, 16-32 980, 32-64 1745, 64-96 1084, >96 2789
+DVIDS: conteggio helicopter <8 69, 8-16 791, 16-32 1893, 32-64 2715, 64-96 1800, >96 8851
+-> /home/scolaroe/Desktop/air-detection/data/dvids/7_conteggio/conteggio.csv
+buchi: fonti dvids, fbd_sv, fred, svanstrom; minimi per cella 2857 istanze, 3 sessioni, 12 video
+  airplane     8-16   1299 ist 133 ses 143 vid   mancano 1558 istanze (col margine 1844)
+  bird        64-96    543 ist  94 ses 125 vid   mancano 2314 istanze (col margine 2600)
+  bird          >96    205 ist  37 ses  42 vid   mancano 2652 istanze (col margine 2938)
+  drone       32-64   2875 ist 129 ses 151 vid   mancano  (col margine 268)
+  drone       64-96   1179 ist 115 ses 120 vid   mancano 1678 istanze (col margine 1964)
+  drone         >96   2856 ist 164 ses 169 vid   mancano 1 istanze (col margine 287)
+  helicopter   8-16   1156 ist 152 ses 159 vid   mancano 1701 istanze (col margine 1987)
+  helicopter  16-32   2317 ist 211 ses 220 vid   mancano 540 istanze (col margine 826)
+  helicopter  64-96   2221 ist 203 ses 213 vid   mancano 636 istanze (col margine 922)
+8 buchi su 20 celle -> /home/scolaroe/Desktop/air-detection/data/aggregati/8_buchi/buchi.csv

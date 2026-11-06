@@ -1,0 +1,3 @@
+n,sessione_a,sessione_b,massimo,coppie_frame,frame_a,frame_b
+1,dvids:DVIDS_941585,dvids:DVIDS_959849,0.943,5,input/dvids/4_ritagli/DVIDS_941585/images/DVIDS_941585_f01131.jpg,input/dvids/4_ritagli/DVIDS_959849/images/DVIDS_959849_f00710.jpg
+2,dvids:DVIDS_1027261,dvids:DVIDS_862051,0.926,1,input/dvids/4_ritagli/DVIDS_1027261/images/DVIDS_1027261_f00795.jpg,input/dvids/4_ritagli/DVIDS_862051/images/DVIDS_862051_f00365.jpg

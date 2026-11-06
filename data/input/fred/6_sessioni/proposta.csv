@@ -1,0 +1,201 @@
+sequenza,proposta,sessione,blocco,gruppo_visivo,ora_inizio,drone,scenario
+0,S01,S01,B01,g24,16_03_03,Betafpv air75,cortile
+1,S01,S01,B01,g24,16_11_01,Betafpv air75,cortile
+2,S01,S02,B01,g23,16_34_05,Betafpv air75,cortile
+3,S01,S03,B01,g19,16_45_27,Betafpv air75,cortile
+4,S01,S03,B01,g19,16_51_03,Betafpv air75,cortile
+5,S02,S04,B02,g26,16_47_37,Betafpv air75,cortile
+6,S02,S04,B02,g26,16_53_18,Betafpv air75,cortile
+7,S02,S05,B02,g21,17_01_52,Betafpv air75,cortile
+8,S02,S05,B02,g21,17_08_44,Betafpv air75,cortile
+9,S02,S06,B02,g12,17_19_48,Betafpv air75,cortile
+10,S02,S06,B02,g12,17_23_42,Betafpv air75,cortile
+11,S02,S07,B02,g13,17_30_25,Betafpv air75,cielo
+12,S02,S07,B02,g13,17_36_41,Betafpv air75,cielo
+13,S02,S08,B02,g22,18_22_18,Betafpv air75,cortile
+14,S02,S08,B02,g22,18_27_51,Betafpv air75,cortile
+15,S02,S08,B02,g22,18_34_10,DarwinFPV cineape20,cortile
+16,S02,S08,B02,g22,18_38_51,DarwinFPV cineape20,cortile
+17,S02,S08,B02,g22,18_48_07,DarwinFPV cineape20,cortile
+18,S02,S09,B02,g20,18_55_57,DarwinFPV cineape20,cortile
+19,S02,S09,B02,g20,19_06_15,DarwinFPV cineape20,cortile
+20,S02,S09,B02,g20,19_14_29,DarwinFPV cineape20,cortile
+22,S04,S10,B04,g34,19_01_47,Betafpv air75,cortile
+23,S04,S10,B04,g35,19_10_03,Betafpv air75,cortile
+24,S04,S10,B04,g34,19_15_34,Betafpv air75,cortile
+25,S04,S10,B04,g34,19_20_17,Betafpv air75,cortile
+26,S04,S10,B04,g34,19_26_39,DarwinFPV cineape20,cortile
+27,S04,S10,B04,g34,19_31_49,DarwinFPV cineape20,cortile
+28,S04,S10,B04,g34,19_34_51,DarwinFPV cineape20,cortile
+29,S04,S10,B04,g34,19_41_35,DarwinFPV cineape20,cortile
+30,S04,S10,B04,g33,19_44_14,DarwinFPV cineape20,cortile
+31,S04,S10,B04,g33,19_47_03,DJI Mini 3|DarwinFPV cineape20,cortile
+32,S04,S10,B04,g33,19_50_32,DJI Mini 3|DarwinFPV cineape20,cortile
+33,S04,S11,B04,g32,19_54_56,DJI Mini 3|DarwinFPV cineape20,cortile
+34,S04,S11,B04,g32,19_57_37,DJI Mini 3|DarwinFPV cineape20,cortile
+35,S04,S11,B04,g32,20_00_54,DJI Mini 3|DarwinFPV cineape20,cortile
+36,S04,S11,B04,g32,20_04_25,DJI Mini 3|DarwinFPV cineape20,cortile
+37,S05,S12,B05,g29,18_23_50,Betafpv air75,cortile
+38,S05,S12,B05,g29,18_28_23,Betafpv air75,cortile
+39,S05,S12,B05,g29,18_31_28,Betafpv air75,cortile
+40,S05,S12,B05,g29,18_35_07,Betafpv air75,cortile
+41,S05,S12,B05,g29,18_38_57,Betafpv air75,cortile
+42,S05,S12,B05,g29,18_43_26,DarwinFPV cineape20,cortile
+43,S05,S12,B05,g29,18_46_37,DarwinFPV cineape20,cortile
+44,S05,S12,B05,g29,18_50_08,DJI Tello EDU|DarwinFPV cineape20,cortile
+45,S05,S12,B05,g29,18_54_22,DJI Tello EDU|DarwinFPV cineape20,cortile
+46,S05,S12,B05,g29,18_56_43,DJI Tello EDU|DarwinFPV cineape20,cortile
+47,S05,S12,B05,g29,18_59_21,DJI Tello EDU|DarwinFPV cineape20,cortile
+48,S05,S13,B05,g28,19_05_39,DJI Tello EDU|DarwinFPV cineape20,cortile_cielo
+49,S05,S13,B05,g28,19_10_18,DJI Tello EDU|DarwinFPV cineape20,cortile_cielo
+50,S05,S13,B05,g28,19_12_43,DJI Tello EDU|DarwinFPV cineape20,cortile_cielo
+51,S05,S13,B05,g28,19_16_20,Betafpv air75|DJI Tello EDU,cortile_cielo
+52,S06,S14,B06,g02,11_17_29,Betafpv air75,cielo
+53,S06,S14,B06,g02,11_22_32,Betafpv air75,cielo
+54,S06,S14,B06,g02,11_26_49,Betafpv air75,cielo
+55,S06,S14,B06,g02,11_42_52,Betafpv air75,cielo
+56,S06,S14,B06,g02,11_46_31,Betafpv air75,cielo
+57,S06,S14,B06,g02,11_51_42,DarwinFPV cineape20,cielo
+58,S06,S14,B06,g02,11_54_33,DarwinFPV cineape20,cielo
+59,S06,S14,B06,g02,11_57_37,DJI Tello EDU|DarwinFPV cineape20,cielo
+60,S06,S14,B06,g02,12_00_08,DJI Tello EDU|DarwinFPV cineape20,cielo
+61,S06,S14,B06,g02,12_03_23,DJI Tello EDU|DarwinFPV cineape20,cielo
+62,S06,S14,B06,g02,12_07_25,DJI Tello EDU|DarwinFPV cineape20,cielo
+63,S06,S14,B06,g02,12_10_05,DJI Tello EDU|DarwinFPV cineape20,cielo
+64,S06,S14,B06,g02,12_14_01,DarwinFPV cineape20|DarwinFPV cineape20ger,cielo
+65,S06,S14,B06,g02,12_16_29,DarwinFPV cineape20|DarwinFPV cineape20ger,cielo
+66,S07,S15,B07,g03,15_52_34,DarwinFPV cineape20,cielo
+67,S07,S15,B07,g03,15_55_26,DarwinFPV cineape20,cielo
+68,S07,S15,B07,g03,00.01110,Betafpv air75|DJI Mini 3,cielo
+69,S07,S16,B08,g04,18_24_42,Betafpv air75,cielo
+70,S07,S16,B08,g04,18_26_58,Betafpv air75,cielo
+71,S07,S16,B08,g04,19_16_27,Betafpv air75,cielo
+72,S07,S16,B08,g04,19_18_43,Betafpv air75,cielo
+73,S07,S16,B08,g04,19_23_32,Betafpv air75,cielo
+74,S07,S16,B08,g04,19_25_47,Betafpv air75,cielo
+75,S07,S16,B08,g04,19_30_18,DarwinFPV cineape20,cielo
+76,S07,S16,B08,g04,19_32_34,DarwinFPV cineape20,cielo
+77,S07,S16,B08,g04,19_34_50,DarwinFPV cineape20,cielo
+78,S07,S16,B08,g04,19_38_13,DarwinFPV cineape20,cielo
+79,S07,S16,B08,g04,19_40_26,DarwinFPV cineape20,cielo
+80,S07,S16,B08,g04,19_42_43,DarwinFPV cineape20,cielo
+81,S08,S17,B09,g09,17_18_04,DarwinFPV cineape20,cielo_alberi
+82,S08,S17,B09,g08,17_20_31,DarwinFPV cineape20,cielo_alberi
+83,S08,S17,B09,g08,17_22_46,DarwinFPV cineape20,cielo_alberi
+84,S08,S17,B09,g07,17_31_16,DarwinFPV cineape20,cielo_alberi
+85,S08,S17,B09,g07,17_33_45,DarwinFPV cineape20,cielo_alberi
+86,S08,S17,B09,g07,17_36_03,DarwinFPV cineape20,cielo_alberi
+87,S08,S18,B10,g07,18_50_56,DarwinFPV cineape20,cielo_alberi
+88,S08,S18,B10,g07,18_53_09,DarwinFPV cineape20,cielo_alberi
+89,S08,S18,B10,g07,18_55_27,DarwinFPV cineape20,cielo_alberi
+90,S08,S18,B10,g07,18_59_02,DarwinFPV cineape20,cielo_alberi
+91,S09,S19,B11,g01,13_58_56,DJI Mini 3,cielo
+92,S09,S19,B11,g01,14_01_14,DJI Mini 3,cielo
+93,S09,S19,B11,g01,14_03_37,DJI Mini 3,cielo
+94,S07,S20,B12,g03,15_59_47,Betafpv air75,cielo
+95,S07,S20,B12,g03,16_02_28,Betafpv air75,cielo
+96,S07,S20,B12,g03,16_47_08,Betafpv air75,cielo
+97,S07,S20,B12,g03,16_49_41,Betafpv air75,cielo
+98,S07,S20,B12,g03,17_33_11,Betafpv air75,cielo
+99,S07,S20,B12,g03,17_35_32,Betafpv air75,cielo
+100,S07,S20,B12,g03,17_37_50,Betafpv air75,cielo
+101,S07,S20,B12,g04,18_31_06,Betafpv air75,cielo
+102,S07,S20,B12,g04,18_33_22,Betafpv air75,cielo
+103,S07,S20,B12,g04,19_08_39,Betafpv air75,cielo
+104,S07,S20,B12,g04,19_11_21,Betafpv air75,cielo
+105,S07,S20,B12,g04,19_49_17,Betafpv air75,cielo
+106,S07,S20,B12,g05,19_51_38,Betafpv air75|DJI Mini 3,cielo
+107,S07,S20,B12,g04,20_21_57,DJI Mini 3,cielo
+108,S07,S20,B12,g04,20_24_16,DJI Mini 3,cielo
+109,S07,S20,B12,g04,20_26_36,DJI Mini 3,cielo
+110,S07,S20,B12,g04,20_28_55,DJI Mini 3,cielo
+112,S08,S21,B13,g09,16_44_00,DarwinFPV cineape20,cortile
+113,S08,S21,B13,g09,17_07_40,DarwinFPV cineape20,cortile
+114,S08,S21,B13,g09,17_10_07,DarwinFPV cineape20,cortile
+115,S07,S22,B14,g04,19_47_02,Betafpv air75,cielo
+116,S10,S23,B15,g14,15_45_56,DJI Tello EDU,cortile
+117,S10,S23,B15,g14,15_56_36,DJI Tello EDU,cortile
+118,S10,S23,B15,g14,16_00_50,DJI Tello EDU,cortile
+119,S10,S23,B15,g14,16_04_06,DJI Tello EDU,cortile
+120,S10,S23,B15,g14,16_07_57,DJI Tello EDU,cortile
+121,S10,S23,B15,g14,16_22_12,DJI Tello EDU,cortile
+122,S10,S23,B15,g14,16_26_07,DJI Tello EDU,cortile
+123,S10,S23,B15,g14,16_29_37,DJI Tello EDU,cortile
+124,S10,S23,B15,g14,16_34_57,DJI Tello EDU,cortile
+125,S10,S23,B15,g14,16_40_06,DJI Tello EDU,cortile
+126,S10,S23,B15,g14,16_45_51,DJI Tello EDU,cortile
+127,S10,S23,B15,g14,11_16_50,DJI Tello EDU,cortile
+128,S10,S23,B15,g14,12_16_53,DJI Tello EDU,cortile
+129,S10,S23,B15,g14,13_16_57,DJI Tello EDU,cortile
+130,S10,S24,B15,g16,17_48_41,DJI Tello EDU,cortile
+131,S10,S24,B15,g16,17_51_46,DJI Tello EDU,cortile
+132,S10,S24,B15,g16,17_56_59,DJI Tello EDU,cortile
+133,S10,S24,B15,g16,18_00_03,DJI Tello EDU,cortile
+134,S10,S24,B15,g16,18_04_36,DJI Tello EDU,cortile
+135,S10,S24,B15,g16,18_09_42,DJI Tello EDU,cortile
+136,S10,S24,B15,g16,18_12_45,DJI Tello EDU,cortile
+137,S10,S24,B15,g16,18_15_53,DJI Tello EDU,cortile
+138,S10,S24,B15,g16,18_19_07,DJI Tello EDU,cortile
+139,S10,S24,B15,g16,18_22_16,DJI Tello EDU,cortile
+140,S10,S25,B15,g30,18_39_46,DJI Tello EDU,cortile
+141,S10,S25,B15,g30,18_42_42,DJI Tello EDU,cortile
+142,S10,S25,B15,g30,18_45_46,DJI Tello EDU,cortile
+143,S10,S26,B15,g10,18_49_19,DJI Tello EDU,cielo_alberi
+144,S11,S27,B16,g41,09_58_35,DJI Tello EDU,cortile
+145,S11,S27,B16,g38,10_10_40,DJI Tello EDU,cortile
+146,S11,S27,B16,g39,10_15_26,DJI Tello EDU,cortile
+147,S11,S27,B16,g38,10_21_57,DJI Tello EDU,cortile
+148,S11,S27,B16,g37,10_25_59,DJI Tello EDU,cortile
+149,S11,S27,B16,g37,10_28_53,DJI Tello EDU,cortile
+150,S11,S27,B16,g37,10_35_25,DJI Tello EDU,cortile
+151,S11,S27,B16,g37,10_38_27,DJI Tello EDU,cortile
+152,S11,S27,B16,g42,10_41_38,DJI Tello EDU,cortile
+153,S11,S27,B16,g37,10_45_42,DJI Tello EDU,cortile
+154,S11,S28,B16,g36,10_48_58,DJI Tello EDU,cortile
+155,S12,S29,B17,g31,11_58_08,DJI Tello EDU,cortile
+156,S12,S29,B17,g31,12_01_08,DJI Tello EDU,cortile
+157,S12,S29,B17,g31,12_04_40,DJI Tello EDU,cortile
+158,S12,S29,B17,g31,12_07_48,DJI Tello EDU,cortile
+159,S12,S29,B17,g31,12_11_07,DJI Tello EDU,cortile
+160,S12,S29,B17,g31,12_14_43,DJI Tello EDU,cortile
+161,S12,S29,B17,g31,12_17_39,DJI Tello EDU,cortile
+162,S12,S29,B17,g31,12_20_37,DJI Tello EDU,cortile
+163,S12,S29,B17,g31,12_23_36,DJI Tello EDU,cortile
+164,S12,S30,B17,g15,12_40_52,DJI Tello EDU,cortile
+165,S12,S30,B17,g15,12_43_54,DJI Tello EDU,cortile
+166,S12,S30,B17,g15,12_47_14,DJI Tello EDU,cortile
+167,S12,S31,B17,g18,12_51_15,DJI Tello EDU,cortile
+197,S13,S32,B18,g27,12_16_08,DJI Mini 2,cortile
+198,S13,S32,B18,g27,12_20_53,DJI Mini 2,cortile
+199,S13,S32,B18,g27,12_29_27,DJI Mini 2,cortile
+200,S13,S32,B18,g27,12_32_46,DJI Mini 2,cortile
+201,S13,S32,B18,g27,12_35_27,DJI Mini 2,cortile
+202,S13,S32,B18,g27,12_38_05,DJI Mini 2,cortile
+203,S14,S33,B19,g40,14_15_49,DJI Mini 2,cortile
+204,S14,S33,B19,g40,14_18_25,DJI Mini 2,cortile
+205,S14,S33,B19,g40,14_22_05,DJI Mini 2,cortile
+206,S14,S33,B19,g43,14_24_57,DJI Mini 2,cortile
+207,S14,S33,B19,g40,14_27_30,DJI Mini 2,cortile
+208,S14,S33,B19,g40,14_30_12,DJI Mini 2,cortile
+209,S14,S33,B19,g40,14_32_53,DJI Mini 2,cortile
+210,S14,S33,B19,g40,14_35_39,DJI Mini 2,cortile
+211,S14,S34,B19,g25,14_53_05,DJI Mini 2|DJI Tello EDU,cortile
+212,S14,S34,B19,g25,14_55_51,DJI Mini 2|DJI Tello EDU,cortile
+213,S14,S34,B19,g25,14_59_29,DJI Mini 2|DJI Tello EDU,cortile
+214,S14,S34,B19,g25,15_02_17,DJI Mini 2|DJI Tello EDU,cortile
+215,S14,S34,B19,g25,15_05_01,DJI Mini 2|DJI Tello EDU,cortile
+216,S14,S34,B19,g25,15_07_44,DJI Mini 2|DJI Tello EDU,cortile
+217,S14,S34,B19,g25,15_12_23,DJI Mini 2,cortile
+218,S14,S35,B19,g11,15_16_31,DJI Mini 2,cielo
+219,S14,S35,B19,g11,15_19_08,DJI Mini 2,cielo
+220,S02,S36,B20,g17,16_41_55,DJI Tello EDU,cortile
+221,S02,S36,B20,g17,16_44_43,DJI Tello EDU,cortile
+222,S02,S36,B20,g17,16_47_38,DJI Tello EDU,cortile
+223,S02,S36,B20,g17,16_50_12,DJI Tello EDU,cortile
+224,S02,S37,B20,g22,16_55_07,DJI Tello EDU,cortile
+225,S02,S37,B20,g22,17_01_57,DJI Tello EDU,cortile
+226,S02,S37,B20,g22,17_04_38,DJI Tello EDU,cortile
+227,S02,S37,B20,g22,17_08_08,DJI Tello EDU,cortile
+228,S02,S37,B20,g22,17_10_44,DJI Tello EDU,cortile
+229,S02,S37,B20,g22,17_13_29,DJI Tello EDU,cortile
+230,S02,S37,B20,g22,17_16_02,DJI Tello EDU,cortile

@@ -1,0 +1,84 @@
+1 S same green field, same framing
+2 S same dry scene and tree
+3 S same scene consecutive
+4 S same hazy scene, timestamps close
+5 D? framing differs, tree vs none
+6 S same F-22, same contrail
+7 S same A-10 formation, pale sky
+8 S same tree, wires, green
+9 D? different framing and ground
+10 D plain sky, different structures
+11 S same pole and trees
+12 S same dry tree and wires
+13 S same wheat field
+14 S same trees and bush
+15 S same dry tree and wheat
+16 D? different sky, A-10 different clip
+17 S same scene
+18 S same scene
+19 D? framing and haze differ
+20 S same trees and wires
+21 S same plant
+22 S same plant
+23 D? different framing, tree vs none
+24 S same scene
+25 S same trees and bush
+26 S same concrete path scene
+27 D green vs yellow wheat
+28 D plain blue sky
+29 S same hillside
+30 S same beach footage
+31 D green vs tan hillside
+32 S same scene
+33 D green vs autumn orange tree
+34 S same foliage
+35 D yellow vs green vegetation
+36 D green vs tan vegetation
+37 S same scene
+38 S same scene
+39 D? crosshair framing differs
+40 D plain blue sky
+41 S same scene
+42 S same scene
+43 D? pink flowers vs none
+44 D? tree present vs absent
+45 S same scene
+46 S same scene
+47 D green vs autumn orange tree
+48 D? vegetation greener in B
+49 D? green vs dry ground
+50 D dry vs green vegetation
+51 D plain blue sky
+52 S same scene
+53 S same scene
+54 S same scene
+55 D? different sky and formation
+56 S same foliage
+57 D different place and sky
+58 S same scene
+59 D plain blue sky
+60 S same tree and wheat
+61 S same scene
+62 S same foliage
+63 S same Anti-UAV session day
+64 S same scene
+65 D? pole vs none
+66 S same pole and bushes
+67 D different sky
+68 S same concrete path
+69 D? pole green vs bare tree
+70 S same overcast helicopter
+71 S same scene
+72 S same scene
+73 D different clips, plain sky
+74 S same Black Hawk footage
+75 S same fence scene
+76 S same concrete path
+77 D different cloud scenes
+78 D plain blue sky
+79 D? greener and brighter in B
+80 S same hillside
+81 S same scene
+82 S same field
+83 S same scene
+84 D? different sky and place

@@ -1,0 +1,443 @@
+download: 570 file in /home/scolaroe/Desktop/air-detection/data/svanstrom/0_raw
+cvat: 329 clip pronte, 0 aspettano SAM
+cvat: V_AIRPLANE_001/s0 task 5, 327 frame, 1 tracce
+cvat: V_AIRPLANE_003/s0 task 6, 327 frame, 1 tracce
+cvat: V_AIRPLANE_004/s0 task 7, 319 frame, 1 tracce
+cvat: V_AIRPLANE_007/s0 task 8, 300 frame, 1 tracce
+cvat: V_AIRPLANE_008/s0 task 9, 117 frame, 1 tracce
+cvat: V_AIRPLANE_008/s1 task 10, 79 frame, 1 tracce
+cvat: V_AIRPLANE_008/s2 task 11, 62 frame, 1 tracce
+cvat: V_AIRPLANE_008/s3 task 12, 62 frame, 1 tracce
+cvat: V_AIRPLANE_009/s0 task 13, 325 frame, 1 tracce
+cvat: V_AIRPLANE_010/s0 task 14, 323 frame, 1 tracce
+cvat: V_AIRPLANE_011/s0 task 15, 308 frame, 1 tracce
+cvat: V_AIRPLANE_012/s0 task 16, 322 frame, 2 tracce
+cvat: V_AIRPLANE_013/s0 task 17, 308 frame, 1 tracce
+cvat: V_AIRPLANE_015/s0 task 18, 139 frame, 1 tracce
+cvat: V_AIRPLANE_015/s1 task 19, 164 frame, 1 tracce
+cvat: V_AIRPLANE_016/s0 task 20, 324 frame, 1 tracce
+cvat: V_AIRPLANE_018/s0 task 21, 309 frame, 1 tracce
+cvat: V_AIRPLANE_019/s0 task 22, 306 frame, 1 tracce
+cvat: V_AIRPLANE_020/s0 task 23, 309 frame, 1 tracce
+cvat: V_AIRPLANE_021/s0 task 24, 319 frame, 1 tracce
+cvat: V_AIRPLANE_022/s0 task 25, 311 frame, 1 tracce
+cvat: V_AIRPLANE_031/s0 task 26, 301 frame, 1 tracce
+cvat: V_AIRPLANE_032/s0 task 27, 316 frame, 1 tracce
+cvat: V_AIRPLANE_033/s0 task 28, 323 frame, 1 tracce
+cvat: V_AIRPLANE_034/s0 task 29, 327 frame, 1 tracce
+cvat: V_AIRPLANE_035/s0 task 30, 257 frame, 1 tracce
+cvat: V_AIRPLANE_035/s1 task 31, 49 frame, 1 tracce
+cvat: V_AIRPLANE_036/s0 task 32, 210 frame, 1 tracce
+cvat: V_AIRPLANE_036/s1 task 33, 97 frame, 1 tracce
+cvat: V_AIRPLANE_037/s0 task 34, 312 frame, 1 tracce
+cvat: V_AIRPLANE_038/s0 task 35, 76 frame, 1 tracce
+cvat: V_AIRPLANE_038/s1 task 36, 86 frame, 1 tracce
+cvat: V_AIRPLANE_038/s2 task 37, 85 frame, 1 tracce
+cvat: V_AIRPLANE_038/s3 task 38, 65 frame, 1 tracce
+cvat: V_AIRPLANE_039/s0 task 39, 67 frame, 1 tracce
+cvat: V_AIRPLANE_039/s1 task 40, 64 frame, 1 tracce
+cvat: V_AIRPLANE_039/s2 task 41, 76 frame, 1 tracce
+cvat: V_AIRPLANE_039/s3 task 42, 86 frame, 1 tracce
+cvat: V_AIRPLANE_039/s4 task 43, 35 frame, 1 tracce
+cvat: V_AIRPLANE_040/s0 task 44, 64 frame, 1 tracce
+cvat: V_AIRPLANE_040/s1 task 45, 62 frame, 1 tracce
+cvat: V_AIRPLANE_040/s2 task 46, 66 frame, 1 tracce
+cvat: V_AIRPLANE_040/s3 task 47, 70 frame, 1 tracce
+cvat: V_AIRPLANE_040/s4 task 48, 61 frame, 1 tracce
+cvat: V_AIRPLANE_041/s0 task 49, 87 frame, 1 tracce
+cvat: V_AIRPLANE_041/s1 task 50, 88 frame, 1 tracce
+cvat: V_AIRPLANE_041/s2 task 51, 89 frame, 1 tracce
+cvat: V_AIRPLANE_041/s3 task 52, 64 frame, 1 tracce
+cvat: V_AIRPLANE_042/s0 task 53, 312 frame, 1 tracce
+cvat: V_AIRPLANE_043/s0 task 54, 318 frame, 1 tracce
+cvat: V_AIRPLANE_044/s0 task 55, 304 frame, 1 tracce
+cvat: V_AIRPLANE_045/s0 task 56, 316 frame, 1 tracce
+cvat: V_AIRPLANE_046/s0 task 57, 304 frame, 1 tracce
+cvat: V_AIRPLANE_047/s0 task 58, 328 frame, 1 tracce
+cvat: V_AIRPLANE_048/s0 task 59, 153 frame, 1 tracce
+cvat: V_AIRPLANE_048/s1 task 60, 150 frame, 1 tracce
+cvat: V_AIRPLANE_049/s0 task 61, 313 frame, 1 tracce
+cvat: V_AIRPLANE_050/s0 task 62, 313 frame, 1 tracce
+cvat: V_AIRPLANE_051/s0 task 63, 324 frame, 1 tracce
+cvat: V_AIRPLANE_052/s0 task 64, 314 frame, 1 tracce
+cvat: V_AIRPLANE_053/s0 task 65, 303 frame, 1 tracce
+cvat: V_AIRPLANE_054/s0 task 66, 311 frame, 1 tracce
+cvat: V_AIRPLANE_055/s0 task 67, 303 frame, 1 tracce
+cvat: V_AIRPLANE_056/s0 task 68, 324 frame, 1 tracce
+cvat: V_AIRPLANE_057/s0 task 69, 315 frame, 1 tracce
+cvat: V_AIRPLANE_058/s0 task 70, 319 frame, 1 tracce
+cvat: V_AIRPLANE_059/s0 task 71, 310 frame, 1 tracce
+cvat: V_BIRD_001/s0 task 72, 54 frame, 1 tracce
+cvat: V_BIRD_001/s1 task 73, 251 frame, 1 tracce
+cvat: V_BIRD_002/s0 task 74, 54 frame, 1 tracce
+cvat: V_BIRD_002/s1 task 75, 78 frame, 1 tracce
+cvat: V_BIRD_002/s2 task 76, 88 frame, 1 tracce
+cvat: V_BIRD_002/s3 task 77, 90 frame, 1 tracce
+cvat: V_BIRD_003/s0 task 78, 303 frame, 2 tracce
+cvat: V_BIRD_004/s0 task 79, 146 frame, 1 tracce
+cvat: V_BIRD_004/s1 task 80, 169 frame, 1 tracce
+cvat: V_BIRD_005/s0 task 81, 302 frame, 7 tracce
+cvat: V_BIRD_006/s0 task 82, 312 frame, 2 tracce
+cvat: V_BIRD_007/s0 task 83, 307 frame, 1 tracce
+cvat: V_BIRD_008/s0 task 84, 321 frame, 2 tracce
+cvat: V_BIRD_009/s0 task 85, 325 frame, 5 tracce
+cvat: V_BIRD_010/s0 task 86, 317 frame, 2 tracce
+cvat: V_BIRD_011/s0 task 87, 318 frame, 2 tracce
+cvat: V_BIRD_012/s0 task 88, 160 frame, 2 tracce
+cvat: V_BIRD_012/s1 task 89, 124 frame, 1 tracce
+cvat: V_BIRD_012/s2 task 90, 44 frame, 1 tracce
+cvat: V_BIRD_013/s0 task 91, 141 frame, 1 tracce
+cvat: V_BIRD_013/s1 task 92, 96 frame, 1 tracce
+cvat: V_BIRD_013/s2 task 93, 30 frame, 1 tracce
+cvat: V_BIRD_013/s3 task 94, 55 frame, 1 tracce
+cvat: V_BIRD_014/s0 task 95, 193 frame, 2 tracce
+cvat: V_BIRD_014/s1 task 96, 136 frame, 2 tracce
+cvat: V_BIRD_015/s0 task 97, 232 frame, 1 tracce
+cvat: V_BIRD_015/s1 task 98, 97 frame, 3 tracce
+cvat: V_BIRD_016/s0 task 99, 328 frame, 2 tracce
+cvat: V_BIRD_017/s0 task 100, 306 frame, 7 tracce
+cvat: V_BIRD_018/s0 task 101, 304 frame, 2 tracce
+cvat: V_BIRD_019/s0 task 102, 316 frame, 2 tracce
+cvat: V_BIRD_020/s0 task 103, 327 frame, 4 tracce
+cvat: V_BIRD_021/s0 task 104, 323 frame, 3 tracce
+cvat: V_BIRD_022/s0 task 105, 323 frame, 3 tracce
+cvat: V_BIRD_023/s0 task 106, 327 frame, 4 tracce
+cvat: V_BIRD_024/s0 task 107, 102 frame, 1 tracce
+cvat: V_BIRD_024/s1 task 108, 91 frame, 1 tracce
+cvat: V_BIRD_024/s2 task 109, 69 frame, 1 tracce
+cvat: V_BIRD_024/s3 task 110, 51 frame, 1 tracce
+cvat: V_BIRD_025/s0 task 111, 319 frame, 1 tracce
+cvat: V_BIRD_026/s0 task 112, 314 frame, 1 tracce
+cvat: V_BIRD_027/s0 task 113, 318 frame, 1 tracce
+cvat: V_BIRD_028/s0 task 114, 318 frame, 1 tracce
+cvat: V_BIRD_029/s0 task 115, 300 frame, 1 tracce
+cvat: V_BIRD_030/s0 task 116, 327 frame, 1 tracce
+cvat: V_BIRD_031/s0 task 117, 312 frame, 1 tracce
+cvat: V_BIRD_032/s0 task 118, 326 frame, 1 tracce
+cvat: V_BIRD_033/s0 task 119, 318 frame, 1 tracce
+cvat: V_BIRD_034/s0 task 120, 319 frame, 1 tracce
+cvat: V_BIRD_035/s0 task 121, 311 frame, 1 tracce
+cvat: V_BIRD_036/s0 task 122, 329 frame, 1 tracce
+cvat: V_BIRD_037/s0 task 123, 326 frame, 1 tracce
+cvat: V_BIRD_038/s0 task 124, 328 frame, 2 tracce
+cvat: V_BIRD_039/s0 task 125, 310 frame, 1 tracce
+cvat: V_BIRD_040/s0 task 126, 304 frame, 2 tracce
+cvat: V_BIRD_041/s0 task 127, 305 frame, 2 tracce
+cvat: V_BIRD_042/s0 task 128, 306 frame, 1 tracce
+cvat: V_BIRD_043/s0 task 129, 310 frame, 1 tracce
+cvat: V_BIRD_044/s0 task 130, 321 frame, 1 tracce
+cvat: V_BIRD_045/s0 task 131, 308 frame, 1 tracce
+cvat: V_BIRD_046/s0 task 132, 113 frame, 1 tracce
+cvat: V_BIRD_046/s1 task 133, 198 frame, 1 tracce
+cvat: V_BIRD_047/s0 task 134, 39 frame, 1 tracce
+cvat: V_BIRD_047/s1 task 135, 139 frame, 1 tracce
+cvat: V_BIRD_047/s2 task 136, 144 frame, 2 tracce
+cvat: V_BIRD_048/s0 task 137, 93 frame, 2 tracce
+cvat: V_BIRD_048/s1 task 138, 149 frame, 1 tracce
+cvat: V_BIRD_048/s2 task 139, 35 frame, 1 tracce
+cvat: V_BIRD_048/s3 task 140, 35 frame, 1 tracce
+cvat: V_BIRD_049/s0 task 141, 304 frame, 1 tracce
+cvat: V_BIRD_050/s0 task 142, 131 frame, 1 tracce
+cvat: V_BIRD_050/s1 task 143, 172 frame, 1 tracce
+cvat: V_BIRD_051/s0 task 144, 210 frame, 1 tracce
+cvat: V_BIRD_051/s1 task 145, 117 frame, 1 tracce
+cvat: V_DRONE_001/s0 task 146, 301 frame, 1 tracce
+cvat: V_DRONE_002/s0 task 147, 301 frame, 1 tracce
+cvat: V_DRONE_003/s0 task 148, 313 frame, 1 tracce
+cvat: V_DRONE_004/s0 task 149, 303 frame, 1 tracce
+cvat: V_DRONE_005/s0 task 150, 252 frame, 1 tracce
+cvat: V_DRONE_005/s1 task 151, 53 frame, 1 tracce
+cvat: V_DRONE_006/s0 task 152, 307 frame, 1 tracce
+cvat: V_DRONE_007/s0 task 153, 302 frame, 1 tracce
+cvat: V_DRONE_008/s0 task 154, 302 frame, 1 tracce
+cvat: V_DRONE_009/s0 task 155, 302 frame, 1 tracce
+cvat: V_DRONE_010/s0 task 156, 301 frame, 1 tracce
+cvat: V_DRONE_011/s0 task 157, 302 frame, 1 tracce
+cvat: V_DRONE_012/s0 task 158, 320 frame, 1 tracce
+cvat: V_DRONE_013/s0 task 159, 328 frame, 1 tracce
+cvat: V_DRONE_014/s0 task 160, 328 frame, 1 tracce
+cvat: V_DRONE_015/s0 task 161, 328 frame, 1 tracce
+cvat: V_DRONE_016/s0 task 162, 310 frame, 1 tracce
+cvat: V_DRONE_017/s0 task 163, 328 frame, 1 tracce
+cvat: V_DRONE_018/s0 task 164, 302 frame, 1 tracce
+cvat: V_DRONE_019/s0 task 165, 321 frame, 1 tracce
+cvat: V_DRONE_020/s0 task 166, 302 frame, 1 tracce
+cvat: V_DRONE_021/s0 task 167, 309 frame, 1 tracce
+cvat: V_DRONE_022/s0 task 168, 301 frame, 1 tracce
+cvat: V_DRONE_023/s0 task 169, 301 frame, 1 tracce
+cvat: V_DRONE_024/s0 task 170, 302 frame, 1 tracce
+cvat: V_DRONE_025/s0 task 171, 305 frame, 1 tracce
+cvat: V_DRONE_026/s0 task 172, 311 frame, 1 tracce
+cvat: V_DRONE_027/s0 task 173, 307 frame, 1 tracce
+cvat: V_DRONE_028/s0 task 174, 311 frame, 1 tracce
+cvat: V_DRONE_029/s0 task 175, 301 frame, 1 tracce
+cvat: V_DRONE_030/s0 task 176, 322 frame, 1 tracce
+cvat: V_DRONE_031/s0 task 177, 328 frame, 1 tracce
+cvat: V_DRONE_032/s0 task 178, 314 frame, 1 tracce
+cvat: V_DRONE_033/s0 task 179, 300 frame, 1 tracce
+cvat: V_DRONE_034/s0 task 180, 300 frame, 1 tracce
+cvat: V_DRONE_035/s0 task 181, 302 frame, 1 tracce
+cvat: V_DRONE_036/s0 task 182, 302 frame, 1 tracce
+cvat: V_DRONE_037/s0 task 183, 300 frame, 1 tracce
+cvat: V_DRONE_038/s0 task 184, 304 frame, 1 tracce
+cvat: V_DRONE_039/s0 task 185, 303 frame, 1 tracce
+cvat: V_DRONE_040/s0 task 186, 311 frame, 1 tracce
+cvat: V_DRONE_041/s0 task 187, 327 frame, 1 tracce
+cvat: V_DRONE_042/s0 task 188, 303 frame, 1 tracce
+cvat: V_DRONE_043/s0 task 189, 305 frame, 1 tracce
+cvat: V_DRONE_044/s0 task 190, 312 frame, 1 tracce
+cvat: V_DRONE_045/s0 task 191, 323 frame, 1 tracce
+cvat: V_DRONE_046/s0 task 192, 312 frame, 1 tracce
+cvat: V_DRONE_047/s0 task 193, 301 frame, 1 tracce
+cvat: V_DRONE_048/s0 task 194, 323 frame, 1 tracce
+cvat: V_DRONE_049/s0 task 195, 307 frame, 1 tracce
+cvat: V_DRONE_050/s0 task 196, 316 frame, 1 tracce
+cvat: V_DRONE_051/s0 task 197, 309 frame, 1 tracce
+cvat: V_DRONE_052/s0 task 198, 312 frame, 1 tracce
+cvat: V_DRONE_053/s0 task 199, 300 frame, 1 tracce
+cvat: V_DRONE_054/s0 task 200, 301 frame, 1 tracce
+cvat: V_DRONE_055/s0 task 201, 301 frame, 1 tracce
+cvat: V_DRONE_056/s0 task 202, 305 frame, 1 tracce
+cvat: V_DRONE_057/s0 task 203, 329 frame, 1 tracce
+cvat: V_DRONE_058/s0 task 204, 305 frame, 1 tracce
+cvat: V_DRONE_059/s0 task 205, 329 frame, 1 tracce
+cvat: V_DRONE_060/s0 task 206, 308 frame, 1 tracce
+cvat: V_DRONE_061/s0 task 207, 308 frame, 1 tracce
+cvat: V_DRONE_062/s0 task 208, 315 frame, 1 tracce
+cvat: V_DRONE_063/s0 task 209, 306 frame, 1 tracce
+cvat: V_DRONE_064/s0 task 210, 316 frame, 1 tracce
+cvat: V_DRONE_065/s0 task 211, 321 frame, 1 tracce
+cvat: V_DRONE_066/s0 task 212, 326 frame, 1 tracce
+cvat: V_DRONE_067/s0 task 213, 325 frame, 1 tracce
+cvat: V_DRONE_068/s0 task 214, 311 frame, 1 tracce
+cvat: V_DRONE_069/s0 task 215, 316 frame, 1 tracce
+cvat: V_DRONE_070/s0 task 216, 305 frame, 1 tracce
+cvat: V_DRONE_071/s0 task 217, 315 frame, 1 tracce
+cvat: V_DRONE_072/s0 task 218, 311 frame, 1 tracce
+cvat: V_DRONE_073/s0 task 219, 311 frame, 1 tracce
+cvat: V_DRONE_074/s0 task 220, 316 frame, 1 tracce
+cvat: V_DRONE_075/s0 task 221, 315 frame, 1 tracce
+cvat: V_DRONE_076/s0 task 222, 306 frame, 1 tracce
+cvat: V_DRONE_077/s0 task 223, 316 frame, 1 tracce
+cvat: V_DRONE_078/s0 task 224, 300 frame, 1 tracce
+cvat: V_DRONE_079/s0 task 225, 311 frame, 1 tracce
+cvat: V_DRONE_080/s0 task 226, 300 frame, 1 tracce
+cvat: V_DRONE_081/s0 task 227, 303 frame, 1 tracce
+cvat: V_DRONE_082/s0 task 228, 307 frame, 1 tracce
+cvat: V_DRONE_083/s0 task 229, 304 frame, 1 tracce
+cvat: V_DRONE_084/s0 task 230, 312 frame, 1 tracce
+cvat: V_DRONE_085/s0 task 231, 316 frame, 1 tracce
+cvat: V_DRONE_086/s0 task 232, 312 frame, 1 tracce
+cvat: V_DRONE_087/s0 task 233, 312 frame, 1 tracce
+cvat: V_DRONE_088/s0 task 234, 316 frame, 1 tracce
+cvat: V_DRONE_089/s0 task 235, 325 frame, 1 tracce
+cvat: V_DRONE_090/s0 task 236, 312 frame, 1 tracce
+cvat: V_DRONE_091/s0 task 237, 329 frame, 1 tracce
+cvat: V_DRONE_092/s0 task 238, 329 frame, 1 tracce
+cvat: V_DRONE_093/s0 task 239, 329 frame, 1 tracce
+cvat: V_DRONE_094/s0 task 240, 321 frame, 1 tracce
+cvat: V_DRONE_095/s0 task 241, 312 frame, 1 tracce
+cvat: V_DRONE_096/s0 task 242, 325 frame, 1 tracce
+cvat: V_DRONE_097/s0 task 243, 303 frame, 1 tracce
+cvat: V_DRONE_098/s0 task 244, 318 frame, 1 tracce
+cvat: V_DRONE_099/s0 task 245, 309 frame, 1 tracce
+cvat: V_DRONE_100/s0 task 246, 328 frame, 1 tracce
+cvat: V_DRONE_101/s0 task 247, 228 frame, 1 tracce
+cvat: V_DRONE_101/s1 task 248, 79 frame, 1 tracce
+cvat: V_DRONE_102/s0 task 249, 46 frame, 1 tracce
+cvat: V_DRONE_102/s1 task 250, 259 frame, 1 tracce
+cvat: V_DRONE_103/s0 task 251, 321 frame, 1 tracce
+cvat: V_DRONE_104/s0 task 252, 300 frame, 1 tracce
+cvat: V_DRONE_105/s0 task 253, 304 frame, 1 tracce
+cvat: V_DRONE_106/s0 task 254, 304 frame, 2 tracce
+cvat: V_DRONE_107/s0 task 255, 300 frame, 2 tracce
+cvat: V_DRONE_108/s0 task 256, 304 frame, 2 tracce
+cvat: V_DRONE_109/s0 task 257, 326 frame, 1 tracce
+cvat: V_DRONE_110/s0 task 258, 325 frame, 1 tracce
+cvat: V_DRONE_111/s0 task 259, 322 frame, 1 tracce
+cvat: V_DRONE_112/s0 task 260, 300 frame, 1 tracce
+cvat: V_DRONE_113/s0 task 261, 322 frame, 1 tracce
+cvat: V_DRONE_114/s0 task 262, 316 frame, 1 tracce
+cvat: V_HELICOPTER_001/s0 task 263, 301 frame, 1 tracce
+cvat: V_HELICOPTER_002/s0 task 264, 305 frame, 1 tracce
+cvat: V_HELICOPTER_003/s0 task 265, 300 frame, 1 tracce
+cvat: V_HELICOPTER_004/s0 task 266, 303 frame, 1 tracce
+cvat: V_HELICOPTER_005/s0 task 267, 311 frame, 1 tracce
+cvat: V_HELICOPTER_006/s0 task 268, 315 frame, 1 tracce
+cvat: V_HELICOPTER_007/s0 task 269, 302 frame, 1 tracce
+cvat: V_HELICOPTER_008/s0 task 270, 304 frame, 1 tracce
+cvat: V_HELICOPTER_009/s0 task 271, 300 frame, 1 tracce
+cvat: V_HELICOPTER_010/s0 task 272, 303 frame, 1 tracce
+cvat: V_HELICOPTER_011/s0 task 273, 309 frame, 1 tracce
+cvat: V_HELICOPTER_012/s0 task 274, 314 frame, 1 tracce
+cvat: V_HELICOPTER_013/s0 task 275, 300 frame, 1 tracce
+cvat: V_HELICOPTER_014/s0 task 276, 303 frame, 1 tracce
+cvat: V_HELICOPTER_015/s0 task 277, 314 frame, 1 tracce
+cvat: V_HELICOPTER_016/s0 task 278, 306 frame, 1 tracce
+cvat: V_HELICOPTER_017/s0 task 279, 314 frame, 1 tracce
+cvat: V_HELICOPTER_018/s0 task 280, 310 frame, 1 tracce
+cvat: V_HELICOPTER_019/s0 task 281, 160 frame, 1 tracce
+cvat: V_HELICOPTER_019/s1 task 282, 153 frame, 1 tracce
+cvat: V_HELICOPTER_020/s0 task 283, 326 frame, 1 tracce
+cvat: V_HELICOPTER_021/s0 task 284, 314 frame, 1 tracce
+cvat: V_HELICOPTER_022/s0 task 285, 303 frame, 1 tracce
+cvat: V_HELICOPTER_023/s0 task 286, 314 frame, 1 tracce
+cvat: V_HELICOPTER_024/s0 task 287, 302 frame, 1 tracce
+cvat: V_HELICOPTER_025/s0 task 288, 303 frame, 1 tracce
+cvat: V_HELICOPTER_026/s0 task 289, 151 frame, 1 tracce
+cvat: V_HELICOPTER_026/s1 task 290, 163 frame, 1 tracce
+cvat: V_HELICOPTER_027/s0 task 291, 258 frame, 1 tracce
+cvat: V_HELICOPTER_027/s1 task 292, 70 frame, 1 tracce
+cvat: V_HELICOPTER_028/s0 task 293, 313 frame, 1 tracce
+cvat: V_HELICOPTER_029/s0 task 294, 317 frame, 1 tracce
+cvat: V_HELICOPTER_030/s0 task 295, 318 frame, 1 tracce
+cvat: V_HELICOPTER_031/s0 task 296, 304 frame, 1 tracce
+cvat: V_HELICOPTER_032/s0 task 297, 307 frame, 1 tracce
+cvat: V_HELICOPTER_033/s0 task 298, 150 frame, 1 tracce
+cvat: V_HELICOPTER_033/s1 task 299, 156 frame, 1 tracce
+cvat: V_HELICOPTER_034/s0 task 300, 317 frame, 1 tracce
+cvat: V_HELICOPTER_035/s0 task 301, 320 frame, 1 tracce
+cvat: V_HELICOPTER_036/s0 task 302, 324 frame, 1 tracce
+cvat: V_HELICOPTER_037/s0 task 303, 319 frame, 1 tracce
+cvat: V_HELICOPTER_038/s0 task 304, 317 frame, 1 tracce
+cvat: V_HELICOPTER_039/s0 task 305, 308 frame, 1 tracce
+cvat: V_HELICOPTER_040/s0 task 306, 316 frame, 3 tracce
+cvat: V_HELICOPTER_041/s0 task 307, 312 frame, 1 tracce
+cvat: V_HELICOPTER_042/s0 task 308, 321 frame, 1 tracce
+cvat: V_HELICOPTER_043/s0 task 309, 326 frame, 1 tracce
+cvat: V_HELICOPTER_044/s0 task 310, 323 frame, 1 tracce
+cvat: V_HELICOPTER_045/s0 task 311, 315 frame, 1 tracce
+cvat: V_HELICOPTER_046/s0 task 312, 311 frame, 1 tracce
+cvat: V_HELICOPTER_047/s0 task 313, 321 frame, 1 tracce
+cvat: V_HELICOPTER_048/s0 task 314, 310 frame, 1 tracce
+cvat: V_HELICOPTER_049/s0 task 315, 318 frame, 1 tracce
+cvat: V_HELICOPTER_050/s0 task 316, 318 frame, 1 tracce
+cvat: V_HELICOPTER_051/s0 task 317, 310 frame, 1 tracce
+cvat: V_HELICOPTER_052/s0 task 318, 301 frame, 1 tracce
+cvat: V_HELICOPTER_053/s0 task 319, 322 frame, 1 tracce
+cvat: V_HELICOPTER_054/s0 task 320, 314 frame, 1 tracce
+cvat: V_HELICOPTER_055/s0 task 321, 174 frame, 1 tracce
+cvat: V_HELICOPTER_055/s1 task 322, 122 frame, 1 tracce
+cvat: V_HELICOPTER_055/s2 task 323, 5 frame, 1 tracce
+cvat: V_HELICOPTER_056/s0 task 324, 159 frame, 1 tracce
+cvat: V_HELICOPTER_056/s1 task 325, 153 frame, 1 tracce
+cvat: V_HELICOPTER_057/s0 task 326, 324 frame, 1 tracce
+cvat: V_HELICOPTER_058/s0 task 327, 312 frame, 1 tracce
+cvat: V_HELICOPTER_059/s0 task 328, 313 frame, 1 tracce
+cvat: V_HELICOPTER_060/s0 task 329, 326 frame, 1 tracce
+cvat: V_HELICOPTER_061/s0 task 330, 155 frame, 1 tracce
+cvat: V_HELICOPTER_061/s1 task 331, 79 frame, 1 tracce
+cvat: V_HELICOPTER_061/s2 task 332, 73 frame, 1 tracce
+download: 570 file in /home/scolaroe/Desktop/air-detection/data/svanstrom/0_raw
+cvat: 329 clip pronte, 0 aspettano SAM
+cvat: S001 task 334, 2 clip, 646 frame, 2 tracce
+cvat: S002 task 335, 1 clip, 327 frame, 1 tracce
+cvat: S003 task 336, 10 clip, 2671 frame, 11 tracce
+cvat: S004 task 337, 1 clip, 146 frame, 1 tracce
+cvat: S005 task 338, 1 clip, 300 frame, 1 tracce
+cvat: S006 task 339, 1 clip, 117 frame, 1 tracce
+cvat: S007 task 340, 1 clip, 79 frame, 1 tracce
+cvat: S008 task 341, 1 clip, 62 frame, 1 tracce
+cvat: S009 task 342, 1 clip, 62 frame, 1 tracce
+cvat: S010 task 343, 5 clip, 1586 frame, 6 tracce
+cvat: S011 task 344, 3 clip, 663 frame, 3 tracce
+cvat: S012 task 345, 2 clip, 475 frame, 2 tracce
+cvat: S013 task 346, 6 clip, 1672 frame, 7 tracce
+cvat: S014 task 347, 1 clip, 309 frame, 1 tracce
+cvat: S015 task 348, 2 clip, 621 frame, 2 tracce
+cvat: S016 task 349, 1 clip, 319 frame, 1 tracce
+cvat: S018 task 350, 3 clip, 699 frame, 3 tracce
+cvat: S019 task 351, 1 clip, 257 frame, 1 tracce
+cvat: S020 task 352, 1 clip, 97 frame, 1 tracce
+cvat: S021 task 353, 3 clip, 228 frame, 3 tracce
+cvat: S022 task 354, 1 clip, 86 frame, 1 tracce
+cvat: S023 task 355, 1 clip, 65 frame, 1 tracce
+cvat: S024 task 356, 1 clip, 64 frame, 1 tracce
+cvat: S025 task 357, 2 clip, 142 frame, 2 tracce
+cvat: S026 task 358, 1 clip, 86 frame, 1 tracce
+cvat: S027 task 359, 1 clip, 35 frame, 1 tracce
+cvat: S028 task 360, 1 clip, 64 frame, 1 tracce
+cvat: S029 task 361, 1 clip, 62 frame, 1 tracce
+cvat: S030 task 362, 1 clip, 70 frame, 1 tracce
+cvat: S031 task 363, 1 clip, 61 frame, 1 tracce
+cvat: S032 task 364, 1 clip, 87 frame, 1 tracce
+cvat: S033 task 365, 1 clip, 88 frame, 1 tracce
+cvat: S034 task 366, 1 clip, 89 frame, 1 tracce
+cvat: S035 task 367, 1 clip, 64 frame, 1 tracce
+cvat: S036 task 368, 1 clip, 312 frame, 1 tracce
+cvat: S037 task 369, 3 clip, 816 frame, 3 tracce
+cvat: S038 task 370, 1 clip, 304 frame, 1 tracce
+cvat: S039 task 371, 4 clip, 923 frame, 4 tracce
+cvat: S040 task 372, 1 clip, 328 frame, 1 tracce
+cvat: S041 task 373, 3 clip, 950 frame, 3 tracce
+cvat: S042 task 374, 1 clip, 303 frame, 1 tracce
+cvat: S043 task 375, 1 clip, 319 frame, 1 tracce
+cvat: S044 task 376, 1 clip, 310 frame, 1 tracce
+cvat: S045 task 377, 1 clip, 54 frame, 1 tracce
+cvat: S046 task 378, 3 clip, 608 frame, 4 tracce
+cvat: S047 task 379, 2 clip, 378 frame, 2 tracce
+cvat: S048 task 380, 28 clip, 8329 frame, 28 tracce
+cvat: S049 task 381, 2 clip, 259 frame, 2 tracce
+cvat: S050 task 382, 1 clip, 302 frame, 7 tracce
+cvat: S051 task 383, 9 clip, 1709 frame, 12 tracce
+cvat: S052 task 384, 2 clip, 485 frame, 7 tracce
+cvat: S053 task 385, 2 clip, 414 frame, 5 tracce
+cvat: S054 task 386, 1 clip, 318 frame, 2 tracce
+cvat: S055 task 387, 2 clip, 232 frame, 3 tracce
+cvat: S056 task 388, 1 clip, 30 frame, 1 tracce
+cvat: S057 task 389, 2 clip, 90 frame, 2 tracce
+cvat: S058 task 390, 6 clip, 1472 frame, 15 tracce
+cvat: S059 task 391, 4 clip, 1300 frame, 14 tracce
+cvat: S060 task 392, 14 clip, 4162 frame, 17 tracce
+cvat: S061 task 393, 1 clip, 91 frame, 1 tracce
+cvat: S062 task 394, 3 clip, 945 frame, 3 tracce
+cvat: S063 task 395, 5 clip, 1467 frame, 5 tracce
+cvat: S064 task 396, 4 clip, 1173 frame, 4 tracce
+cvat: S065 task 397, 2 clip, 483 frame, 2 tracce
+cvat: S066 task 398, 2 clip, 368 frame, 2 tracce
+cvat: S067 task 399, 1 clip, 326 frame, 1 tracce
+cvat: S068 task 400, 2 clip, 445 frame, 3 tracce
+cvat: S069 task 401, 3 clip, 919 frame, 5 tracce
+cvat: S070 task 402, 1 clip, 113 frame, 1 tracce
+cvat: S071 task 403, 1 clip, 139 frame, 1 tracce
+cvat: S072 task 404, 1 clip, 131 frame, 1 tracce
+cvat: S073 task 405, 4 clip, 973 frame, 4 tracce
+cvat: S074 task 406, 15 clip, 4632 frame, 15 tracce
+cvat: S075 task 407, 9 clip, 2803 frame, 9 tracce
+cvat: S076 task 408, 49 clip, 14787 frame, 49 tracce
+cvat: S077 task 409, 10 clip, 3038 frame, 10 tracce
+cvat: S078 task 410, 7 clip, 2166 frame, 7 tracce
+cvat: S079 task 411, 1 clip, 310 frame, 1 tracce
+cvat: S080 task 412, 1 clip, 160 frame, 1 tracce
+cvat: S081 task 413, 1 clip, 153 frame, 1 tracce
+cvat: S082 task 414, 1 clip, 326 frame, 1 tracce
+cvat: S083 task 415, 5 clip, 1386 frame, 5 tracce
+cvat: S084 task 416, 2 clip, 466 frame, 2 tracce
+cvat: S085 task 417, 2 clip, 221 frame, 2 tracce
+cvat: S086 task 418, 1 clip, 258 frame, 1 tracce
+cvat: S087 task 419, 1 clip, 313 frame, 1 tracce
+cvat: S088 task 420, 1 clip, 317 frame, 1 tracce
+cvat: S089 task 421, 1 clip, 318 frame, 1 tracce
+cvat: S090 task 422, 1 clip, 304 frame, 1 tracce
+cvat: S091 task 423, 3 clip, 613 frame, 3 tracce
+cvat: S092 task 424, 1 clip, 317 frame, 1 tracce
+cvat: S093 task 425, 1 clip, 320 frame, 1 tracce
+cvat: S094 task 426, 1 clip, 319 frame, 1 tracce
+cvat: S095 task 427, 1 clip, 317 frame, 1 tracce
+cvat: S096 task 428, 1 clip, 308 frame, 1 tracce
+cvat: S097 task 429, 1 clip, 316 frame, 3 tracce
+cvat: S098 task 430, 1 clip, 312 frame, 1 tracce
+cvat: S099 task 431, 1 clip, 321 frame, 1 tracce
+cvat: S100 task 432, 2 clip, 649 frame, 2 tracce
+cvat: S101 task 433, 1 clip, 315 frame, 1 tracce
+cvat: S102 task 434, 3 clip, 637 frame, 3 tracce
+cvat: S103 task 435, 2 clip, 628 frame, 2 tracce
+cvat: S104 task 436, 1 clip, 318 frame, 1 tracce
+cvat: S105 task 437, 1 clip, 310 frame, 1 tracce
+cvat: S106 task 438, 1 clip, 301 frame, 1 tracce
+cvat: S107 task 439, 2 clip, 636 frame, 2 tracce
+cvat: S108 task 440, 1 clip, 122 frame, 1 tracce
+cvat: S109 task 441, 1 clip, 159 frame, 1 tracce
+cvat: S110 task 442, 4 clip, 1275 frame, 4 tracce
+cvat: S111 task 443, 2 clip, 234 frame, 2 tracce
+cvat: S112 task 444, 1 clip, 73 frame, 1 tracce

@@ -1,0 +1,10 @@
+# passo 5: clip SAM sbagliate (revisione umana di fogli_sam, numeri 1-34), 13/10/2026
+6 V_AIRPLANE_017/s0
+9 V_AIRPLANE_021/s0
+10 V_AIRPLANE_035/s0
+11 V_AIRPLANE_038/s1
+14 V_AIRPLANE_040/s1
+15 V_AIRPLANE_041/s0
+31 V_BIRD_002/s3
+32 V_BIRD_003/s0
+34 V_BIRD_004/s1

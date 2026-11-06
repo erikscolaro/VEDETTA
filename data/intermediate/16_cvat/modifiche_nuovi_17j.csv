@@ -1,0 +1,5 @@
+split,nome,immagine,modifica,classe_prima,classe_dopo,iou,lato_px
+val,DVIDS_851100_f00112,input/dvids/4_ritagli/DVIDS_851100/images/DVIDS_851100_f00112.jpg,aggiunto,,airplane,,79.5
+test,DVIDS_865471_f00094,input/dvids/4_ritagli/DVIDS_865471/images/DVIDS_865471_f00094.jpg,tolto,airplane,,,79.6
+test,DVIDS_865471_f00095,input/dvids/4_ritagli/DVIDS_865471/images/DVIDS_865471_f00095.jpg,tolto,airplane,,,76.1
+test,DVIDS_865471_f00099,input/dvids/4_ritagli/DVIDS_865471/images/DVIDS_865471_f00099.jpg,tolto,airplane,,,80.4

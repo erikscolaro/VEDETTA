@@ -1,0 +1,7 @@
+# Revisione dell utente dei fogli R01-R03 e dei dettagli (26/10/2026). Doppioni: le notturne (1-5, 7, 10, 13, 14, 16,
+# 19, 21, 23), Open Images 11, Anti-UAV di giorno 6, 12, 18, 20, 24. Diversi: 8, 9, 15, 17, 22, 25, 26.
+1-7
+10-14
+16
+18-21
+23-24

@@ -1,0 +1,3 @@
+split,nome,immagine,modifica,classe_prima,classe_dopo,iou,lato_px
+val,DVIDS_831340_f00128,input/dvids/4_ritagli/DVIDS_831340/images/DVIDS_831340_f00128.jpg,aggiunto,,helicopter,,72.4
+val,DVIDS_866116_f00481,input/dvids/4_ritagli/DVIDS_866116/images/DVIDS_866116_f00481.jpg,aggiunto,,helicopter,,96.1

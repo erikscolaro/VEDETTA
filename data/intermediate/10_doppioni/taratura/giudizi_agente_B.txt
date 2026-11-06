@@ -1,0 +1,76 @@
+85 D? different vegetation color
+86 S same scene, sky, framing
+87 D? same hill, different framing
+88 D different place/conditions
+89 D? vegetation differs
+90 D? similar scene, framing differs
+91 D? vegetation differs
+92 D different place/conditions
+93 D different place/conditions
+94 D? similar scene, unsure day
+95 D? different vegetation, framing
+96 D? similar clouds, different helicopter
+97 D? bare tree, differing field
+98 D different place/conditions
+99 D different place/conditions
+100 D different place/conditions
+101 D different place/conditions
+102 D? foliage light differs
+103 D different place/conditions
+104 D different place/conditions
+105 D different place/conditions
+106 D? maybe same formation airshow
+107 S consecutive IDs, same F-35 flight
+108 D? nearby IDs, different sky
+109 D different place/conditions
+110 D different place/conditions
+111 D different place/conditions
+112 D different place/conditions
+113 D? different sky, same type
+114 D different place/conditions
+115 D different place/conditions
+116 D? grass color differs
+117 D different place/conditions
+118 D different place/conditions
+119 D different place/conditions
+120 D different place/conditions
+121 D? similar smoke show, different
+122 D? same field, unsure day
+123 D different place/conditions
+124 D different place/conditions
+125 D? vegetation similar, framing differs
+126 D different place/conditions
+127 D different place/conditions
+128 D different place/conditions
+129 D different place/conditions
+130 D different place/conditions
+131 D different place/conditions
+132 D different place/conditions
+133 D different place/conditions
+134 D different place/conditions
+135 D different place/conditions
+136 D different place/conditions
+137 D different place/conditions
+138 D different place/conditions
+139 D different place/conditions
+140 D different place/conditions
+141 D different place/conditions
+142 D different place/conditions
+143 D different place/conditions
+144 D? fence similar, unsure
+145 D different place/conditions
+146 D different place/conditions
+147 D different place/conditions
+148 D different place/conditions
+149 D different place/conditions
+150 D different place/conditions
+151 D different place/conditions
+152 D different place/conditions
+153 D different place/conditions
+154 D different place/conditions
+155 D different place/conditions
+156 D different place/conditions
+157 D different place/conditions
+158 D different place/conditions
+159 D different place/conditions
+160 D? same team, different cuts

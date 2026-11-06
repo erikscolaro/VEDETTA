@@ -1,0 +1,16 @@
+dvids: 522 tratti esclusi su 781 di fogli_tratti12
+DVIDS: 1061 clip in 1061 sessioni
+dvids: 82434 box, classe del video cambiata 8385, sotto i 4 px^2 tolte 0
+fred: 11863 box, classe del video cambiata 0, sotto i 4 px^2 tolte 29
+fbd_sv: 11366 box, classe del video cambiata 0, sotto i 4 px^2 tolte 0
+anti_uav: 7235 box, classe del video cambiata 0, sotto i 4 px^2 tolte 0
+sopra il tetto 5343 : airplane 32-64 6575, airplane >96 7349, bird 16-32 5656, drone 16-32 7001, drone 8-16 7941, helicopter >96 5557
+dvids: esclusi 21231 ({'primo_piano': 9450, 'notte': 1080, 'fumo': 7233, 'tetto': 3468}) -> /home/scolaroe/Desktop/air-detection/data/dvids/5_box/preselezione/esclusi.txt
+fred: esclusi 3176 ({'tetto': 3176}) -> /home/scolaroe/Desktop/air-detection/data/fred/5_box/preselezione/esclusi.txt
+fbd_sv: esclusi 287 ({'tetto': 287}) -> /home/scolaroe/Desktop/air-detection/data/fbd_sv/5_box/preselezione/esclusi.txt
+anti_uav: esclusi 2620 ({'notte': 2586, 'tetto': 34}) -> /home/scolaroe/Desktop/air-detection/data/anti_uav/5_box/preselezione/esclusi.txt
+5 buchi su 20 celle -> /home/scolaroe/Desktop/air-detection/data/aggregati/8_buchi/buchi.csv
+task cancellati 47
+30
+5
+11

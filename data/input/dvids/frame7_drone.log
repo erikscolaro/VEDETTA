@@ -1,0 +1,203 @@
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x568405217f00] stream 0, offset 0x52f1: partial file
+    Last message repeated 1 times
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x568405217e00] Error during demuxing: Invalid data found when processing input
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x568405217e00] Error retrieving a packet from demuxer: Invalid data found when processing input
+Cannot determine format of input stream 0:0 after EOF
+Error marking filters as finished
+Error while filtering: Invalid data found when processing input
+[out#0/image2 @ 0x5684052240c0] Nothing was written into output file, because at least one of its streams received no packets.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x5fc815f53f00] stream 0, offset 0x14a79: partial file
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x5fd63afd5f00] stream 1, offset 0x40a56: partial file
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x5fd63afd5f00] stream 0, offset 0xa7235d1: partial file
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x5fd63afd5e00] Error during demuxing: Invalid data found when processing input
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x5fd63afd5e00] Error retrieving a packet from demuxer: Invalid data found when processing input
+Cannot determine format of input stream 0:0 after EOF
+Error marking filters as finished
+Error while filtering: Invalid data found when processing input
+[out#0/image2 @ 0x5fd63afe2100] Nothing was written into output file, because at least one of its streams received no packets.
+[in#0 @ 0x5e8d102eae00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2609/DOD_111968010/DOD_111968010.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x57bcf0aa6e00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2604/DOD_111614766/DOD_111614766.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x5b9be54faf00] stream 0, offset 0x3997d: partial file
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x5b9be54faf00] stream 0, offset 0x8460b7b: partial file
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x5b9be54fae00] Error during demuxing: Invalid data found when processing input
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x5b9be54fae00] Error retrieving a packet from demuxer: Invalid data found when processing input
+Cannot determine format of input stream 0:0 after EOF
+Error marking filters as finished
+Error while filtering: Invalid data found when processing input
+[out#0/image2 @ 0x5b9be5bf4e80] Nothing was written into output file, because at least one of its streams received no packets.
+[in#0 @ 0x62c316be1e00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2604/DOD_111634234/DOD_111634234.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x5943ad04ae00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2609/DOD_111968010/DOD_111968010.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x5e480b67ae00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2604/DOD_111614766/DOD_111614766.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x5ecbad5cfe00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2506/DOD_111101387/DOD_111101387.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x5c8c9c8dfe00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2506/DOD_111101387/DOD_111101387.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x5a8931ccae00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2506/DOD_111101387/DOD_111101387.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x6453d974de00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2208/DOD_109194814/DOD_109194814.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x5d3956fcee00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2602/DOD_111533205/DOD_111533205.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x58c004a79e00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2208/DOD_109194814/DOD_109194814.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x6408c65ece00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2602/DOD_111533205/DOD_111533205.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+dvids: DVIDS_917133 25.0-35.0 s, 50 frame, 41 box
+dvids: DVIDS_1020149 5.0-15.0 s, 50 frame, 40 box
+dvids: DVIDS_924638 175.0-185.0 s, 50 frame, 34 box
+dvids: DVIDS_925149 155.0-165.0 s, 50 frame, 47 box
+dvids: DVIDS_995334 15.0-25.0 s, 50 frame, 51 box
+dvids: DVIDS_977453 35.0-45.0 s, 50 frame, 50 box
+dvids: DVIDS_923904 155.0-165.0 s, 50 frame, 63 box
+dvids: DVIDS_1025744 85.0-95.0 s, 50 frame, 26 box
+[in#0 @ 0x580d2baf9e00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2312/DOD_110020851/DOD_110020851.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x58bbc627ff00] stream 0, offset 0x2dabd: partial file
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x58bbc627ff00] stream 0, offset 0x5d62501: partial file
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x58bbc627fe00] Error during demuxing: Invalid data found when processing input
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x58bbc627fe00] Error retrieving a packet from demuxer: Invalid data found when processing input
+Cannot determine format of input stream 0:0 after EOF
+Error marking filters as finished
+Error while filtering: Invalid data found when processing input
+[out#0/image2 @ 0x58bbc628c280] Nothing was written into output file, because at least one of its streams received no packets.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x5df808599f00] stream 0, offset 0xcbefa4: partial file
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x5df808599e00] Error during demuxing: Invalid data found when processing input
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x5df808599e00] Error retrieving a packet from demuxer: Invalid data found when processing input
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x617519feff00] stream 1, offset 0x7b559: partial file
+[in#0 @ 0x64690eff7e00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2402/DOD_110127083/DOD_110127083.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x617519feff00] stream 0, offset 0x7d6684d: partial file
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x617519fefe00] Error during demuxing: Invalid data found when processing input
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x617519fefe00] Error retrieving a packet from demuxer: Invalid data found when processing input
+Cannot determine format of input stream 0:0 after EOF
+Error marking filters as finished
+Error while filtering: Invalid data found when processing input
+[out#0/image2 @ 0x61751a002680] Nothing was written into output file, because at least one of its streams received no packets.
+[in#0 @ 0x5c3bdae4ce00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2402/DOD_110127083/DOD_110127083.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x62c5fe177e00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2412/DOD_110729878/DOD_110729878.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x5e152d795e00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2402/DOD_110127083/DOD_110127083.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x5b358e657e00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2412/DOD_110729878/DOD_110729878.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+dvids: DVIDS_1021765 135.0-145.0 s, 50 frame, 59 box
+dvids: DVIDS_1020084 45.0-55.0 s, 50 frame, 49 box
+dvids: DVIDS_1022656 145.0-155.0 s, 0 frame, 0 box
+dvids: DVIDS_1001929 165.0-175.0 s, 50 frame, 53 box
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x5e91969baf00] stream 0, offset 0x34a982f: partial file
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x5e91969bae00] Error during demuxing: Invalid data found when processing input
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x5e91969bae00] Error retrieving a packet from demuxer: Invalid data found when processing input
+dvids: DVIDS_1002823 165.0-175.0 s, 50 frame, 37 box
+dvids: DVIDS_962484 155.0-165.0 s, 50 frame, 34 box
+dvids: DVIDS_968304 15.0-25.0 s, 0 frame, 0 box
+dvids: DVIDS_855934 15.0-25.0 s, 50 frame, 15 box
+dvids: DVIDS_996659 65.0-75.0 s, 50 frame, 63 box
+dvids: DVIDS_994344 55.0-65.0 s, 50 frame, 40 box
+dvids: DVIDS_989756 195.0-205.0 s, 50 frame, 32 box
+dvids: DVIDS_888379 25.0-35.0 s, 0 frame, 0 box
+dvids: DVIDS_946576 115.0-125.0 s, 0 frame, 0 box
+dvids: DVIDS_957782 105.0-115.0 s, 50 frame, 41 box
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x5aded8108f00] stream 1, offset 0x5ee8d: partial file
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x5aded8108f00] stream 0, offset 0xdfa5aef: partial file
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x5aded8108e00] Error during demuxing: Invalid data found when processing input
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x5aded8108e00] Error retrieving a packet from demuxer: Invalid data found when processing input
+Cannot determine format of input stream 0:0 after EOF
+Error marking filters as finished
+Error while filtering: Invalid data found when processing input
+[out#0/image2 @ 0x5aded81f9c80] Nothing was written into output file, because at least one of its streams received no packets.
+[in#0 @ 0x5e8e79f99e00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2608/DOD_111904730/DOD_111904730.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x6532fe200e00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2601/DOD_111466653/DOD_111466653.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x5d30cb958e00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2608/DOD_111904730/DOD_111904730.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x614f72f31e00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2601/DOD_111466653/DOD_111466653.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x601d1771be00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2608/DOD_111904730/DOD_111904730.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x55ec9dd81e00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2605/DOD_111720637/DOD_111720637.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+dvids: DVIDS_905968 75.0-85.0 s, 50 frame, 54 box
+dvids: DVIDS_891522 75.0-95.0 s, 0 frame, 0 box
+dvids: DVIDS_892558 325.0-335.0 s, 50 frame, 45 box
+dvids: DVIDS_912886 15.0-25.0 s, 0 frame, 0 box
+dvids: DVIDS_969470 25.0-35.0 s, 50 frame, 49 box
+dvids: DVIDS_902700 45.0-55.0 s, 50 frame, 35 box
+dvids: DVIDS_881136 35.0-55.0 s, 100 frame, 80 box
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x62e2baeb3f00] stream 0, offset 0x4d6f6: partial file
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x62e2baeb3f00] stream 0, offset 0x40e958c: partial file
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x62e2baeb3e00] Error during demuxing: Invalid data found when processing input
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x62e2baeb3e00] Error retrieving a packet from demuxer: Invalid data found when processing input
+Cannot determine format of input stream 0:0 after EOF
+Error marking filters as finished
+Error while filtering: Invalid data found when processing input
+[out#0/image2 @ 0x62e2bb1f2540] Nothing was written into output file, because at least one of its streams received no packets.
+dvids: DVIDS_962480 35.0-55.0 s, 100 frame, 45 box
+[in#0 @ 0x5d9ad74c8e00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2603/DOD_111587398/DOD_111587398.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x644d79058e00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2603/DOD_111587398/DOD_111587398.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x583a28729e00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2605/DOD_111690451/DOD_111690451.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+dvids: DVIDS_897455 15.0-25.0 s, 50 frame, 53 box
+dvids: DVIDS_973766 35.0-45.0 s, 50 frame, 23 box
+dvids: DVIDS_992115 195.0-205.0 s, 0 frame, 0 box
+dvids: DVIDS_1005611 85.0-95.0 s, 50 frame, 52 box
+dvids: DVIDS_1018812 75.0-95.0 s, 0 frame, 0 box
+[in#0 @ 0x5c41d5459e00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2603/DOD_111587398/DOD_111587398.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x651cb4180f00] stream 0, offset 0x69be660: partial file
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x651cb4180e00] Error during demuxing: Invalid data found when processing input
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x651cb4180e00] Error retrieving a packet from demuxer: Invalid data found when processing input
+[in#0 @ 0x577d16c85e00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2603/DOD_111587398/DOD_111587398.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+[in#0 @ 0x5e6414774e00] Error opening input: Server returned 5XX Server Error reply
+Error opening input file https://d34w7g4gy10iej.cloudfront.net/video/2603/DOD_111587398/DOD_111587398.mp4.
+Error opening input files: Server returned 5XX Server Error reply
+dvids: DVIDS_1007770 185.0-195.0 s, 50 frame, 53 box
+dvids: DVIDS_916234 85.0-95.0 s, 50 frame, 55 box
+dvids: DVIDS_993513 25.0-45.0 s, 100 frame, 89 box
+dvids: DVIDS_985953 35.0-45.0 s, 50 frame, 38 box
+dvids: DVIDS_855596 295.0-305.0 s, 50 frame, 93 box
+dvids: DVIDS_1000424 75.0-85.0 s, 0 frame, 0 box
+dvids: DVIDS_926012 45.0-55.0 s, 50 frame, 23 box
+dvids: DVIDS_1008367 35.0-45.0 s, 50 frame, 56 box
+dvids: DVIDS_1006203 65.0-75.0 s, 50 frame, 46 box
+dvids: DVIDS_968304 95.0-105.0 s, 0 frame, 0 box
+dvids: DVIDS_1000424 175.0-185.0 s, 0 frame, 0 box
+dvids: secondi per classe in questo giro {'drone': 510.0}

@@ -1,0 +1,53 @@
+fred: FRED_2 3411 frame, 2877 box, 1 label senza frame entro mezzo frame
+fred: FRED_0 3233 frame, 1667 box, 0 label senza frame entro mezzo frame
+fred: FRED_198 3566 frame, 2887 box, 2 label senza frame entro mezzo frame
+fred: FRED_209 3592 frame, 3179 box, 1 label senza frame entro mezzo frame
+fred: FRED_111 3222 frame, 2587 box, 0 label senza frame entro mezzo frame
+fred: FRED_108 3363 frame, 2858 box, 1 label senza frame entro mezzo frame
+fred: FRED_133 3651 frame, 2425 box, 1 label senza frame entro mezzo frame
+fred: FRED_165 1189 frame, 710 box, 1 label senza frame entro mezzo frame
+fred: FRED_19 3409 frame, 2757 box, 1 label senza frame entro mezzo frame
+fred: FRED_28 3344 frame, 2503 box, 1 label senza frame entro mezzo frame
+fred: FRED_2 2877 frame con box, 534 senza (tolti)
+fred: FRED_0 1667 frame con box, 1566 senza (tolti)
+fred: FRED_198 2887 frame con box, 679 senza (tolti)
+fred: FRED_209 3179 frame con box, 413 senza (tolti)
+fred: FRED_111 2587 frame con box, 635 senza (tolti)
+fred: FRED_108 2858 frame con box, 505 senza (tolti)
+fred: FRED_133 2425 frame con box, 1226 senza (tolti)
+fred: FRED_165 710 frame con box, 479 senza (tolti)
+fred: FRED_19 2757 frame con box, 652 senza (tolti)
+fred: FRED_28 2503 frame con box, 841 senza (tolti)
+fred: FRED_2 1064 frame tenuti su 2877 (37%)
+fred: FRED_0 911 frame tenuti su 1667 (55%)
+fred: FRED_198 628 frame tenuti su 2887 (22%)
+fred: FRED_209 706 frame tenuti su 3179 (22%)
+fred: FRED_111 1390 frame tenuti su 2587 (54%)
+fred: FRED_108 2010 frame tenuti su 2858 (70%)
+fred: FRED_133 684 frame tenuti su 2425 (28%)
+fred: FRED_165 252 frame tenuti su 710 (35%)
+fred: FRED_19 1465 frame tenuti su 2757 (53%)
+fred: FRED_28 1078 frame tenuti su 2503 (43%)
+fred: FRED_2 1064 ritagli, area valida 28,36-1247,693; frame con box tagliati 34, con box fuori 0
+fred: FRED_0 911 ritagli, area valida 28,36-1247,693; frame con box tagliati 60, con box fuori 0
+fred: FRED_198 628 ritagli, area valida 28,36-1247,693; frame con box tagliati 29, con box fuori 0
+fred: FRED_209 706 ritagli, area valida 28,36-1247,693; frame con box tagliati 1, con box fuori 0
+fred: FRED_111 1390 ritagli, area valida 29,36-1247,636; frame con box tagliati 77, con box fuori 0
+fred: FRED_108 2010 ritagli, area valida 28,36-1247,693; frame con box tagliati 31, con box fuori 0
+fred: FRED_133 684 ritagli, area valida 28,36-1247,693; frame con box tagliati 10, con box fuori 0
+fred: FRED_165 252 ritagli, area valida 28,36-1247,693; frame con box tagliati 12, con box fuori 0
+fred: FRED_19 1465 ritagli, area valida 28,36-1247,693; frame con box tagliati 37, con box fuori 0
+fred: FRED_28 1078 ritagli, area valida 28,36-1247,693; frame con box tagliati 51, con box fuori 0
+fred: FRED_108 YOLO su 2010 box, 1967 trovati (98%), lato YOLO/originale mediana 0.24
+fred: FRED_111 YOLO su 1390 box, 23 trovati (2%), lato YOLO/originale mediana 0.41
+fred: FRED_2 movimento su 1064 box, 944 trovati, lato/originale mediana 0.34
+fred: FRED_0 movimento su 911 box, 875 trovati, lato/originale mediana 0.33
+fred: FRED_198 movimento su 628 box, 627 trovati, lato/originale mediana 0.49
+fred: FRED_209 movimento su 706 box, 658 trovati, lato/originale mediana 0.32
+fred: FRED_111 movimento su 1390 box, 1247 trovati, lato/originale mediana 0.23
+fred: FRED_133 movimento su 684 box, 683 trovati, lato/originale mediana 0.62
+fred: FRED_165 movimento su 252 box, 252 trovati, lato/originale mediana 0.57
+fred: FRED_19 movimento su 1465 box, 1453 trovati, lato/originale mediana 0.37
+fred: FRED_28 movimento su 1078 box, 1054 trovati, lato/originale mediana 0.31
+fred: fogli yolo in /home/scolaroe/Desktop/air-detection/data/fred/5_box/fogli_yolo
+fred: fogli movimento in /home/scolaroe/Desktop/air-detection/data/fred/5_box/fogli_movimento

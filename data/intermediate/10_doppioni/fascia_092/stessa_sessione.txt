@@ -1,0 +1,65 @@
+# Revisione dell'utente dei fogli R01-R22 (23/10/2026), criterio stretto; basta una delle due coppie della riga.
+# Letture da confermare: "46910" -> 4, 6, 9, 10; "7783 cielo" -> 77, 83 (83: cielo).
+1
+2
+3
+4
+6
+9
+10
+13
+17
+18
+20
+21
+23
+25
+34
+35
+39
+49
+55
+58
+59
+64
+66
+67
+68
+71
+72
+74
+75
+77
+83  # cielo
+90
+94
+96
+97
+99
+100
+102
+106
+107
+110
+113
+124
+127
+138
+144
+157
+159
+162
+163
+169
+185
+195
+196
+207
+215
+227  # "sembrano doppioni, attenzione"
+232
+233
+234
+238
+242
+# dubbi (non contati): 33, 69, 164, 170, 206, 251

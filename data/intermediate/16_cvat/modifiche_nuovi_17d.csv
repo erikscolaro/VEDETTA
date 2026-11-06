@@ -1,0 +1,15 @@
+split,nome,immagine,modifica,classe_prima,classe_dopo,iou,lato_px
+val,DVIDS_946797_f00186,input/dvids/4_ritagli/DVIDS_946797/images/DVIDS_946797_f00186.jpg,classe,drone,helicopter,1.0,126.9
+val,DVIDS_946797_f00187,input/dvids/4_ritagli/DVIDS_946797/images/DVIDS_946797_f00187.jpg,classe,drone,helicopter,1.0,120.8
+val,DVIDS_946797_f00188,input/dvids/4_ritagli/DVIDS_946797/images/DVIDS_946797_f00188.jpg,classe,drone,helicopter,1.0,125.1
+val,DVIDS_946797_f00189,input/dvids/4_ritagli/DVIDS_946797/images/DVIDS_946797_f00189.jpg,classe,drone,helicopter,1.0,120.1
+val,DVIDS_946797_f00190,input/dvids/4_ritagli/DVIDS_946797/images/DVIDS_946797_f00190.jpg,classe,drone,helicopter,1.0,120.6
+val,DVIDS_946797_f00191,input/dvids/4_ritagli/DVIDS_946797/images/DVIDS_946797_f00191.jpg,classe,drone,helicopter,1.0,123.7
+val,DVIDS_946797_f00192,input/dvids/4_ritagli/DVIDS_946797/images/DVIDS_946797_f00192.jpg,classe,drone,helicopter,1.0,120.4
+val,DVIDS_946797_f00196,input/dvids/4_ritagli/DVIDS_946797/images/DVIDS_946797_f00196.jpg,classe,drone,helicopter,1.0,123.9
+val,DVIDS_946797_f00197,input/dvids/4_ritagli/DVIDS_946797/images/DVIDS_946797_f00197.jpg,classe,drone,helicopter,1.0,114.8
+val,DVIDS_946797_f00198,input/dvids/4_ritagli/DVIDS_946797/images/DVIDS_946797_f00198.jpg,classe,drone,helicopter,1.0,113.4
+val,DVIDS_946797_f00199,input/dvids/4_ritagli/DVIDS_946797/images/DVIDS_946797_f00199.jpg,classe,drone,helicopter,1.0,109.6
+val,DVIDS_946797_f00200,input/dvids/4_ritagli/DVIDS_946797/images/DVIDS_946797_f00200.jpg,classe,drone,helicopter,1.0,103.2
+val,DVIDS_946797_f00201,input/dvids/4_ritagli/DVIDS_946797/images/DVIDS_946797_f00201.jpg,classe,drone,helicopter,1.0,95.7
+val,DVIDS_946797_f00203,input/dvids/4_ritagli/DVIDS_946797/images/DVIDS_946797_f00203.jpg,classe,drone,helicopter,1.0,100.8

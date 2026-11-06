@@ -1,0 +1,38 @@
+# eccezioni alla proposta (revisione dei fogli, 16/10/2026)
+# "SNN: via a b c-d": le sequenze elencate escono dalla sessione SNN della proposta (colonna `proposta` di proposta.csv) e formano insieme una sessione nuova
+S02: via 5 6
+S10: via 130-139
+S12: via 164-166
+S14: via 211-217
+S14: via 218-219
+S12: via 167
+S10: via 140-142
+S10: via 143
+S05: via 49-51
+S02: via 9-10
+S02: via 11-12
+S02: via 13-20 224-230
+S02: via 220-223
+# "unisci a b c": le sessioni delle sequenze a, b, c diventano una (numeri di sequenza); regola: sessione = stesso posto e stesse condizioni
+# revisione di Claude con la regola (16/10/2026)
+# "separa a b c-d": le sequenze elencate formano insieme una sessione nuova (numeri di sequenza)
+# panorama di Firenze: un giorno o pomeriggio per sessione (blocchi B07, B08, B12, B14)
+separa 66-68
+separa 69-80
+separa 115
+# pini ed edificio bianco: blocchi B09, B10, B13
+separa 87-90
+separa 112-114
+# muro con finestre verdi e pozzo: 13-17 (B02) e 224-230 (B20) giorni diversi; 18-20 parete con l'oblo' e l'albero
+separa 224-230
+separa 18-20
+# S01: tre pareti diverse (0-1, 2, 3-4)
+separa 2
+separa 3-4
+# 48 e' il prato con le case di 49-51, non il viale di 37-47
+separa 48-51
+# 154 e' un altro piazzale (edificio giallo, auto), non quello dell'albero di 144-153
+separa 154
+# condizioni diverse nella stessa ripresa: notte e crepuscolo
+separa 111
+separa 33-36

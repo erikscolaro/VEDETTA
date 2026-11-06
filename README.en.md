@@ -538,7 +538,9 @@ data/
 └── output/         the final dataset (frozen)
 ```
 
-`input/` and `intermediate/` stay outside git, `output/` is versioned.
+Of `input/` and `intermediate/`, git holds only the operator choices, lists and logs (files under 5 MB) and the
+labels reviewed in CVAT (`manuale.tar.gz` per source); raw data is downloaded again by the download steps. `output/`
+goes to Hugging Face, in a private dataset repo.
 
 ### Svanström: `tools/svanstrom.py`
 

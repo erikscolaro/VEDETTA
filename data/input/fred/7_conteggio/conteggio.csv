@@ -1,0 +1,7 @@
+classe,fascia,istanze,frame,clip,video,sessioni
+drone,<8,540,540,9,9,7
+drone,8-16,2319,2319,7,7,5
+drone,16-32,2987,2987,10,10,8
+drone,32-64,790,790,10,10,8
+drone,64-96,72,72,7,7,6
+drone,>96,34,34,4,4,4

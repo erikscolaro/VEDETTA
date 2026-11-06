@@ -1,0 +1,13 @@
+task,nome,immagine
+17m_train_01,AUAV_20190926_103046_1_8_f00350.jpg,input/anti_uav/4_ritagli/AUAV_20190926_103046_1_8/images/AUAV_20190926_103046_1_8_f00350.jpg
+17m_train_01,DVIDS_836039_f00301.jpg,input/dvids/4_ritagli/DVIDS_836039/images/DVIDS_836039_f00301.jpg
+17m_train_01,DVIDS_882759_f01930.jpg,input/dvids/4_ritagli/DVIDS_882759/images/DVIDS_882759_f01930.jpg
+17m_train_01,DVIDS_938336_f00711.jpg,input/dvids/4_ritagli/DVIDS_938336/images/DVIDS_938336_f00711.jpg
+17m_val_01,DVIDS_831340_f00128.jpg,input/dvids/4_ritagli/DVIDS_831340/images/DVIDS_831340_f00128.jpg
+17m_val_01,DVIDS_831340_f00129.jpg,input/dvids/4_ritagli/DVIDS_831340/images/DVIDS_831340_f00129.jpg
+17m_val_01,DVIDS_831340_f00132.jpg,input/dvids/4_ritagli/DVIDS_831340/images/DVIDS_831340_f00132.jpg
+17m_val_01,DVIDS_831340_f00159.jpg,input/dvids/4_ritagli/DVIDS_831340/images/DVIDS_831340_f00159.jpg
+17m_val_01,DVIDS_866116_f00481.jpg,input/dvids/4_ritagli/DVIDS_866116/images/DVIDS_866116_f00481.jpg
+17m_val_01,DVIDS_866116_f00482.jpg,input/dvids/4_ritagli/DVIDS_866116/images/DVIDS_866116_f00482.jpg
+17m_val_01,DVIDS_866116_f00484.jpg,input/dvids/4_ritagli/DVIDS_866116/images/DVIDS_866116_f00484.jpg
+17m_val_01,DVIDS_866116_f00500.jpg,input/dvids/4_ritagli/DVIDS_866116/images/DVIDS_866116_f00500.jpg

@@ -1,0 +1,35 @@
+# Seconda revisione dell'utente (23/10/2026), criterio stretto: doppione = stessa ripresa (stesso momento, stessa luce
+# e cielo) o stesso girato; stesso posto in un altro giorno o con luce/saturazione diverse = non doppione.
+# Dal foglio T09 in poi (coppie 97-160) nessun doppione. Prima versione (criterio largo) in stessa_sessione_v1.txt.
+3
+6
+8
+14
+17
+18
+20
+22
+24
+25
+26
+30  # duplicato esatto
+32  # solo la coppia piu' simile
+39
+41
+42
+45
+46
+47
+49
+53
+54
+56
+61
+63
+68
+73
+75
+80
+81  # solo la coppia piu' simile
+86
+# dubbi (non contati): 9, 10, 11

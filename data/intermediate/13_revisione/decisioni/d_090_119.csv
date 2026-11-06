@@ -1,0 +1,721 @@
+id,decisione,nota
+K02160,classe:airplane,
+K02161,classe:airplane,
+K02162,classe:airplane,
+K02163,classe:airplane,
+K02164,classe:airplane,
+K02165,aggiungi,aereo in primo piano tagliato
+K02166,classe:airplane,
+K02167,classe:airplane,
+K02168,classe:airplane,
+K02169,dubbio,puntino minuscolo
+K02170,ignora,figura scura vicino a muro
+K02171,aggiungi,
+K02172,aggiungi,
+K02173,togli,solo nuvola
+K02174,aggiungi,sfocato
+K02175,aggiungi,tagliato al bordo
+K02176,aggiungi,
+K02177,ignora,berretto di persona
+K02178,aggiungi,
+K02179,aggiungi,
+K02180,aggiungi,
+K02181,classe:airplane,sfocato
+K02182,ignora,
+K02183,aggiungi,aereo parcheggiato
+K02184,aggiungi,aereo parcheggiato sullo sfondo
+K02185,dubbio,
+K02186,aggiungi,aereo parcheggiato
+K02187,aggiungi,aereo parcheggiato
+K02188,tieni,sfocato
+K02189,tieni,piccolo sfocato
+K02190,tieni,aereo tagliato in basso
+K02191,tieni,
+K02192,tieni,tagliato al bordo
+K02193,tieni,
+K02194,tieni,molto debole
+K02195,dubbio,
+K02196,dubbio,
+K02197,dubbio,
+K02198,tieni,debole
+K02199,dubbio,
+K02200,tieni,
+K02201,aggiungi,
+K02202,dubbio,
+K02203,dubbio,
+K02204,dubbio,
+K02205,aggiungi,tagliato al bordo
+K02206,tieni,tagliato al bordo
+K02207,aggiungi,tagliato al bordo
+K02208,aggiungi,tagliato al bordo
+K02209,tieni,
+K02210,tieni,
+K02211,ignora,ramo
+K02212,tieni,
+K02213,tieni,
+K02214,tieni,
+K02215,tieni,
+K02216,tieni,
+K02217,tieni,
+K02218,tieni,
+K02219,tieni,
+K02220,tieni,
+K02221,tieni,
+K02222,tieni,
+K02223,tieni,
+K02224,tieni,
+K02225,tieni,
+K02226,tieni,
+K02227,tieni,
+K02228,tieni,
+K02229,tieni,
+K02230,tieni,
+K02231,tieni,
+K02232,tieni,
+K02233,tieni,tagliato al bordo
+K02234,tieni,
+K02235,tieni,tagliato al bordo
+K02236,tieni,tagliato al bordo
+K02237,tieni,
+K02238,tieni,
+K02239,tieni,
+K02240,tieni,
+K02241,tieni,
+K02242,tieni,
+K02243,tieni,
+K02244,tieni,
+K02245,tieni,
+K02246,tieni,
+K02247,ignora,rami
+K02248,tieni,tagliato al bordo
+K02249,tieni,
+K02250,tieni,
+K02251,tieni,
+K02252,tieni,
+K02253,tieni,
+K02254,tieni,
+K02255,tieni,
+K02256,tieni,
+K02257,tieni,
+K02258,tieni,
+K02259,tieni,
+K02260,tieni,
+K02261,tieni,
+K02262,tieni,
+K02263,tieni,
+K02264,tieni,
+K02265,tieni,
+K02266,tieni,
+K02267,tieni,
+K02268,tieni,
+K02269,tieni,
+K02270,tieni,tagliato al bordo
+K02271,tieni,
+K02272,tieni,
+K02273,ignora,scritta o texture
+K02274,tieni,
+K02275,tieni,
+K02276,tieni,
+K02277,tieni,tagliato al bordo
+K02278,tieni,
+K02279,tieni,
+K02280,tieni,
+K02281,tieni,
+K02282,tieni,
+K02283,tieni,
+K02284,tieni,
+K02285,tieni,
+K02286,tieni,
+K02287,tieni,
+K02288,tieni,
+K02289,tieni,
+K02290,tieni,
+K02291,tieni,
+K02292,tieni,
+K02293,tieni,
+K02294,tieni,
+K02295,tieni,
+K02296,tieni,
+K02297,tieni,
+K02298,dubbio,blob sfocato
+K02299,dubbio,blob sfocato
+K02300,dubbio,blob sfocato
+K02301,tieni,
+K02302,ignora,montagna
+K02303,tieni,drone con bracci
+K02304,dubbio,
+K02305,dubbio,
+K02306,ignora,fari su palo
+K02307,aggiungi,piccolo oggetto scuro
+K02308,aggiungi,piccolo oggetto scuro
+K02309,dubbio,
+K02310,tieni,
+K02311,tieni,
+K02312,tieni,
+K02313,dubbio,
+K02314,dubbio,
+K02315,classe:airplane,
+K02316,classe:airplane,
+K02317,classe:airplane,
+K02318,classe:airplane,
+K02319,tieni,
+K02320,dubbio,
+K02321,classe:airplane,
+K02322,classe:airplane,modello appeso
+K02323,togli,logo stella
+K02324,ignora,logo stella
+K02325,tieni,drone
+K02326,tieni,drone
+K02327,togli,
+K02328,togli,ombra a terra
+K02329,classe:airplane,jet a decollo verticale
+K02330,classe:airplane,jet a decollo verticale
+K02331,classe:airplane,jet a decollo verticale
+K02332,classe:airplane,jet a decollo verticale
+K02333,classe:airplane,jet a decollo verticale
+K02334,classe:airplane,jet a decollo verticale
+K02335,ignora,
+K02336,togli,
+K02337,aggiungi,elicottero a terra
+K02338,dubbio,
+K02339,aggiungi,oggetto scuro sfocato, probabile uccello vicino
+K02340,aggiungi,oggetto scuro sfocato, probabile uccello vicino
+K02341,aggiungi,oggetto scuro sfocato, probabile uccello vicino
+K02342,aggiungi,oggetto scuro sfocato, probabile uccello vicino
+K02343,aggiungi,oggetto scuro sfocato, probabile uccello vicino
+K02344,aggiungi,oggetto scuro sfocato, probabile uccello vicino
+K02345,aggiungi:bird,stesso oggetto
+K02346,togli,
+K02347,dubbio,
+K02348,dubbio,
+K02349,classe:airplane,bimotore
+K02350,classe:airplane,bimotore
+K02351,classe:airplane,bimotore
+K02352,classe:airplane,bimotore
+K02353,classe:airplane,bimotore
+K02354,classe:airplane,bimotore
+K02355,classe:airplane,bimotore
+K02356,tieni,V-22 tiltrotor
+K02357,tieni,V-22 tiltrotor
+K02358,tieni,V-22 tiltrotor
+K02359,tieni,V-22 tiltrotor
+K02360,tieni,V-22 tiltrotor
+K02361,tieni,V-22 tiltrotor
+K02362,tieni,V-22 tiltrotor
+K02363,tieni,V-22 tiltrotor
+K02364,tieni,V-22 tiltrotor
+K02365,togli,nuvola
+K02366,tieni,
+K02367,dubbio,
+K02368,dubbio,
+K02369,dubbio,
+K02370,tieni,
+K02371,tieni,
+K02372,dubbio,
+K02373,tieni,
+K02374,dubbio,
+K02375,dubbio,
+K02376,dubbio,
+K02377,tieni,
+K02378,dubbio,
+K02379,tieni,
+K02380,tieni,
+K02381,tieni,
+K02382,tieni,
+K02383,tieni,
+K02384,tieni,
+K02385,tieni,
+K02386,dubbio,
+K02387,tieni,
+K02388,tieni,
+K02389,dubbio,
+K02390,dubbio,
+K02391,togli,nuvola
+K02392,aggiungi,coda di aereo a terra
+K02393,togli,
+K02394,classe:helicopter,
+K02395,classe:helicopter,
+K02396,dubbio,
+K02397,classe:airplane,jet
+K02398,classe:airplane,jet
+K02399,dubbio,
+K02400,tieni,jet
+K02401,tieni,jet
+K02402,ignora,nave sul mare
+K02403,ignora,nave sul mare
+K02404,ignora,nave sul mare
+K02405,ignora,nave sul mare
+K02406,dubbio,piccolo oggetto sul mare
+K02407,dubbio,piccolo oggetto sul mare
+K02408,dubbio,piccolo oggetto sul mare
+K02409,dubbio,piccolo oggetto sul mare
+K02410,dubbio,piccolo oggetto sul mare
+K02411,dubbio,piccolo oggetto sul mare
+K02412,ignora,ala dell'aereo ospite
+K02413,dubbio,
+K02414,ignora,ala dell'aereo ospite
+K02415,tieni,UAV ad ala fissa
+K02416,tieni,UAV ad ala fissa
+K02417,tieni,UAV ad ala fissa
+K02418,tieni,UAV ad ala fissa
+K02419,tieni,UAV ad ala fissa
+K02420,tieni,UAV ad ala fissa
+K02421,dubbio,bagliore
+K02422,togli,
+K02423,togli,
+K02424,dubbio,debole
+K02425,dubbio,debole
+K02426,togli,
+K02427,dubbio,debole
+K02428,dubbio,debole
+K02429,togli,
+K02430,togli,
+K02431,tieni,drone bianco piccolo
+K02432,togli,
+K02433,togli,
+K02434,togli,
+K02435,togli,
+K02436,togli,
+K02437,dubbio,
+K02438,togli,
+K02439,togli,
+K02440,togli,
+K02441,dubbio,triangolo chiaro
+K02442,togli,
+K02443,togli,
+K02444,togli,
+K02445,dubbio,
+K02446,togli,
+K02447,togli,
+K02448,togli,
+K02449,togli,
+K02450,dubbio,
+K02451,togli,
+K02452,togli,
+K02453,togli,
+K02454,tieni,sagoma scura
+K02455,dubbio,
+K02456,togli,
+K02457,aggiungi,sagoma di drone sul tetto
+K02458,togli,
+K02459,togli,
+K02460,togli,
+K02461,togli,
+K02462,dubbio,
+K02463,togli,
+K02464,togli,
+K02465,dubbio,
+K02466,aggiungi,sagoma scura al bordo
+K02467,togli,gru
+K02468,aggiungi,drone visibile
+K02469,togli,
+K02470,togli,
+K02471,dubbio,
+K02472,dubbio,
+K02473,togli,
+K02474,togli,
+K02475,togli,
+K02476,togli,
+K02477,togli,
+K02478,togli,
+K02479,togli,
+K02480,dubbio,
+K02481,togli,
+K02482,dubbio,puntino chiaro
+K02483,togli,
+K02484,togli,
+K02485,togli,
+K02486,togli,
+K02487,dubbio,
+K02488,tieni,uccello bianco
+K02489,tieni,uccello bianco
+K02490,dubbio,
+K02491,tieni,uccello su filo o recinto
+K02492,tieni,uccello su filo o recinto
+K02493,tieni,uccello su filo o recinto
+K02494,dubbio,
+K02495,dubbio,
+K02496,dubbio,
+K02497,tieni,
+K02498,tieni,
+K02499,dubbio,
+K02500,tieni,
+K02501,tieni,
+K02502,tieni,
+K02503,tieni,
+K02504,tieni,
+K02505,tieni,
+K02506,tieni,
+K02507,tieni,
+K02508,dubbio,
+K02509,dubbio,
+K02510,tieni,
+K02511,dubbio,
+K02512,dubbio,
+K02513,togli,
+K02514,togli,
+K02515,tieni,
+K02516,tieni,
+K02517,tieni,
+K02518,tieni,
+K02519,tieni,
+K02520,dubbio,debole
+K02521,tieni,piccolo uccello su filo
+K02522,tieni,piccolo uccello su filo
+K02523,tieni,piccolo uccello su filo
+K02524,tieni,piccolo uccello su filo
+K02525,tieni,piccolo uccello su filo
+K02526,dubbio,debole
+K02527,dubbio,debole
+K02528,tieni,uccello su filo
+K02529,tieni,uccello su filo
+K02530,tieni,uccello su filo
+K02531,tieni,uccello su filo
+K02532,tieni,uccello su filo
+K02533,togli,bici
+K02534,dubbio,
+K02535,dubbio,sagoma scura nell'erba
+K02536,dubbio,sagoma scura nell'erba
+K02537,dubbio,sagoma scura nell'erba
+K02538,togli,
+K02539,togli,
+K02540,tieni,uccello grigio a terra
+K02541,tieni,uccello grigio a terra
+K02542,togli,
+K02543,dubbio,
+K02544,tieni,sagoma scura in volo
+K02545,ignora,
+K02546,tieni,uccello in volo davanti al camion
+K02547,tieni,uccello in volo davanti al camion
+K02548,dubbio,
+K02549,dubbio,
+K02550,tieni,uccello tra fiori o isolatore
+K02551,tieni,uccello tra fiori o isolatore
+K02552,tieni,uccello tra fiori o isolatore
+K02553,tieni,uccello tra fiori o isolatore
+K02554,tieni,uccello tra fiori o isolatore
+K02555,dubbio,
+K02556,dubbio,
+K02557,tieni,uccello in volo
+K02558,tieni,
+K02559,tieni,
+K02560,tieni,
+K02561,tieni,
+K02562,tieni,uccello sul sentiero
+K02563,tieni,uccello sul sentiero
+K02564,tieni,uccello sul sentiero
+K02565,tieni,uccello sul sentiero
+K02566,tieni,uccello sul sentiero
+K02567,dubbio,piccolo
+K02568,tieni,
+K02569,tieni,
+K02570,tieni,
+K02571,tieni,
+K02572,tieni,
+K02573,dubbio,
+K02574,dubbio,
+K02575,tieni,
+K02576,tieni,
+K02577,tieni,
+K02578,tieni,
+K02579,dubbio,
+K02580,dubbio,
+K02581,tieni,grigio su telo
+K02582,dubbio,
+K02583,togli,foglie
+K02584,togli,foglie
+K02585,dubbio,
+K02586,dubbio,
+K02587,tieni,uccello in volo
+K02588,tieni,uccello vicino al telo verde
+K02589,tieni,uccello vicino al telo verde
+K02590,tieni,uccello vicino al telo verde
+K02591,tieni,uccello vicino al telo verde
+K02592,dubbio,
+K02593,tieni,uccello sul telo verde
+K02594,tieni,uccello sul telo verde
+K02595,tieni,uccello sul telo verde
+K02596,tieni,uccello sul telo verde
+K02597,tieni,uccello sul telo verde
+K02598,tieni,uccello sul telo verde
+K02599,togli,
+K02600,ignora,persona accovacciata
+K02601,togli,cespuglio
+K02602,ignora,persona accovacciata
+K02603,ignora,persona accovacciata
+K02604,ignora,persona accovacciata
+K02605,ignora,persona accovacciata
+K02606,ignora,persona accovacciata
+K02607,ignora,persona accovacciata
+K02608,ignora,persona accovacciata
+K02609,ignora,persona accovacciata
+K02610,ignora,persona accovacciata
+K02611,ignora,persona accovacciata
+K02612,dubbio,
+K02613,ignora,persona
+K02614,dubbio,
+K02615,ignora,persona
+K02616,dubbio,
+K02617,ignora,persona
+K02618,ignora,persona
+K02619,ignora,persona
+K02620,togli,
+K02621,ignora,persona
+K02622,ignora,persona
+K02623,dubbio,
+K02624,ignora,persona
+K02625,ignora,persona
+K02626,dubbio,
+K02627,ignora,persona
+K02628,ignora,persona
+K02629,tieni,tagliato al bordo
+K02630,ignora,persona
+K02631,tieni,tagliato al bordo
+K02632,ignora,persona
+K02633,dubbio,
+K02634,togli,
+K02635,dubbio,
+K02636,ignora,persona
+K02637,ignora,persona
+K02638,ignora,persona
+K02639,ignora,persona
+K02640,ignora,persona
+K02641,tieni,uccello su filo
+K02642,dubbio,
+K02643,dubbio,
+K02644,tieni,tagliato al bordo
+K02645,dubbio,
+K02646,dubbio,
+K02647,dubbio,
+K02648,dubbio,
+K02649,dubbio,
+K02650,tieni,uccello su isolatore o palo
+K02651,tieni,uccello su isolatore o palo
+K02652,dubbio,
+K02653,tieni,uccello su ramo
+K02654,togli,foglie
+K02655,togli,foglie
+K02656,togli,foglie
+K02657,togli,foglie
+K02658,togli,foglie
+K02659,dubbio,
+K02660,dubbio,
+K02661,dubbio,
+K02662,dubbio,
+K02663,togli,
+K02664,dubbio,
+K02665,dubbio,
+K02666,togli,
+K02667,dubbio,
+K02668,tieni,uccello sul tronco
+K02669,dubbio,
+K02670,dubbio,
+K02671,tieni,uccello su filo
+K02672,dubbio,
+K02673,dubbio,
+K02674,dubbio,
+K02675,dubbio,
+K02676,dubbio,
+K02677,dubbio,
+K02678,dubbio,
+K02679,tieni,uccello su ramo
+K02680,tieni,uccello su ramo
+K02681,dubbio,
+K02682,tieni,uccello su albero
+K02683,dubbio,
+K02684,tieni,
+K02685,dubbio,
+K02686,ignora,furgone
+K02687,ignora,furgone
+K02688,ignora,furgone
+K02689,ignora,furgone
+K02690,ignora,furgone
+K02691,togli,foglie o erba
+K02692,togli,foglie o erba
+K02693,togli,foglie o erba
+K02694,togli,foglie o erba
+K02695,togli,foglie o erba
+K02696,tieni,uccello in volo
+K02697,dubbio,
+K02698,tieni,uccello su fiore o filo
+K02699,tieni,uccello su fiore o filo
+K02700,dubbio,
+K02701,togli,
+K02702,dubbio,
+K02703,togli,
+K02704,dubbio,
+K02705,togli,
+K02706,dubbio,
+K02707,dubbio,
+K02708,dubbio,
+K02709,tieni,uccello su filo o in volo
+K02710,tieni,uccello su filo o in volo
+K02711,tieni,uccello su filo o in volo
+K02712,tieni,uccello su palo
+K02713,dubbio,
+K02714,tieni,uccello su traliccio
+K02715,tieni,uccello su traliccio
+K02716,tieni,uccello su traliccio
+K02717,tieni,uccello su traliccio
+K02718,tieni,uccello su traliccio
+K02719,tieni,uccello su traliccio
+K02720,tieni,uccello su traliccio
+K02721,tieni,uccello su traliccio
+K02722,tieni,uccello su traliccio
+K02723,dubbio,
+K02724,tieni,uccello su palo o filo
+K02725,tieni,uccello su palo o filo
+K02726,tieni,uccello su palo o filo
+K02727,tieni,uccello su palo o filo
+K02728,tieni,uccello su palo o filo
+K02729,tieni,uccello su palo o filo
+K02730,tieni,uccello su palo o filo
+K02731,tieni,uccello su palo o filo
+K02732,tieni,uccello su palo o filo
+K02733,tieni,uccello su palo o filo
+K02734,dubbio,
+K02735,dubbio,
+K02736,tieni,uccello su filo
+K02737,dubbio,
+K02738,dubbio,
+K02739,dubbio,
+K02740,tieni,uccello sul tronco
+K02741,tieni,uccello sul tronco
+K02742,tieni,uccello sul tronco
+K02743,dubbio,
+K02744,dubbio,
+K02745,tieni,
+K02746,dubbio,
+K02747,tieni,uccello sul tronco
+K02748,tieni,uccello sul tronco
+K02749,dubbio,tagliato al bordo
+K02750,dubbio,tagliato al bordo
+K02751,tieni,piccolo uccello
+K02752,dubbio,
+K02753,tieni,
+K02754,tieni,
+K02755,togli,
+K02756,dubbio,
+K02757,dubbio,
+K02758,dubbio,
+K02759,tieni,piccolo uccello su filo
+K02760,dubbio,
+K02761,tieni,uccello su filo
+K02762,dubbio,
+K02763,tieni,piccolo uccello su ramo
+K02764,dubbio,
+K02765,togli,
+K02766,dubbio,
+K02767,togli,ramo
+K02768,togli,ramo
+K02769,dubbio,
+K02770,dubbio,
+K02771,tieni,uccello con macchia bianca
+K02772,tieni,uccello con macchia bianca
+K02773,dubbio,
+K02774,dubbio,
+K02775,dubbio,
+K02776,dubbio,
+K02777,tieni,tagliato al bordo
+K02778,tieni,piccione a terra
+K02779,tieni,piccione a terra
+K02780,tieni,piccione a terra
+K02781,tieni,piccione a terra
+K02782,tieni,piccione a terra
+K02783,tieni,piccione a terra
+K02784,tieni,piccione a terra
+K02785,tieni,piccione a terra
+K02786,tieni,piccione a terra
+K02787,tieni,uccello chiaro a terra
+K02788,tieni,uccello chiaro a terra
+K02789,tieni,uccello chiaro a terra
+K02790,togli,
+K02791,dubbio,
+K02792,dubbio,
+K02793,dubbio,
+K02794,tieni,uccello su ramo
+K02795,dubbio,
+K02796,tieni,uccello su palo
+K02797,togli,solo ramo e filo
+K02798,togli,solo ramo e filo
+K02799,togli,solo ramo e filo
+K02800,togli,solo ramo e filo
+K02801,togli,solo ramo e filo
+K02802,togli,solo ramo e filo
+K02803,togli,solo ramo e filo
+K02804,togli,solo ramo e filo
+K02805,togli,solo ramo e filo
+K02806,togli,solo ramo e filo
+K02807,togli,solo ramo e filo
+K02808,togli,solo ramo e filo
+K02809,togli,
+K02810,dubbio,
+K02811,dubbio,
+K02812,tieni,uccello su filo
+K02813,dubbio,
+K02814,dubbio,
+K02815,dubbio,
+K02816,dubbio,
+K02817,togli,
+K02818,tieni,uccello su ramo
+K02819,tieni,uccello su ramo
+K02820,dubbio,
+K02821,togli,
+K02822,togli,
+K02823,dubbio,
+K02824,dubbio,
+K02825,dubbio,
+K02826,dubbio,
+K02827,dubbio,
+K02828,togli,
+K02829,togli,
+K02830,togli,
+K02831,tieni,uccello su filo
+K02832,tieni,uccello su filo
+K02833,tieni,uccello su filo
+K02834,tieni,uccello su filo
+K02835,dubbio,
+K02836,dubbio,
+K02837,tieni,uccello sul tronco
+K02838,dubbio,
+K02839,tieni,uccello sul tronco
+K02840,dubbio,
+K02841,tieni,uccello sul tronco
+K02842,dubbio,
+K02843,tieni,uccello sul tronco
+K02844,dubbio,
+K02845,tieni,uccello sul tronco
+K02846,dubbio,
+K02847,tieni,uccello sul tronco
+K02848,tieni,uccello sul tronco
+K02849,tieni,uccello sul tronco
+K02850,dubbio,
+K02851,tieni,uccello sul tronco
+K02852,dubbio,
+K02853,tieni,uccello sul tronco
+K02854,tieni,uccello sul tronco
+K02855,tieni,uccello sul tronco
+K02856,tieni,uccello sul tronco
+K02857,tieni,uccello sul tronco
+K02858,dubbio,
+K02859,dubbio,
+K02860,dubbio,
+K02861,dubbio,
+K02862,tieni,airone su palo
+K02863,tieni,airone su palo
+K02864,tieni,airone su palo
+K02865,tieni,airone su palo
+K02866,tieni,airone su palo
+K02867,tieni,airone su palo
+K02868,tieni,airone su palo
+K02869,tieni,airone su palo
+K02870,tieni,airone su palo
+K02871,tieni,airone su palo
+K02872,tieni,airone su palo
+K02873,tieni,airone su palo
+K02874,tieni,airone su palo
+K02875,tieni,airone su palo
+K02876,tieni,airone su palo
+K02877,togli,
+K02878,togli,
+K02879,dubbio,

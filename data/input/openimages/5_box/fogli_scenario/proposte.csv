@@ -1,0 +1,1060 @@
+n   , foglio, immagine                                                 , proposta , p_orizzonte, tessitura
+   1, S01   , input/openimages/4_ritagli/images/OI_d2ab34d88b30d28b.jpg, cielo    ,       0.0  , cielo
+   2, S01   , input/openimages/4_ritagli/images/OI_f28178448aec1685.jpg, cielo    ,       0.0  , cielo
+   3, S01   , input/openimages/4_ritagli/images/OI_f3572cbfe430fcbe.jpg, cielo    ,       0.0  , cielo
+   4, S01   , input/openimages/4_ritagli/images/OI_15b7f6e10d11d9ca.jpg, cielo    ,       0.0  , cielo
+   5, S01   , input/openimages/4_ritagli/images/OI_5a4af691dc24837e.jpg, cielo    ,       0.0  , cielo
+   6, S01   , input/openimages/4_ritagli/images/OI_9f12b3a51253de13.jpg, cielo    ,       0.0  , cielo
+   7, S01   , input/openimages/4_ritagli/images/OI_c531c00ed67f8b54.jpg, cielo    ,       0.0  , cielo
+   8, S01   , input/openimages/4_ritagli/images/OI_009ce3a5a26a74c0.jpg, cielo    ,       0.0  , cielo
+   9, S01   , input/openimages/4_ritagli/images/OI_448a93eff22e131b.jpg, cielo    ,       0.001, cielo
+  10, S01   , input/openimages/4_ritagli/images/OI_e105dc1c61e43862.jpg, cielo    ,       0.001, cielo
+  11, S01   , input/openimages/4_ritagli/images/OI_0caed09f453d4e1e.jpg, cielo    ,       0.001, cielo
+  12, S01   , input/openimages/4_ritagli/images/OI_51508a148b9862b2.jpg, cielo    ,       0.001, cielo
+  13, S01   , input/openimages/4_ritagli/images/OI_ec55b31f2041ca2c.jpg, cielo    ,       0.001, cielo
+  14, S01   , input/openimages/4_ritagli/images/OI_33379ecc2fa16010.jpg, cielo    ,       0.001, cielo
+  15, S01   , input/openimages/4_ritagli/images/OI_8376d0b58f65b9fe.jpg, cielo    ,       0.001, cielo
+  16, S01   , input/openimages/4_ritagli/images/OI_7fcf60084ed6df28.jpg, cielo    ,       0.001, orizzonte
+  17, S01   , input/openimages/4_ritagli/images/OI_bd71dfdfc65f4be2.jpg, cielo    ,       0.001, cielo
+  18, S01   , input/openimages/4_ritagli/images/OI_fc14279485e2ad06.jpg, cielo    ,       0.001, orizzonte
+  19, S01   , input/openimages/4_ritagli/images/OI_b2aac0721e2aba97.jpg, cielo    ,       0.001, orizzonte
+  20, S01   , input/openimages/4_ritagli/images/OI_f0a3be400a912bd9.jpg, cielo    ,       0.001, cielo
+  21, S01   , input/openimages/4_ritagli/images/OI_84354705138bdfe9.jpg, cielo    ,       0.001, cielo
+  22, S01   , input/openimages/4_ritagli/images/OI_5be1e68413ca6949.jpg, cielo    ,       0.001, cielo
+  23, S01   , input/openimages/4_ritagli/images/OI_cfb57b6dd3cde031.jpg, cielo    ,       0.001, cielo
+  24, S01   , input/openimages/4_ritagli/images/OI_ce014f16c6372b3a.jpg, cielo    ,       0.001, orizzonte
+  25, S01   , input/openimages/4_ritagli/images/OI_b23aa0917acfc8d4.jpg, cielo    ,       0.001, cielo
+  26, S01   , input/openimages/4_ritagli/images/OI_c7cf890d1d103aae.jpg, cielo    ,       0.001, orizzonte
+  27, S01   , input/openimages/4_ritagli/images/OI_455ba73b2ed91968.jpg, cielo    ,       0.001, orizzonte
+  28, S01   , input/openimages/4_ritagli/images/OI_d50b770a77186c7d.jpg, cielo    ,       0.002, cielo
+  29, S01   , input/openimages/4_ritagli/images/OI_6c03a64f3e815238.jpg, cielo    ,       0.002, orizzonte
+  30, S01   , input/openimages/4_ritagli/images/OI_83c0c30e2552d0f0.jpg, cielo    ,       0.002, cielo
+  31, S01   , input/openimages/4_ritagli/images/OI_6160acf2cf64ccd6.jpg, cielo    ,       0.002, cielo
+  32, S01   , input/openimages/4_ritagli/images/OI_86b8bf9ffdbdbfe1.jpg, cielo    ,       0.002, orizzonte
+  33, S01   , input/openimages/4_ritagli/images/OI_639eca80cfffc78b.jpg, cielo    ,       0.002, orizzonte
+  34, S01   , input/openimages/4_ritagli/images/OI_69a3bdbe98845c04.jpg, cielo    ,       0.002, cielo
+  35, S01   , input/openimages/4_ritagli/images/OI_f41bf06f470e07c4.jpg, cielo    ,       0.002, cielo
+  36, S01   , input/openimages/4_ritagli/images/OI_953f4b85cd0f7b36.jpg, cielo    ,       0.002, cielo
+  37, S01   , input/openimages/4_ritagli/images/OI_07ba1443b8782406.jpg, cielo    ,       0.002, cielo
+  38, S01   , input/openimages/4_ritagli/images/OI_5bbbca0b2d41e2aa.jpg, cielo    ,       0.002, cielo
+  39, S01   , input/openimages/4_ritagli/images/OI_7b654199120fae49.jpg, cielo    ,       0.002, cielo
+  40, S01   , input/openimages/4_ritagli/images/OI_2a22656c86457a81.jpg, cielo    ,       0.002, cielo
+  41, S01   , input/openimages/4_ritagli/images/OI_3656a0ff6042ddbb.jpg, cielo    ,       0.002, cielo
+  42, S01   , input/openimages/4_ritagli/images/OI_a1e502fa1b929f1a.jpg, cielo    ,       0.002, cielo
+  43, S01   , input/openimages/4_ritagli/images/OI_558b5c3cc8a20c98.jpg, cielo    ,       0.002, cielo
+  44, S01   , input/openimages/4_ritagli/images/OI_debba0f880182e65.jpg, cielo    ,       0.002, cielo
+  45, S01   , input/openimages/4_ritagli/images/OI_7218460891b00da1.jpg, cielo    ,       0.002, cielo
+  46, S01   , input/openimages/4_ritagli/images/OI_f4f0616b1e2a77f4.jpg, cielo    ,       0.003, cielo
+  47, S01   , input/openimages/4_ritagli/images/OI_e34d525a9994af26.jpg, cielo    ,       0.003, orizzonte
+  48, S01   , input/openimages/4_ritagli/images/OI_b601f3d4f689f51f.jpg, cielo    ,       0.003, orizzonte
+  49, S02   , input/openimages/4_ritagli/images/OI_4a3afb09ed76fe09.jpg, cielo    ,       0.003, cielo
+  50, S02   , input/openimages/4_ritagli/images/OI_cefed405f04174fa.jpg, cielo    ,       0.003, cielo
+  51, S02   , input/openimages/4_ritagli/images/OI_8e1c19c949b4d55e.jpg, cielo    ,       0.003, cielo
+  52, S02   , input/openimages/4_ritagli/images/OI_bc51fcd59cd38172.jpg, cielo    ,       0.003, cielo
+  53, S02   , input/openimages/4_ritagli/images/OI_6d092700806d8fa9.jpg, cielo    ,       0.003, orizzonte
+  54, S02   , input/openimages/4_ritagli/images/OI_538f34f1a58e5345.jpg, cielo    ,       0.003, orizzonte
+  55, S02   , input/openimages/4_ritagli/images/OI_3afa4f03ec5c212e.jpg, cielo    ,       0.004, orizzonte
+  56, S02   , input/openimages/4_ritagli/images/OI_4ad3e5310db3b2fd.jpg, cielo    ,       0.004, cielo
+  57, S02   , input/openimages/4_ritagli/images/OI_9be0a73267b9c439.jpg, cielo    ,       0.004, cielo
+  58, S02   , input/openimages/4_ritagli/images/OI_e67f7600de1b4811.jpg, cielo    ,       0.004, cielo
+  59, S02   , input/openimages/4_ritagli/images/OI_1f57ce11c731b20a.jpg, cielo    ,       0.004, cielo
+  60, S02   , input/openimages/4_ritagli/images/OI_c148683b72657962.jpg, cielo    ,       0.004, cielo
+  61, S02   , input/openimages/4_ritagli/images/OI_86b1018b4b9c5352.jpg, cielo    ,       0.004, orizzonte
+  62, S02   , input/openimages/4_ritagli/images/OI_c147397d6832e629.jpg, cielo    ,       0.004, cielo
+  63, S02   , input/openimages/4_ritagli/images/OI_865adfd463af7d00.jpg, cielo    ,       0.004, orizzonte
+  64, S02   , input/openimages/4_ritagli/images/OI_63e50360c4a48584.jpg, cielo    ,       0.005, cielo
+  65, S02   , input/openimages/4_ritagli/images/OI_9d5e908759e11ed1.jpg, cielo    ,       0.005, cielo
+  66, S02   , input/openimages/4_ritagli/images/OI_abdb6514db462010.jpg, cielo    ,       0.005, cielo
+  67, S02   , input/openimages/4_ritagli/images/OI_bb14e453b94ef596.jpg, cielo    ,       0.005, cielo
+  68, S02   , input/openimages/4_ritagli/images/OI_720ac120c5c1f149.jpg, cielo    ,       0.005, cielo
+  69, S02   , input/openimages/4_ritagli/images/OI_cd210d9a5a5c0699.jpg, cielo    ,       0.005, cielo
+  70, S02   , input/openimages/4_ritagli/images/OI_478bf4656e1a05e3.jpg, cielo    ,       0.005, cielo
+  71, S02   , input/openimages/4_ritagli/images/OI_562cbf22d5fa6bb8.jpg, cielo    ,       0.005, cielo
+  72, S02   , input/openimages/4_ritagli/images/OI_c4a56b6f2db29905.jpg, cielo    ,       0.006, cielo
+  73, S02   , input/openimages/4_ritagli/images/OI_f0aa9ddeb9003fe3.jpg, cielo    ,       0.006, cielo
+  74, S02   , input/openimages/4_ritagli/images/OI_4466e2c9e8824596.jpg, cielo    ,       0.006, cielo
+  75, S02   , input/openimages/4_ritagli/images/OI_a637c6c629c9e487.jpg, cielo    ,       0.006, cielo
+  76, S02   , input/openimages/4_ritagli/images/OI_4fe9ce922b33ae36.jpg, cielo    ,       0.006, cielo
+  77, S02   , input/openimages/4_ritagli/images/OI_a8f2c61da3dc9bbf.jpg, cielo    ,       0.006, cielo
+  78, S02   , input/openimages/4_ritagli/images/OI_17b118d39d5e5948.jpg, cielo    ,       0.006, cielo
+  79, S02   , input/openimages/4_ritagli/images/OI_81a835e02278947d.jpg, cielo    ,       0.006, orizzonte
+  80, S02   , input/openimages/4_ritagli/images/OI_f761e2a9436bb51f.jpg, cielo    ,       0.006, cielo
+  81, S02   , input/openimages/4_ritagli/images/OI_3e89e92d0b2f0820.jpg, cielo    ,       0.006, cielo
+  82, S02   , input/openimages/4_ritagli/images/OI_d1608cbd6314fc20.jpg, cielo    ,       0.006, cielo
+  83, S02   , input/openimages/4_ritagli/images/OI_1e5365cb59d12651.jpg, cielo    ,       0.007, orizzonte
+  84, S02   , input/openimages/4_ritagli/images/OI_24eb627ec3e6a45c.jpg, cielo    ,       0.007, cielo
+  85, S02   , input/openimages/4_ritagli/images/OI_6ae5cab5b8555fd6.jpg, cielo    ,       0.007, orizzonte
+  86, S02   , input/openimages/4_ritagli/images/OI_c366f70edb76edd7.jpg, cielo    ,       0.007, cielo
+  87, S02   , input/openimages/4_ritagli/images/OI_96bdbb6c4f30b77b.jpg, cielo    ,       0.007, orizzonte
+  88, S02   , input/openimages/4_ritagli/images/OI_00d9d7792bf8c583.jpg, orizzonte    ,       0.008, cielo
+  89, S02   , input/openimages/4_ritagli/images/OI_1895b1b2174638a1.jpg, cielo    ,       0.008, orizzonte
+  90, S02   , input/openimages/4_ritagli/images/OI_c57abf5c9613d9ea.jpg, cielo    ,       0.008, cielo
+  91, S02   , input/openimages/4_ritagli/images/OI_00da3e2881f9db42.jpg, cielo    ,       0.008, cielo
+  92, S02   , input/openimages/4_ritagli/images/OI_1d131ba9b79e532a.jpg, cielo    ,       0.008, orizzonte
+  93, S02   , input/openimages/4_ritagli/images/OI_3342fb5ed8ddff3e.jpg, cielo    ,       0.008, cielo
+  94, S02   , input/openimages/4_ritagli/images/OI_70a74d3f2564ecfb.jpg, cielo    ,       0.008, orizzonte
+  95, S02   , input/openimages/4_ritagli/images/OI_124ce32c6ee58cce.jpg, cielo    ,       0.009, cielo
+  96, S02   , input/openimages/4_ritagli/images/OI_29ede5f413cfc82c.jpg, cielo    ,       0.009, cielo
+  97, S03   , input/openimages/4_ritagli/images/OI_29ac732623b49e63.jpg, cielo    ,       0.009, orizzonte
+  98, S03   , input/openimages/4_ritagli/images/OI_6d7383cecbb0a0b5.jpg, cielo    ,       0.009, cielo
+  99, S03   , input/openimages/4_ritagli/images/OI_5126653dccf52bea.jpg, cielo    ,       0.009, orizzonte
+ 100, S03   , input/openimages/4_ritagli/images/OI_0be554ab73af1a47.jpg, cielo    ,       0.01 , cielo
+ 101, S03   , input/openimages/4_ritagli/images/OI_a73d013b04a74c4d.jpg, cielo    ,       0.01 , cielo
+ 102, S03   , input/openimages/4_ritagli/images/OI_17861c999326ef82.jpg, cielo    ,       0.01 , cielo
+ 103, S03   , input/openimages/4_ritagli/images/OI_9d61ef683f1d46a1.jpg, cielo    ,       0.011, orizzonte
+ 104, S03   , input/openimages/4_ritagli/images/OI_b038ae2c4ecccc6d.jpg, cielo    ,       0.011, orizzonte
+ 105, S03   , input/openimages/4_ritagli/images/OI_27e59184c6c621dc.jpg, cielo    ,       0.011, orizzonte
+ 106, S03   , input/openimages/4_ritagli/images/OI_2948ba17630b403a.jpg, cielo    ,       0.011, orizzonte
+ 107, S03   , input/openimages/4_ritagli/images/OI_edc6126696a31909.jpg, cielo    ,       0.011, cielo
+ 108, S03   , input/openimages/4_ritagli/images/OI_6b6452ab980794b1.jpg, cielo    ,       0.011, cielo
+ 109, S03   , input/openimages/4_ritagli/images/OI_a7b6d534da75918b.jpg, cielo    ,       0.012, orizzonte
+ 110, S03   , input/openimages/4_ritagli/images/OI_13235ad039b2742b.jpg, cielo    ,       0.012, orizzonte
+ 111, S03   , input/openimages/4_ritagli/images/OI_6e5c54a12f910d4b.jpg, cielo    ,       0.012, cielo
+ 112, S03   , input/openimages/4_ritagli/images/OI_c5ec8460550d5c6e.jpg, cielo    ,       0.012, orizzonte
+ 113, S03   , input/openimages/4_ritagli/images/OI_f168068e0681bb08.jpg, cielo    ,       0.012, orizzonte
+ 114, S03   , input/openimages/4_ritagli/images/OI_be43a0db2212e900.jpg, cielo    ,       0.012, cielo
+ 115, S03   , input/openimages/4_ritagli/images/OI_234766bd5dc7c51e.jpg, cielo    ,       0.012, cielo
+ 116, S03   , input/openimages/4_ritagli/images/OI_9c21ba5db80589c8.jpg, cielo    ,       0.013, orizzonte
+ 117, S03   , input/openimages/4_ritagli/images/OI_50f281a665e0deda.jpg, cielo    ,       0.014, cielo
+ 118, S03   , input/openimages/4_ritagli/images/OI_e6fc3202096f3ac2.jpg, cielo    ,       0.014, orizzonte
+ 119, S03   , input/openimages/4_ritagli/images/OI_72f93d3a5b4467e5.jpg, cielo    ,       0.014, orizzonte
+ 120, S03   , input/openimages/4_ritagli/images/OI_7cc5ce9c86325cc8.jpg, cielo    ,       0.015, cielo
+ 121, S03   , input/openimages/4_ritagli/images/OI_8a316854fd2760d1.jpg, cielo    ,       0.015, cielo
+ 122, S03   , input/openimages/4_ritagli/images/OI_b181d5937350d1aa.jpg, cielo    ,       0.015, orizzonte
+ 123, S03   , input/openimages/4_ritagli/images/OI_c00fcb45252189be.jpg, cielo    ,       0.015, orizzonte
+ 124, S03   , input/openimages/4_ritagli/images/OI_ebbf685401359939.jpg, cielo    ,       0.015, cielo
+ 125, S03   , input/openimages/4_ritagli/images/OI_6792c7bcb48440c4.jpg, cielo    ,       0.015, cielo
+ 126, S03   , input/openimages/4_ritagli/images/OI_2bcd87df5c89f411.jpg, cielo    ,       0.015, cielo
+ 127, S03   , input/openimages/4_ritagli/images/OI_ff59777f20242338.jpg, cielo    ,       0.016, cielo
+ 128, S03   , input/openimages/4_ritagli/images/OI_1a10e4d3ac55c95a.jpg, cielo    ,       0.016, cielo
+ 129, S03   , input/openimages/4_ritagli/images/OI_2f6e75e1965952e2.jpg, cielo    ,       0.016, cielo
+ 130, S03   , input/openimages/4_ritagli/images/OI_2e073eebbdc2aeb5.jpg, cielo    ,       0.016, cielo
+ 131, S03   , input/openimages/4_ritagli/images/OI_4ab7e325ed169610.jpg, cielo    ,       0.017, cielo
+ 132, S03   , input/openimages/4_ritagli/images/OI_4d0aed9606fcdaa3.jpg, cielo    ,       0.017, cielo
+ 133, S03   , input/openimages/4_ritagli/images/OI_9f3f97c1872ae9e5.jpg, cielo    ,       0.018, cielo
+ 134, S03   , input/openimages/4_ritagli/images/OI_79a539c6daef5730.jpg, cielo    ,       0.018, cielo
+ 135, S03   , input/openimages/4_ritagli/images/OI_9296f50b2b8a5fd7.jpg, cielo    ,       0.018, cielo
+ 136, S03   , input/openimages/4_ritagli/images/OI_66f4db11d7e9c8d7.jpg, cielo    ,       0.018, orizzonte
+ 137, S03   , input/openimages/4_ritagli/images/OI_644fd231e56ee599.jpg, cielo    ,       0.018, cielo
+ 138, S03   , input/openimages/4_ritagli/images/OI_af9151fd54017999.jpg, cielo    ,       0.019, orizzonte
+ 139, S03   , input/openimages/4_ritagli/images/OI_481cfae0c13d0349.jpg, cielo    ,       0.019, orizzonte
+ 140, S03   , input/openimages/4_ritagli/images/OI_9b9d787f705fcb0c.jpg, cielo    ,       0.019, orizzonte
+ 141, S03   , input/openimages/4_ritagli/images/OI_c9151803e44bafc7.jpg, cielo    ,       0.019, cielo
+ 142, S03   , input/openimages/4_ritagli/images/OI_f873558d432b8806.jpg, cielo    ,       0.019, cielo
+ 143, S03   , input/openimages/4_ritagli/images/OI_ac106e36ef303bad.jpg, cielo    ,       0.019, cielo
+ 144, S03   , input/openimages/4_ritagli/images/OI_15a85f16e64607ba.jpg, cielo    ,       0.019, orizzonte
+ 145, S04   , input/openimages/4_ritagli/images/OI_411f821471426ffc.jpg, cielo    ,       0.019, cielo
+ 146, S04   , input/openimages/4_ritagli/images/OI_6d920358ab5dcc49.jpg, cielo    ,       0.019, cielo
+ 147, S04   , input/openimages/4_ritagli/images/OI_7294b238b4aa4dc2.jpg, cielo    ,       0.019, orizzonte
+ 148, S04   , input/openimages/4_ritagli/images/OI_5b6440f4417b353f.jpg, cielo    ,       0.02 , cielo
+ 149, S04   , input/openimages/4_ritagli/images/OI_d4b353707c916c6a.jpg, cielo    ,       0.02 , orizzonte
+ 150, S04   , input/openimages/4_ritagli/images/OI_a511e7d47e4a0adc.jpg, cielo    ,       0.021, cielo
+ 151, S04   , input/openimages/4_ritagli/images/OI_b44d13c6150e84f8.jpg, cielo    ,       0.021, cielo
+ 152, S04   , input/openimages/4_ritagli/images/OI_00eb3b32abf6f0e2.jpg, cielo    ,       0.021, orizzonte
+ 153, S04   , input/openimages/4_ritagli/images/OI_98c3eeaed30962ba.jpg, cielo    ,       0.021, orizzonte
+ 154, S04   , input/openimages/4_ritagli/images/OI_ad71a66ebc3aa0c6.jpg, cielo    ,       0.022, cielo
+ 155, S04   , input/openimages/4_ritagli/images/OI_a0d2ffa6c3c76dcf.jpg, cielo    ,       0.023, cielo
+ 156, S04   , input/openimages/4_ritagli/images/OI_b3e49c44755f4553.jpg, cielo    ,       0.023, cielo
+ 157, S04   , input/openimages/4_ritagli/images/OI_a882a4cdfd08bdf2.jpg, cielo    ,       0.023, cielo
+ 158, S04   , input/openimages/4_ritagli/images/OI_de48f9dab88618c8.jpg, cielo    ,       0.023, orizzonte
+ 159, S04   , input/openimages/4_ritagli/images/OI_8801b185ef022a75.jpg, cielo    ,       0.024, orizzonte
+ 160, S04   , input/openimages/4_ritagli/images/OI_9268600df8ecb47a.jpg, cielo    ,       0.024, cielo
+ 161, S04   , input/openimages/4_ritagli/images/OI_a70d4792342f42c9.jpg, cielo    ,       0.024, orizzonte
+ 162, S04   , input/openimages/4_ritagli/images/OI_15dbe8c81625aacf.jpg, cielo    ,       0.024, orizzonte
+ 163, S04   , input/openimages/4_ritagli/images/OI_9d3537a299f3daad.jpg, cielo    ,       0.025, orizzonte
+ 164, S04   , input/openimages/4_ritagli/images/OI_c95565afeabbbe75.jpg, cielo    ,       0.025, orizzonte
+ 165, S04   , input/openimages/4_ritagli/images/OI_18478eeea7fa4d0a.jpg, cielo    ,       0.025, cielo
+ 166, S04   , input/openimages/4_ritagli/images/OI_f9e65335f48daddf.jpg, cielo    ,       0.025, cielo
+ 167, S04   , input/openimages/4_ritagli/images/OI_112e3fb0a79e288d.jpg, cielo    ,       0.025, cielo
+ 168, S04   , input/openimages/4_ritagli/images/OI_939cca2c93b2864b.jpg, cielo    ,       0.025, cielo
+ 169, S04   , input/openimages/4_ritagli/images/OI_203a8bcc2dab7aaf.jpg, cielo    ,       0.025, cielo
+ 170, S04   , input/openimages/4_ritagli/images/OI_30f21b787f7c8028.jpg, cielo    ,       0.026, orizzonte
+ 171, S04   , input/openimages/4_ritagli/images/OI_1233b2e45f5dbaa6.jpg, cielo    ,       0.026, orizzonte
+ 172, S04   , input/openimages/4_ritagli/images/OI_8e943fff3b5a5e25.jpg, cielo    ,       0.026, orizzonte
+ 173, S04   , input/openimages/4_ritagli/images/OI_eae6a1789e1fc242.jpg, cielo    ,       0.026, orizzonte
+ 174, S04   , input/openimages/4_ritagli/images/OI_cc715c7b41fc1464.jpg, cielo    ,       0.026, orizzonte
+ 175, S04   , input/openimages/4_ritagli/images/OI_8fde0afdeb96afc0.jpg, cielo    ,       0.027, cielo
+ 176, S04   , input/openimages/4_ritagli/images/OI_fd1e9db8318d3311.jpg, cielo    ,       0.027, orizzonte
+ 177, S04   , input/openimages/4_ritagli/images/OI_243db2ddb52e9090.jpg, cielo    ,       0.027, cielo
+ 178, S04   , input/openimages/4_ritagli/images/OI_b4fca86187812e8a.jpg, cielo    ,       0.027, cielo
+ 179, S04   , input/openimages/4_ritagli/images/OI_84342f9dc7e85bb6.jpg, cielo    ,       0.029, cielo
+ 180, S04   , input/openimages/4_ritagli/images/OI_84e530498b1797b2.jpg, cielo    ,       0.029, orizzonte
+ 181, S04   , input/openimages/4_ritagli/images/OI_3a578bcac8998749.jpg, cielo    ,       0.029, cielo
+ 182, S04   , input/openimages/4_ritagli/images/OI_69f4f0ea4aa9a0f3.jpg, cielo    ,       0.029, orizzonte
+ 183, S04   , input/openimages/4_ritagli/images/OI_301a2bfbd3398cec.jpg, cielo    ,       0.03 , cielo
+ 184, S04   , input/openimages/4_ritagli/images/OI_5dbc27129042f546.jpg, cielo    ,       0.03 , cielo
+ 185, S04   , input/openimages/4_ritagli/images/OI_9f23d777c55bb974.jpg, cielo    ,       0.03 , orizzonte
+ 186, S04   , input/openimages/4_ritagli/images/OI_f60b5cc587b8b688.jpg, cielo    ,       0.032, orizzonte
+ 187, S04   , input/openimages/4_ritagli/images/OI_ce3128d9f585072c.jpg, cielo    ,       0.032, cielo
+ 188, S04   , input/openimages/4_ritagli/images/OI_df4a5a9b88a28380.jpg, cielo    ,       0.032, cielo
+ 189, S04   , input/openimages/4_ritagli/images/OI_ba693d0c1cb42046.jpg, cielo    ,       0.033, orizzonte
+ 190, S04   , input/openimages/4_ritagli/images/OI_dda46fb5e825f043.jpg, cielo    ,       0.033, cielo
+ 191, S04   , input/openimages/4_ritagli/images/OI_06808d8d978aadc2.jpg, cielo    ,       0.033, orizzonte
+ 192, S04   , input/openimages/4_ritagli/images/OI_e34244dadef8046a.jpg, cielo    ,       0.034, orizzonte
+ 193, S05   , input/openimages/4_ritagli/images/OI_f76f6a48496fb616.jpg, cielo    ,       0.034, orizzonte
+ 194, S05   , input/openimages/4_ritagli/images/OI_d3bbcada45d56c42.jpg, cielo    ,       0.035, orizzonte
+ 195, S05   , input/openimages/4_ritagli/images/OI_47f24bee0c5257b8.jpg, cielo    ,       0.036, cielo
+ 196, S05   , input/openimages/4_ritagli/images/OI_b2df67b913b63619.jpg, cielo    ,       0.036, orizzonte
+ 197, S05   , input/openimages/4_ritagli/images/OI_218286ba4b3c3533.jpg, cielo    ,       0.036, orizzonte
+ 198, S05   , input/openimages/4_ritagli/images/OI_452b254cd4e11b8c.jpg, cielo    ,       0.036, cielo
+ 199, S05   , input/openimages/4_ritagli/images/OI_dd48ebf8d9cc78eb.jpg, cielo    ,       0.037, orizzonte
+ 200, S05   , input/openimages/4_ritagli/images/OI_af7795cd7dbbf406.jpg, cielo    ,       0.037, orizzonte
+ 201, S05   , input/openimages/4_ritagli/images/OI_0522fa267f284165.jpg, cielo    ,       0.038, orizzonte
+ 202, S05   , input/openimages/4_ritagli/images/OI_fce6179455327710.jpg, cielo    ,       0.038, cielo
+ 203, S05   , input/openimages/4_ritagli/images/OI_bde9218d29a13820.jpg, cielo    ,       0.038, cielo
+ 204, S05   , input/openimages/4_ritagli/images/OI_7d54632aba309c29.jpg, cielo    ,       0.039, orizzonte
+ 205, S05   , input/openimages/4_ritagli/images/OI_bf84a4cd999cbaf7.jpg, cielo    ,       0.039, cielo
+ 206, S05   , input/openimages/4_ritagli/images/OI_aea76354713368d6.jpg, cielo    ,       0.039, cielo
+ 207, S05   , input/openimages/4_ritagli/images/OI_125e6d002321acfc.jpg, cielo    ,       0.039, orizzonte
+ 208, S05   , input/openimages/4_ritagli/images/OI_a38cde2f490fb34e.jpg, cielo    ,       0.039, cielo
+ 209, S05   , input/openimages/4_ritagli/images/OI_f09e29671f6f8b69.jpg, cielo    ,       0.04 , cielo
+ 210, S05   , input/openimages/4_ritagli/images/OI_a5584aa083f76c93.jpg, cielo    ,       0.041, orizzonte
+ 211, S05   , input/openimages/4_ritagli/images/OI_d60a04a9d6689468.jpg, cielo    ,       0.041, cielo
+ 212, S05   , input/openimages/4_ritagli/images/OI_ad2673a9c39188e6.jpg, cielo    ,       0.041, cielo
+ 213, S05   , input/openimages/4_ritagli/images/OI_bba71b7631bae704.jpg, cielo    ,       0.041, cielo
+ 214, S05   , input/openimages/4_ritagli/images/OI_0d75e1d57855cccc.jpg, cielo    ,       0.042, orizzonte
+ 215, S05   , input/openimages/4_ritagli/images/OI_b74129fbf38fb981.jpg, cielo    ,       0.042, cielo
+ 216, S05   , input/openimages/4_ritagli/images/OI_c36e698e8d4bf524.jpg, cielo    ,       0.042, orizzonte
+ 217, S05   , input/openimages/4_ritagli/images/OI_b0eab158bd5c3c6a.jpg, cielo    ,       0.043, orizzonte
+ 218, S05   , input/openimages/4_ritagli/images/OI_dc7828adc0923518.jpg, cielo    ,       0.043, orizzonte
+ 219, S05   , input/openimages/4_ritagli/images/OI_da7dca2d165dbecc.jpg, cielo    ,       0.044, orizzonte
+ 220, S05   , input/openimages/4_ritagli/images/OI_9adbdc9913d9ad86.jpg, cielo    ,       0.044, orizzonte
+ 221, S05   , input/openimages/4_ritagli/images/OI_b5e67d936b928139.jpg, cielo    ,       0.044, cielo
+ 222, S05   , input/openimages/4_ritagli/images/OI_69ff418254c30432.jpg, cielo    ,       0.045, cielo
+ 223, S05   , input/openimages/4_ritagli/images/OI_569107ec7cb1154c.jpg, cielo    ,       0.045, cielo
+ 224, S05   , input/openimages/4_ritagli/images/OI_8658cfcb62f303a0.jpg, cielo    ,       0.047, cielo
+ 225, S05   , input/openimages/4_ritagli/images/OI_265c434d1fed5dbe.jpg, cielo    ,       0.048, cielo
+ 226, S05   , input/openimages/4_ritagli/images/OI_a91e47fb14307593.jpg, cielo    ,       0.048, orizzonte
+ 227, S05   , input/openimages/4_ritagli/images/OI_2717fb742586f5c9.jpg, cielo    ,       0.049, orizzonte
+ 228, S05   , input/openimages/4_ritagli/images/OI_41aa2a12a5dfbeb1.jpg, cielo    ,       0.05 , cielo
+ 229, S05   , input/openimages/4_ritagli/images/OI_84eec6d0ab0660be.jpg, cielo    ,       0.051, cielo
+ 230, S05   , input/openimages/4_ritagli/images/OI_f341824b14a0f87d.jpg, cielo    ,       0.052, cielo
+ 231, S05   , input/openimages/4_ritagli/images/OI_68fe125c69830937.jpg, cielo    ,       0.053, cielo
+ 232, S05   , input/openimages/4_ritagli/images/OI_d3d815a9801e85b9.jpg, cielo    ,       0.053, orizzonte
+ 233, S05   , input/openimages/4_ritagli/images/OI_d7d6cdd48d42c5a4.jpg, cielo    ,       0.053, orizzonte
+ 234, S05   , input/openimages/4_ritagli/images/OI_23eefa130976de10.jpg, cielo    ,       0.053, orizzonte
+ 235, S05   , input/openimages/4_ritagli/images/OI_32862893fe5b29d8.jpg, cielo    ,       0.054, cielo
+ 236, S05   , input/openimages/4_ritagli/images/OI_b60651527bd54e99.jpg, cielo    ,       0.054, orizzonte
+ 237, S05   , input/openimages/4_ritagli/images/OI_a49a08d2a3a5b00e.jpg, cielo    ,       0.055, cielo
+ 238, S05   , input/openimages/4_ritagli/images/OI_39dd29ffad5f8acf.jpg, cielo    ,       0.055, cielo
+ 239, S05   , input/openimages/4_ritagli/images/OI_5af7b698e63c1029.jpg, cielo    ,       0.055, orizzonte
+ 240, S05   , input/openimages/4_ritagli/images/OI_2dfa4937722b86c3.jpg, cielo    ,       0.055, cielo
+ 241, S06   , input/openimages/4_ritagli/images/OI_865a25560f0ca4c8.jpg, cielo    ,       0.055, orizzonte
+ 242, S06   , input/openimages/4_ritagli/images/OI_f4b42bc473da22d9.jpg, cielo    ,       0.055, orizzonte
+ 243, S06   , input/openimages/4_ritagli/images/OI_dd234b7042e9d5c8.jpg, cielo    ,       0.056, cielo
+ 244, S06   , input/openimages/4_ritagli/images/OI_3d96808fefa99a4a.jpg, cielo    ,       0.057, orizzonte
+ 245, S06   , input/openimages/4_ritagli/images/OI_1aa0b9acc88c00f0.jpg, cielo    ,       0.057, orizzonte
+ 246, S06   , input/openimages/4_ritagli/images/OI_229dbffeabf48b7e.jpg, cielo    ,       0.058, cielo
+ 247, S06   , input/openimages/4_ritagli/images/OI_5c8f0efad2780e09.jpg, cielo    ,       0.058, cielo
+ 248, S06   , input/openimages/4_ritagli/images/OI_9b1981e08a366671.jpg, cielo    ,       0.059, cielo
+ 249, S06   , input/openimages/4_ritagli/images/OI_ca5b1557e9e13672.jpg, cielo    ,       0.059, cielo
+ 250, S06   , input/openimages/4_ritagli/images/OI_93825ef920780000.jpg, cielo    ,       0.06 , cielo
+ 251, S06   , input/openimages/4_ritagli/images/OI_97a20fccd16fd694.jpg, cielo    ,       0.06 , cielo
+ 252, S06   , input/openimages/4_ritagli/images/OI_3ed6d3e59cbafe57.jpg, cielo    ,       0.063, orizzonte
+ 253, S06   , input/openimages/4_ritagli/images/OI_496ff2ab9ea93b3f.jpg, cielo    ,       0.064, cielo
+ 254, S06   , input/openimages/4_ritagli/images/OI_9da2903d6cd7f1b3.jpg, cielo    ,       0.064, cielo
+ 255, S06   , input/openimages/4_ritagli/images/OI_391d7ff68d12a59c.jpg, cielo    ,       0.064, orizzonte
+ 256, S06   , input/openimages/4_ritagli/images/OI_6f8eb620b76a4319.jpg, cielo    ,       0.064, cielo
+ 257, S06   , input/openimages/4_ritagli/images/OI_a108e793c96fc291.jpg, cielo    ,       0.064, orizzonte
+ 258, S06   , input/openimages/4_ritagli/images/OI_73564f79bc9f8c25.jpg, cielo    ,       0.065, orizzonte
+ 259, S06   , input/openimages/4_ritagli/images/OI_1158e85e58b879d2.jpg, cielo    ,       0.066, cielo
+ 260, S06   , input/openimages/4_ritagli/images/OI_d47f0f1a3552ce46.jpg, cielo    ,       0.068, cielo
+ 261, S06   , input/openimages/4_ritagli/images/OI_ebae259e11100e2e.jpg, cielo    ,       0.068, orizzonte
+ 262, S06   , input/openimages/4_ritagli/images/OI_3736ff973537cd9f.jpg, cielo    ,       0.069, orizzonte
+ 263, S06   , input/openimages/4_ritagli/images/OI_21174ddb597fba11.jpg, cielo    ,       0.069, cielo
+ 264, S06   , input/openimages/4_ritagli/images/OI_0033a2bdfd2f8a1b.jpg, cielo    ,       0.069, cielo
+ 265, S06   , input/openimages/4_ritagli/images/OI_dc320ead84b7b7de.jpg, cielo    ,       0.069, cielo
+ 266, S06   , input/openimages/4_ritagli/images/OI_6a99170247452b89.jpg, cielo    ,       0.07 , cielo
+ 267, S06   , input/openimages/4_ritagli/images/OI_00083b384685315d.jpg, cielo    ,       0.07 , cielo
+ 268, S06   , input/openimages/4_ritagli/images/OI_4b500a793718adaa.jpg, cielo    ,       0.071, orizzonte
+ 269, S06   , input/openimages/4_ritagli/images/OI_e542719ef48b9bb9.jpg, cielo    ,       0.071, cielo
+ 270, S06   , input/openimages/4_ritagli/images/OI_845ec7c188738322.jpg, cielo    ,       0.071, cielo
+ 271, S06   , input/openimages/4_ritagli/images/OI_cb2c431700b90afa.jpg, cielo    ,       0.072, orizzonte
+ 272, S06   , input/openimages/4_ritagli/images/OI_17bc4125c677f4f4.jpg, cielo    ,       0.073, cielo
+ 273, S06   , input/openimages/4_ritagli/images/OI_719db1fe640731d2.jpg, cielo    ,       0.074, cielo
+ 274, S06   , input/openimages/4_ritagli/images/OI_7218b3163b77186f.jpg, cielo    ,       0.075, cielo
+ 275, S06   , input/openimages/4_ritagli/images/OI_1aba2b51e808e0b1.jpg, cielo    ,       0.075, cielo
+ 276, S06   , input/openimages/4_ritagli/images/OI_79a94129851a4968.jpg, cielo    ,       0.075, cielo
+ 277, S06   , input/openimages/4_ritagli/images/OI_bee721eff1c01d6b.jpg, cielo    ,       0.076, cielo
+ 278, S06   , input/openimages/4_ritagli/images/OI_e3ce52acb24a2098.jpg, cielo    ,       0.077, cielo
+ 279, S06   , input/openimages/4_ritagli/images/OI_4f98e33c09bbf69f.jpg, cielo    ,       0.079, cielo
+ 280, S06   , input/openimages/4_ritagli/images/OI_721aa4e7cde8de8a.jpg, cielo    ,       0.079, orizzonte
+ 281, S06   , input/openimages/4_ritagli/images/OI_9784da23f78a7486.jpg, cielo    ,       0.079, cielo
+ 282, S06   , input/openimages/4_ritagli/images/OI_ed7d042734d413cd.jpg, cielo    ,       0.079, cielo
+ 283, S06   , input/openimages/4_ritagli/images/OI_c32d0cbf387186a5.jpg, cielo    ,       0.08 , orizzonte
+ 284, S06   , input/openimages/4_ritagli/images/OI_d36b1e7ab6183bfb.jpg, cielo    ,       0.08 , cielo
+ 285, S06   , input/openimages/4_ritagli/images/OI_c5a340124a94633e.jpg, cielo    ,       0.082, orizzonte
+ 286, S06   , input/openimages/4_ritagli/images/OI_6a273c8d78af3eb0.jpg, cielo    ,       0.083, cielo
+ 287, S06   , input/openimages/4_ritagli/images/OI_95b0c36dd147f454.jpg, cielo    ,       0.083, orizzonte
+ 288, S06   , input/openimages/4_ritagli/images/OI_ff26f230b638f2ab.jpg, cielo    ,       0.084, orizzonte
+ 289, S07   , input/openimages/4_ritagli/images/OI_6e4b54377473af68.jpg, cielo    ,       0.084, orizzonte
+ 290, S07   , input/openimages/4_ritagli/images/OI_294ef004ed1a049a.jpg, cielo    ,       0.086, cielo
+ 291, S07   , input/openimages/4_ritagli/images/OI_8ac3ea998448ea28.jpg, cielo    ,       0.086, orizzonte
+ 292, S07   , input/openimages/4_ritagli/images/OI_1c544e299c2807aa.jpg, cielo    ,       0.087, orizzonte
+ 293, S07   , input/openimages/4_ritagli/images/OI_0c476cfbfec412f0.jpg, cielo    ,       0.088, orizzonte
+ 294, S07   , input/openimages/4_ritagli/images/OI_83e0132548a11b02.jpg, cielo    ,       0.088, cielo
+ 295, S07   , input/openimages/4_ritagli/images/OI_8e1dcbdc25441d28.jpg, cielo    ,       0.088, orizzonte
+ 296, S07   , input/openimages/4_ritagli/images/OI_aaf378d56de78bda.jpg, cielo    ,       0.089, orizzonte
+ 297, S07   , input/openimages/4_ritagli/images/OI_82ce9419b648e474.jpg, cielo    ,       0.089, cielo
+ 298, S07   , input/openimages/4_ritagli/images/OI_8cb355b6932a23a5.jpg, cielo    ,       0.09 , cielo
+ 299, S07   , input/openimages/4_ritagli/images/OI_b1b6dd2923311184.jpg, cielo    ,       0.09 , cielo
+ 300, S07   , input/openimages/4_ritagli/images/OI_1fe605d0b64b9ce3.jpg, cielo    ,       0.091, cielo
+ 301, S07   , input/openimages/4_ritagli/images/OI_4a61320a75427f44.jpg, cielo    ,       0.091, orizzonte
+ 302, S07   , input/openimages/4_ritagli/images/OI_79c0f06c2d436409.jpg, cielo    ,       0.091, orizzonte
+ 303, S07   , input/openimages/4_ritagli/images/OI_385deb7153acf8bb.jpg, orizzonte    ,       0.092, cielo
+ 304, S07   , input/openimages/4_ritagli/images/OI_4ef1bafcd048fd9e.jpg, cielo    ,       0.093, cielo
+ 305, S07   , input/openimages/4_ritagli/images/OI_18d19b2a395c2aa3.jpg, cielo    ,       0.093, orizzonte
+ 306, S07   , input/openimages/4_ritagli/images/OI_076cc243fa84da5a.jpg, cielo    ,       0.094, cielo
+ 307, S07   , input/openimages/4_ritagli/images/OI_deb4971fba2a5270.jpg, cielo    ,       0.094, cielo
+ 308, S07   , input/openimages/4_ritagli/images/OI_ad75e3a8456261da.jpg, cielo    ,       0.095, cielo
+ 309, S07   , input/openimages/4_ritagli/images/OI_b0dd2cd18273ad7c.jpg, cielo    ,       0.096, orizzonte
+ 310, S07   , input/openimages/4_ritagli/images/OI_bbab11c1e5076b6e.jpg, orizzonte    ,       0.096, orizzonte
+ 311, S07   , input/openimages/4_ritagli/images/OI_753d1172f006d206.jpg, cielo    ,       0.096, cielo
+ 312, S07   , input/openimages/4_ritagli/images/OI_76d46d111e6c6464.jpg, cielo    ,       0.096, orizzonte
+ 313, S07   , input/openimages/4_ritagli/images/OI_2f770d98b3a3a5e3.jpg, cielo    ,       0.097, cielo
+ 314, S07   , input/openimages/4_ritagli/images/OI_9e69f3125adfb076.jpg, cielo    ,       0.097, orizzonte
+ 315, S07   , input/openimages/4_ritagli/images/OI_500fc02ce0a6f85f.jpg, cielo    ,       0.098, cielo
+ 316, S07   , input/openimages/4_ritagli/images/OI_8e74b15f6f7bc2af.jpg, cielo    ,       0.098, cielo
+ 317, S07   , input/openimages/4_ritagli/images/OI_80f21d3b3162ae2a.jpg, orizzonte    ,       0.098, cielo
+ 318, S07   , input/openimages/4_ritagli/images/OI_439ead09c5bbf196.jpg, cielo    ,       0.098, cielo
+ 319, S07   , input/openimages/4_ritagli/images/OI_eab3d0872b1eb9c1.jpg, cielo    ,       0.1  , cielo
+ 320, S07   , input/openimages/4_ritagli/images/OI_6e2b5a993e82cb71.jpg, cielo    ,       0.101, cielo
+ 321, S07   , input/openimages/4_ritagli/images/OI_666e96e2acb7c1f7.jpg, cielo    ,       0.101, cielo
+ 322, S07   , input/openimages/4_ritagli/images/OI_63cd4ac172af9993.jpg, cielo    ,       0.103, orizzonte
+ 323, S07   , input/openimages/4_ritagli/images/OI_6aa20bdcbcd0c5ba.jpg, cielo    ,       0.104, orizzonte
+ 324, S07   , input/openimages/4_ritagli/images/OI_a3f2b0845490cc5c.jpg, cielo    ,       0.104, cielo
+ 325, S07   , input/openimages/4_ritagli/images/OI_dab471c9f1da9193.jpg, cielo    ,       0.104, cielo
+ 326, S07   , input/openimages/4_ritagli/images/OI_efbec3dfcf20980c.jpg, cielo    ,       0.104, orizzonte
+ 327, S07   , input/openimages/4_ritagli/images/OI_fa7ed9cce66f34a3.jpg, orizzonte    ,       0.104, cielo
+ 328, S07   , input/openimages/4_ritagli/images/OI_585302265f270ed4.jpg, cielo    ,       0.105, orizzonte
+ 329, S07   , input/openimages/4_ritagli/images/OI_d1217948a38cd2bf.jpg, cielo    ,       0.105, cielo
+ 330, S07   , input/openimages/4_ritagli/images/OI_70a565a912ba779c.jpg, cielo    ,       0.106, orizzonte
+ 331, S07   , input/openimages/4_ritagli/images/OI_8fd12107c4d9303d.jpg, cielo    ,       0.106, orizzonte
+ 332, S07   , input/openimages/4_ritagli/images/OI_67cfa3a212d1a915.jpg, cielo    ,       0.106, cielo
+ 333, S07   , input/openimages/4_ritagli/images/OI_d359673088fe531e.jpg, cielo    ,       0.107, cielo
+ 334, S07   , input/openimages/4_ritagli/images/OI_632cdb6a0fba52f3.jpg, cielo    ,       0.109, cielo
+ 335, S07   , input/openimages/4_ritagli/images/OI_8e25bb1db474b415.jpg, cielo    ,       0.11 , cielo
+ 336, S07   , input/openimages/4_ritagli/images/OI_9db61ddd6364979e.jpg, cielo    ,       0.11 , orizzonte
+ 337, S08   , input/openimages/4_ritagli/images/OI_9b6b5008a248536c.jpg, cielo    ,       0.111, cielo
+ 338, S08   , input/openimages/4_ritagli/images/OI_b6d0184cbe60433c.jpg, cielo    ,       0.112, cielo
+ 339, S08   , input/openimages/4_ritagli/images/OI_cf039372f327e3f3.jpg, cielo    ,       0.113, cielo
+ 340, S08   , input/openimages/4_ritagli/images/OI_291c4e06550ef676.jpg, cielo    ,       0.113, cielo
+ 341, S08   , input/openimages/4_ritagli/images/OI_5a679b4cfc39882e.jpg, cielo    ,       0.113, cielo
+ 342, S08   , input/openimages/4_ritagli/images/OI_896f914045427e9a.jpg, cielo    ,       0.115, cielo
+ 343, S08   , input/openimages/4_ritagli/images/OI_5ba55393bfa8bddb.jpg, cielo    ,       0.116, orizzonte
+ 344, S08   , input/openimages/4_ritagli/images/OI_dbfa86d1b73ff7f4.jpg, cielo    ,       0.117, cielo
+ 345, S08   , input/openimages/4_ritagli/images/OI_9c17b2c6372a8c82.jpg, cielo    ,       0.117, orizzonte
+ 346, S08   , input/openimages/4_ritagli/images/OI_276f06139304128c.jpg, cielo    ,       0.117, orizzonte
+ 347, S08   , input/openimages/4_ritagli/images/OI_8410160011ac2f30.jpg, cielo    ,       0.12 , cielo
+ 348, S08   , input/openimages/4_ritagli/images/OI_81717d4d0d668f64.jpg, cielo    ,       0.123, cielo
+ 349, S08   , input/openimages/4_ritagli/images/OI_d7576d419101156a.jpg, cielo    ,       0.123, orizzonte
+ 350, S08   , input/openimages/4_ritagli/images/OI_a694b169b77c4ee7.jpg, cielo    ,       0.124, orizzonte
+ 351, S08   , input/openimages/4_ritagli/images/OI_96a1ad5e51dfe0a5.jpg, cielo    ,       0.124, orizzonte
+ 352, S08   , input/openimages/4_ritagli/images/OI_1cade7d01571b602.jpg, cielo    ,       0.125, cielo
+ 353, S08   , input/openimages/4_ritagli/images/OI_84c3840d76658917.jpg, cielo    ,       0.125, cielo
+ 354, S08   , input/openimages/4_ritagli/images/OI_37cd1c11c25ab6cc.jpg, cielo    ,       0.126, cielo
+ 355, S08   , input/openimages/4_ritagli/images/OI_5b424bc060aa85fc.jpg, cielo    ,       0.126, cielo
+ 356, S08   , input/openimages/4_ritagli/images/OI_70bd1aa5d23ddd05.jpg, cielo    ,       0.126, cielo
+ 357, S08   , input/openimages/4_ritagli/images/OI_5483e2da854752d1.jpg, cielo    ,       0.127, cielo
+ 358, S08   , input/openimages/4_ritagli/images/OI_7d1fd09946081087.jpg, cielo    ,       0.127, cielo
+ 359, S08   , input/openimages/4_ritagli/images/OI_93cecfa40f61c523.jpg, cielo    ,       0.128, orizzonte
+ 360, S08   , input/openimages/4_ritagli/images/OI_619134034802891b.jpg, cielo    ,       0.129, cielo
+ 361, S08   , input/openimages/4_ritagli/images/OI_7c1f7135cbb3ffcc.jpg, cielo    ,       0.13 , cielo
+ 362, S08   , input/openimages/4_ritagli/images/OI_e01e40faf88e27a9.jpg, cielo    ,       0.131, cielo
+ 363, S08   , input/openimages/4_ritagli/images/OI_4fb37d535c39a099.jpg, cielo    ,       0.133, cielo
+ 364, S08   , input/openimages/4_ritagli/images/OI_5e64273dd3808a3c.jpg, cielo    ,       0.134, cielo
+ 365, S08   , input/openimages/4_ritagli/images/OI_6db347e92a51b700.jpg, cielo    ,       0.134, cielo
+ 366, S08   , input/openimages/4_ritagli/images/OI_01bcd1c93e2edc81.jpg, cielo    ,       0.135, orizzonte
+ 367, S08   , input/openimages/4_ritagli/images/OI_566e904e3886ae7f.jpg, cielo    ,       0.135, cielo
+ 368, S08   , input/openimages/4_ritagli/images/OI_a37d34b7644667ff.jpg, cielo    ,       0.136, cielo
+ 369, S08   , input/openimages/4_ritagli/images/OI_573bff42b2bc5f99.jpg, cielo    ,       0.136, cielo
+ 370, S08   , input/openimages/4_ritagli/images/OI_5c6388809b97fff2.jpg, cielo    ,       0.136, orizzonte
+ 371, S08   , input/openimages/4_ritagli/images/OI_b121cc5df7817d2a.jpg, cielo    ,       0.136, orizzonte
+ 372, S08   , input/openimages/4_ritagli/images/OI_d3fec53e144299f7.jpg, cielo    ,       0.137, cielo
+ 373, S08   , input/openimages/4_ritagli/images/OI_c5724b198674e591.jpg, cielo    ,       0.138, cielo
+ 374, S08   , input/openimages/4_ritagli/images/OI_dae5282f7b228f86.jpg, cielo    ,       0.138, cielo
+ 375, S08   , input/openimages/4_ritagli/images/OI_7b472c7f21829159.jpg, cielo    ,       0.139, orizzonte
+ 376, S08   , input/openimages/4_ritagli/images/OI_09d82b7a6d6d8da9.jpg, cielo    ,       0.139, cielo
+ 377, S08   , input/openimages/4_ritagli/images/OI_0d978ef80811574c.jpg, cielo    ,       0.139, orizzonte
+ 378, S08   , input/openimages/4_ritagli/images/OI_6b49cc1b9a17dd96.jpg, cielo    ,       0.139, cielo
+ 379, S08   , input/openimages/4_ritagli/images/OI_036bf0130ba8d224.jpg, cielo    ,       0.14 , cielo
+ 380, S08   , input/openimages/4_ritagli/images/OI_b3ea218bf380060c.jpg, cielo    ,       0.141, orizzonte
+ 381, S08   , input/openimages/4_ritagli/images/OI_9ad6ffa52c1a83d1.jpg, cielo    ,       0.141, cielo
+ 382, S08   , input/openimages/4_ritagli/images/OI_69f2353ddd7665d2.jpg, cielo    ,       0.142, cielo
+ 383, S08   , input/openimages/4_ritagli/images/OI_12a190af39fcf343.jpg, cielo    ,       0.143, cielo
+ 384, S08   , input/openimages/4_ritagli/images/OI_67abec35319a0b7f.jpg, cielo    ,       0.144, cielo
+ 385, S09   , input/openimages/4_ritagli/images/OI_418b22a69876f7b2.jpg, cielo    ,       0.146, cielo
+ 386, S09   , input/openimages/4_ritagli/images/OI_61886bed4f8b6825.jpg, cielo    ,       0.146, cielo
+ 387, S09   , input/openimages/4_ritagli/images/OI_dd0abd75e09dec14.jpg, cielo    ,       0.146, cielo
+ 388, S09   , input/openimages/4_ritagli/images/OI_0df304b575cc0852.jpg, cielo    ,       0.147, cielo
+ 389, S09   , input/openimages/4_ritagli/images/OI_1aa1c605e2fde93b.jpg, cielo    ,       0.147, orizzonte
+ 390, S09   , input/openimages/4_ritagli/images/OI_d10b539c2658b6f3.jpg, cielo    ,       0.149, cielo
+ 391, S09   , input/openimages/4_ritagli/images/OI_6a2c725cffff3570.jpg, cielo    ,       0.15 , orizzonte
+ 392, S09   , input/openimages/4_ritagli/images/OI_4760d47dbcd19989.jpg, cielo    ,       0.15 , cielo
+ 393, S09   , input/openimages/4_ritagli/images/OI_9d0b2414c9ee5845.jpg, cielo    ,       0.153, cielo
+ 394, S09   , input/openimages/4_ritagli/images/OI_1860ece86eae1811.jpg, cielo    ,       0.154, orizzonte
+ 395, S09   , input/openimages/4_ritagli/images/OI_65ceb6b8351e4f84.jpg, cielo    ,       0.157, cielo
+ 396, S09   , input/openimages/4_ritagli/images/OI_003764bc8997bd7e.jpg, cielo    ,       0.157, cielo
+ 397, S09   , input/openimages/4_ritagli/images/OI_b8928edeaf4ccc15.jpg, cielo    ,       0.157, orizzonte
+ 398, S09   , input/openimages/4_ritagli/images/OI_d73addcb28ee3cd0.jpg, orizzonte    ,       0.158, orizzonte
+ 399, S09   , input/openimages/4_ritagli/images/OI_b8ae160e232ae746.jpg, cielo    ,       0.159, cielo
+ 400, S09   , input/openimages/4_ritagli/images/OI_b013330a74986f03.jpg, cielo    ,       0.16 , cielo
+ 401, S09   , input/openimages/4_ritagli/images/OI_752d681037cf279a.jpg, cielo    ,       0.161, orizzonte
+ 402, S09   , input/openimages/4_ritagli/images/OI_55a12d61937e380e.jpg, cielo    ,       0.163, orizzonte
+ 403, S09   , input/openimages/4_ritagli/images/OI_d2d352084dcd7dc0.jpg, cielo    ,       0.163, orizzonte
+ 404, S09   , input/openimages/4_ritagli/images/OI_80e7d67e9142eded.jpg, cielo    ,       0.165, orizzonte
+ 405, S09   , input/openimages/4_ritagli/images/OI_fb248544dec2fc47.jpg, cielo    ,       0.165, cielo
+ 406, S09   , input/openimages/4_ritagli/images/OI_8c4de13197dad364.jpg, cielo    ,       0.168, cielo
+ 407, S09   , input/openimages/4_ritagli/images/OI_edbe7c1bb2870181.jpg, cielo    ,       0.168, cielo
+ 408, S09   , input/openimages/4_ritagli/images/OI_dd8bfe1afcdf8fe2.jpg, cielo    ,       0.168, orizzonte
+ 409, S09   , input/openimages/4_ritagli/images/OI_4e1f57b2bae157f3.jpg, cielo    ,       0.169, orizzonte
+ 410, S09   , input/openimages/4_ritagli/images/OI_c05cbf091abdbb6b.jpg, cielo    ,       0.17 , cielo
+ 411, S09   , input/openimages/4_ritagli/images/OI_bf23512f3b846d7c.jpg, cielo    ,       0.173, orizzonte
+ 412, S09   , input/openimages/4_ritagli/images/OI_3f34654a300a7a7e.jpg, cielo    ,       0.176, cielo
+ 413, S09   , input/openimages/4_ritagli/images/OI_207b4ea6c3c2f259.jpg, cielo    ,       0.177, orizzonte
+ 414, S09   , input/openimages/4_ritagli/images/OI_45ae26edf7970bc0.jpg, cielo    ,       0.178, cielo
+ 415, S09   , input/openimages/4_ritagli/images/OI_53e34f0829c5a644.jpg, cielo    ,       0.178, orizzonte
+ 416, S09   , input/openimages/4_ritagli/images/OI_044aa41f8fcafdfa.jpg, cielo    ,       0.178, cielo
+ 417, S09   , input/openimages/4_ritagli/images/OI_4bbc5159be086310.jpg, cielo    ,       0.178, cielo
+ 418, S09   , input/openimages/4_ritagli/images/OI_e1bc6063c11f70a7.jpg, cielo    ,       0.178, cielo
+ 419, S09   , input/openimages/4_ritagli/images/OI_f1624c529e1a2698.jpg, cielo    ,       0.18 , cielo
+ 420, S09   , input/openimages/4_ritagli/images/OI_51b0eb2ef689432e.jpg, cielo    ,       0.182, cielo
+ 421, S09   , input/openimages/4_ritagli/images/OI_dc8ff1f33782990b.jpg, cielo    ,       0.182, cielo
+ 422, S09   , input/openimages/4_ritagli/images/OI_f922b1ed923eba9f.jpg, cielo    ,       0.182, orizzonte
+ 423, S09   , input/openimages/4_ritagli/images/OI_6591136bd2c5bf6f.jpg, cielo    ,       0.184, cielo
+ 424, S09   , input/openimages/4_ritagli/images/OI_b63a5763d1a2b6c3.jpg, cielo    ,       0.185, orizzonte
+ 425, S09   , input/openimages/4_ritagli/images/OI_ba93e99d06aa21cc.jpg, cielo    ,       0.185, orizzonte
+ 426, S09   , input/openimages/4_ritagli/images/OI_1cafe348f5dbe6ab.jpg, cielo    ,       0.186, orizzonte
+ 427, S09   , input/openimages/4_ritagli/images/OI_c769373ad9d0db88.jpg, cielo    ,       0.186, cielo
+ 428, S09   , input/openimages/4_ritagli/images/OI_78b610a6539dd5b5.jpg, orizzonte    ,       0.187, cielo
+ 429, S09   , input/openimages/4_ritagli/images/OI_8dd88e78a459e0b1.jpg, cielo    ,       0.188, cielo
+ 430, S09   , input/openimages/4_ritagli/images/OI_4828f5229fec1ffb.jpg, cielo    ,       0.188, orizzonte
+ 431, S09   , input/openimages/4_ritagli/images/OI_d910277da7404966.jpg, cielo    ,       0.188, cielo
+ 432, S09   , input/openimages/4_ritagli/images/OI_cc28411ec520cf4a.jpg, cielo    ,       0.19 , cielo
+ 433, S10   , input/openimages/4_ritagli/images/OI_26fe4763d054a29c.jpg, cielo    ,       0.19 , orizzonte
+ 434, S10   , input/openimages/4_ritagli/images/OI_602a743b0da635f1.jpg, orizzonte    ,       0.193, orizzonte
+ 435, S10   , input/openimages/4_ritagli/images/OI_8f0233ff9242b114.jpg, cielo    ,       0.193, orizzonte
+ 436, S10   , input/openimages/4_ritagli/images/OI_8e1174161e049fa9.jpg, cielo    ,       0.194, cielo
+ 437, S10   , input/openimages/4_ritagli/images/OI_9e2ac571bb42be4e.jpg, cielo    ,       0.194, orizzonte
+ 438, S10   , input/openimages/4_ritagli/images/OI_368f80863745cbe7.jpg, cielo    ,       0.196, cielo
+ 439, S10   , input/openimages/4_ritagli/images/OI_eb28ea5d2c8037a2.jpg, cielo    ,       0.198, cielo
+ 440, S10   , input/openimages/4_ritagli/images/OI_1859f55376486587.jpg, cielo    ,       0.201, orizzonte
+ 441, S10   , input/openimages/4_ritagli/images/OI_13e2cb5136c6e7bf.jpg, cielo    ,       0.203, cielo
+ 442, S10   , input/openimages/4_ritagli/images/OI_ac3341a97922a178.jpg, orizzonte    ,       0.204, cielo
+ 443, S10   , input/openimages/4_ritagli/images/OI_2823d7324125ad35.jpg, cielo    ,       0.206, cielo
+ 444, S10   , input/openimages/4_ritagli/images/OI_30262a2d6451e2d9.jpg, cielo    ,       0.206, cielo
+ 445, S10   , input/openimages/4_ritagli/images/OI_48e43f83a1b2b167.jpg, cielo    ,       0.207, cielo
+ 446, S10   , input/openimages/4_ritagli/images/OI_de176562ffbdb6da.jpg, cielo    ,       0.208, cielo
+ 447, S10   , input/openimages/4_ritagli/images/OI_b3cd20088e0bc09e.jpg, orizzonte    ,       0.209, cielo
+ 448, S10   , input/openimages/4_ritagli/images/OI_31113c417de95b38.jpg, cielo    ,       0.212, orizzonte
+ 449, S10   , input/openimages/4_ritagli/images/OI_5cfbfc47e5354a5a.jpg, cielo    ,       0.213, orizzonte
+ 450, S10   , input/openimages/4_ritagli/images/OI_cd371f7b6b35a876.jpg, cielo    ,       0.213, orizzonte
+ 451, S10   , input/openimages/4_ritagli/images/OI_5853a2037419486d.jpg, cielo    ,       0.215, cielo
+ 452, S10   , input/openimages/4_ritagli/images/OI_fb8876db2b547148.jpg, cielo    ,       0.215, cielo
+ 453, S10   , input/openimages/4_ritagli/images/OI_0ad1999f9b3467e5.jpg, cielo    ,       0.216, cielo
+ 454, S10   , input/openimages/4_ritagli/images/OI_5c0a5da7293c3a68.jpg, cielo    ,       0.216, cielo
+ 455, S10   , input/openimages/4_ritagli/images/OI_a5e918f666f09191.jpg, cielo    ,       0.216, cielo
+ 456, S10   , input/openimages/4_ritagli/images/OI_69a85a6a48470c48.jpg, cielo    ,       0.217, orizzonte
+ 457, S10   , input/openimages/4_ritagli/images/OI_3b0cdafac82107d0.jpg, cielo    ,       0.217, cielo
+ 458, S10   , input/openimages/4_ritagli/images/OI_93076ff7910256f4.jpg, cielo    ,       0.22 , cielo
+ 459, S10   , input/openimages/4_ritagli/images/OI_42ea48bc5b8e81e3.jpg, cielo    ,       0.221, cielo
+ 460, S10   , input/openimages/4_ritagli/images/OI_04b63fa5f38f838e.jpg, cielo    ,       0.221, orizzonte
+ 461, S10   , input/openimages/4_ritagli/images/OI_2999492c52e92da6.jpg, cielo    ,       0.221, cielo
+ 462, S10   , input/openimages/4_ritagli/images/OI_c0a33c14603c2540.jpg, cielo    ,       0.223, orizzonte
+ 463, S10   , input/openimages/4_ritagli/images/OI_d471dc3ffdfc6584.jpg, cielo    ,       0.224, cielo
+ 464, S10   , input/openimages/4_ritagli/images/OI_65ae1cdaf02be1e4.jpg, cielo    ,       0.225, cielo
+ 465, S10   , input/openimages/4_ritagli/images/OI_f42bc140548b9c96.jpg, cielo    ,       0.228, orizzonte
+ 466, S10   , input/openimages/4_ritagli/images/OI_7c87b05ca8b2b4f5.jpg, cielo    ,       0.228, cielo
+ 467, S10   , input/openimages/4_ritagli/images/OI_e2b3abf3c50d4567.jpg, cielo    ,       0.228, orizzonte
+ 468, S10   , input/openimages/4_ritagli/images/OI_8b165f4ccfcf2a3d.jpg, orizzonte    ,       0.23 , cielo
+ 469, S10   , input/openimages/4_ritagli/images/OI_3e51225a9ab624be.jpg, cielo    ,       0.232, cielo
+ 470, S10   , input/openimages/4_ritagli/images/OI_6be4640e4691f76a.jpg, cielo    ,       0.234, cielo
+ 471, S10   , input/openimages/4_ritagli/images/OI_59c1d090c8a8eb4f.jpg, cielo    ,       0.235, orizzonte
+ 472, S10   , input/openimages/4_ritagli/images/OI_fc64b58ebeebfa43.jpg, cielo    ,       0.235, cielo
+ 473, S10   , input/openimages/4_ritagli/images/OI_a1ca931c498fd1a0.jpg, cielo    ,       0.238, orizzonte
+ 474, S10   , input/openimages/4_ritagli/images/OI_811154b81acbb71d.jpg, cielo    ,       0.238, cielo
+ 475, S10   , input/openimages/4_ritagli/images/OI_f2336bd1c0bd8fab.jpg, cielo    ,       0.238, cielo
+ 476, S10   , input/openimages/4_ritagli/images/OI_6941f389fe7ad14c.jpg, orizzonte    ,       0.241, cielo
+ 477, S10   , input/openimages/4_ritagli/images/OI_0e68c76731237871.jpg, cielo    ,       0.242, cielo
+ 478, S10   , input/openimages/4_ritagli/images/OI_6be35cfd301c7405.jpg, cielo    ,       0.242, orizzonte
+ 479, S10   , input/openimages/4_ritagli/images/OI_8af23f482c44e27c.jpg, cielo    ,       0.242, orizzonte
+ 480, S10   , input/openimages/4_ritagli/images/OI_76e3da56716bb4ed.jpg, cielo    ,       0.248, cielo
+ 481, S11   , input/openimages/4_ritagli/images/OI_7688cf6e3660733f.jpg, cielo    ,       0.248, orizzonte
+ 482, S11   , input/openimages/4_ritagli/images/OI_069de5f903b070d9.jpg, cielo    ,       0.249, orizzonte
+ 483, S11   , input/openimages/4_ritagli/images/OI_0bbc2ed796ba600b.jpg, cielo    ,       0.251, cielo
+ 484, S11   , input/openimages/4_ritagli/images/OI_50f6e8570498dd6f.jpg, cielo    ,       0.251, orizzonte
+ 485, S11   , input/openimages/4_ritagli/images/OI_723e795de8789c7a.jpg, cielo    ,       0.252, cielo
+ 486, S11   , input/openimages/4_ritagli/images/OI_2435e1d57e000616.jpg, cielo    ,       0.254, cielo
+ 487, S11   , input/openimages/4_ritagli/images/OI_ed9b59641c34f4f6.jpg, cielo    ,       0.254, orizzonte
+ 488, S11   , input/openimages/4_ritagli/images/OI_73ccd7be76b75996.jpg, cielo    ,       0.255, orizzonte
+ 489, S11   , input/openimages/4_ritagli/images/OI_ea2258f4970ed427.jpg, cielo    ,       0.257, cielo
+ 490, S11   , input/openimages/4_ritagli/images/OI_5029cb99e737ce9e.jpg, cielo    ,       0.257, orizzonte
+ 491, S11   , input/openimages/4_ritagli/images/OI_dd441ecd83c1e2e6.jpg, cielo    ,       0.258, orizzonte
+ 492, S11   , input/openimages/4_ritagli/images/OI_c3c51f43e7fa43bb.jpg, cielo    ,       0.26 , cielo
+ 493, S11   , input/openimages/4_ritagli/images/OI_5fe2ede75311e004.jpg, cielo    ,       0.263, orizzonte
+ 494, S11   , input/openimages/4_ritagli/images/OI_b91b35ee2b7cefa8.jpg, cielo    ,       0.266, cielo
+ 495, S11   , input/openimages/4_ritagli/images/OI_b5e7c30b99114231.jpg, cielo    ,       0.267, orizzonte
+ 496, S11   , input/openimages/4_ritagli/images/OI_5ae5a02bcab9029e.jpg, cielo    ,       0.27 , cielo
+ 497, S11   , input/openimages/4_ritagli/images/OI_83b0f1f8e3f67a1d.jpg, cielo    ,       0.27 , orizzonte
+ 498, S11   , input/openimages/4_ritagli/images/OI_cd7f8ca77c811d38.jpg, cielo    ,       0.27 , orizzonte
+ 499, S11   , input/openimages/4_ritagli/images/OI_fee484edb50161fe.jpg, cielo    ,       0.272, orizzonte
+ 500, S11   , input/openimages/4_ritagli/images/OI_207bde9dca3dabc1.jpg, cielo    ,       0.272, cielo
+ 501, S11   , input/openimages/4_ritagli/images/OI_5cb51a768438857c.jpg, cielo    ,       0.274, orizzonte
+ 502, S11   , input/openimages/4_ritagli/images/OI_c8628bbd896ccc53.jpg, cielo    ,       0.274, cielo
+ 503, S11   , input/openimages/4_ritagli/images/OI_13b7a54c9243efca.jpg, cielo    ,       0.274, cielo
+ 504, S11   , input/openimages/4_ritagli/images/OI_62e8e5c70d976189.jpg, cielo    ,       0.274, orizzonte
+ 505, S11   , input/openimages/4_ritagli/images/OI_cd93df33f81ba9f7.jpg, cielo    ,       0.274, cielo
+ 506, S11   , input/openimages/4_ritagli/images/OI_b88cc8f0c4aab648.jpg, cielo    ,       0.274, orizzonte
+ 507, S11   , input/openimages/4_ritagli/images/OI_17dd5eb6b993bac1.jpg, cielo    ,       0.276, orizzonte
+ 508, S11   , input/openimages/4_ritagli/images/OI_22e99f8bcd4beee4.jpg, cielo    ,       0.277, orizzonte
+ 509, S11   , input/openimages/4_ritagli/images/OI_00e9fe2360a545c3.jpg, cielo    ,       0.278, cielo
+ 510, S11   , input/openimages/4_ritagli/images/OI_7a855368ba9e0463.jpg, cielo    ,       0.278, cielo
+ 511, S11   , input/openimages/4_ritagli/images/OI_5f0a93c460b82e6f.jpg, cielo    ,       0.278, cielo
+ 512, S11   , input/openimages/4_ritagli/images/OI_0a19d4db89b381ae.jpg, cielo    ,       0.281, cielo
+ 513, S11   , input/openimages/4_ritagli/images/OI_21a8767e89c21d19.jpg, cielo    ,       0.281, orizzonte
+ 514, S11   , input/openimages/4_ritagli/images/OI_dde83072f888104a.jpg, cielo    ,       0.285, cielo
+ 515, S11   , input/openimages/4_ritagli/images/OI_5163dd358e5a7f30.jpg, cielo    ,       0.288, cielo
+ 516, S11   , input/openimages/4_ritagli/images/OI_684d4d04f9ba9077.jpg, cielo    ,       0.288, orizzonte
+ 517, S11   , input/openimages/4_ritagli/images/OI_f7a7c9ea05f1eff3.jpg, cielo    ,       0.289, cielo
+ 518, S11   , input/openimages/4_ritagli/images/OI_0e8cbe6aa0822efd.jpg, cielo    ,       0.289, orizzonte
+ 519, S11   , input/openimages/4_ritagli/images/OI_6d1188b1d2f3ffe6.jpg, cielo    ,       0.292, cielo
+ 520, S11   , input/openimages/4_ritagli/images/OI_3e1fec3b80f473d8.jpg, cielo    ,       0.293, cielo
+ 521, S11   , input/openimages/4_ritagli/images/OI_5005a59b74e06777.jpg, cielo    ,       0.296, cielo
+ 522, S11   , input/openimages/4_ritagli/images/OI_0b24ae3baf6ac907.jpg, cielo    ,       0.297, orizzonte
+ 523, S11   , input/openimages/4_ritagli/images/OI_76b3ed7fe4812eec.jpg, cielo    ,       0.297, cielo
+ 524, S11   , input/openimages/4_ritagli/images/OI_e1cc88ee9a76f44a.jpg, cielo    ,       0.299, orizzonte
+ 525, S11   , input/openimages/4_ritagli/images/OI_768b849bf2a8f853.jpg, cielo    ,       0.299, cielo
+ 526, S11   , input/openimages/4_ritagli/images/OI_08f365245ade5807.jpg, cielo    ,       0.301, orizzonte
+ 527, S11   , input/openimages/4_ritagli/images/OI_3307754d42584760.jpg, cielo    ,       0.301, orizzonte
+ 528, S11   , input/openimages/4_ritagli/images/OI_2c27f3f8ff934caa.jpg, cielo    ,       0.302, cielo
+ 529, S12   , input/openimages/4_ritagli/images/OI_c3fe6d1087dd495b.jpg, cielo    ,       0.307, orizzonte
+ 530, S12   , input/openimages/4_ritagli/images/OI_9ebe69ac44875335.jpg, cielo    ,       0.307, cielo
+ 531, S12   , input/openimages/4_ritagli/images/OI_e6d3cd2a5d13a0cc.jpg, cielo    ,       0.309, orizzonte
+ 532, S12   , input/openimages/4_ritagli/images/OI_8f365c38ac324f34.jpg, cielo    ,       0.311, cielo
+ 533, S12   , input/openimages/4_ritagli/images/OI_04b3fd445f1d8390.jpg, cielo    ,       0.311, cielo
+ 534, S12   , input/openimages/4_ritagli/images/OI_69619490f3a32b1c.jpg, cielo    ,       0.312, orizzonte
+ 535, S12   , input/openimages/4_ritagli/images/OI_6bd8748a70843fda.jpg, cielo    ,       0.312, cielo
+ 536, S12   , input/openimages/4_ritagli/images/OI_0a75b038b4c4c1d3.jpg, cielo    ,       0.312, orizzonte
+ 537, S12   , input/openimages/4_ritagli/images/OI_7643863f1b1b0046.jpg, cielo    ,       0.313, orizzonte
+ 538, S12   , input/openimages/4_ritagli/images/OI_0177407c660b1521.jpg, cielo    ,       0.317, cielo
+ 539, S12   , input/openimages/4_ritagli/images/OI_84894652a738a4b3.jpg, cielo    ,       0.317, orizzonte
+ 540, S12   , input/openimages/4_ritagli/images/OI_de8925b8cb048cab.jpg, cielo    ,       0.317, cielo
+ 541, S12   , input/openimages/4_ritagli/images/OI_8681e79acdeb58a8.jpg, cielo    ,       0.323, cielo
+ 542, S12   , input/openimages/4_ritagli/images/OI_001a8ef7d32b1fdc.jpg, cielo    ,       0.324, cielo
+ 543, S12   , input/openimages/4_ritagli/images/OI_6de1e2974e377998.jpg, cielo    ,       0.324, cielo
+ 544, S12   , input/openimages/4_ritagli/images/OI_7c13725e581a74b1.jpg, cielo    ,       0.326, orizzonte
+ 545, S12   , input/openimages/4_ritagli/images/OI_952ec5d1a6635740.jpg, cielo    ,       0.326, cielo
+ 546, S12   , input/openimages/4_ritagli/images/OI_beb9280209159f63.jpg, cielo    ,       0.326, cielo
+ 547, S12   , input/openimages/4_ritagli/images/OI_3d0c55893215a7c9.jpg, cielo    ,       0.327, cielo
+ 548, S12   , input/openimages/4_ritagli/images/OI_66eded189c0baf48.jpg, cielo    ,       0.329, cielo
+ 549, S12   , input/openimages/4_ritagli/images/OI_e4c090be82e6905d.jpg, cielo    ,       0.329, cielo
+ 550, S12   , input/openimages/4_ritagli/images/OI_348418330b60b246.jpg, cielo    ,       0.332, orizzonte
+ 551, S12   , input/openimages/4_ritagli/images/OI_5d99e333b085a77e.jpg, cielo    ,       0.333, orizzonte
+ 552, S12   , input/openimages/4_ritagli/images/OI_86512514f9945ca6.jpg, cielo    ,       0.333, cielo
+ 553, S12   , input/openimages/4_ritagli/images/OI_f06b56a3ac1d7802.jpg, cielo    ,       0.333, cielo
+ 554, S12   , input/openimages/4_ritagli/images/OI_229182db2b587c18.jpg, cielo    ,       0.333, cielo
+ 555, S12   , input/openimages/4_ritagli/images/OI_3f533a8bf2294571.jpg, cielo    ,       0.335, orizzonte
+ 556, S12   , input/openimages/4_ritagli/images/OI_799a027f98837148.jpg, cielo    ,       0.335, orizzonte
+ 557, S12   , input/openimages/4_ritagli/images/OI_26ea2d7f1dd6736e.jpg, cielo    ,       0.336, cielo
+ 558, S12   , input/openimages/4_ritagli/images/OI_34bc27a2477904aa.jpg, cielo    ,       0.338, orizzonte
+ 559, S12   , input/openimages/4_ritagli/images/OI_4582ffac0c0dd7b3.jpg, cielo    ,       0.338, orizzonte
+ 560, S12   , input/openimages/4_ritagli/images/OI_1428e9f5a18d1056.jpg, cielo    ,       0.342, cielo
+ 561, S12   , input/openimages/4_ritagli/images/OI_755922b2fe210867.jpg, cielo    ,       0.343, cielo
+ 562, S12   , input/openimages/4_ritagli/images/OI_01f1d734b28b951c.jpg, cielo    ,       0.345, cielo
+ 563, S12   , input/openimages/4_ritagli/images/OI_2a325382f6b63d8b.jpg, cielo    ,       0.345, cielo
+ 564, S12   , input/openimages/4_ritagli/images/OI_9a9b83a0af61d946.jpg, cielo    ,       0.347, cielo
+ 565, S12   , input/openimages/4_ritagli/images/OI_6053b32cd6044e40.jpg, cielo    ,       0.349, cielo
+ 566, S12   , input/openimages/4_ritagli/images/OI_2d3304d3ccc5607a.jpg, cielo    ,       0.35 , cielo
+ 567, S12   , input/openimages/4_ritagli/images/OI_dbefdffccc8efd5e.jpg, cielo    ,       0.35 , cielo
+ 568, S12   , input/openimages/4_ritagli/images/OI_00d1abef1c8d5f5e.jpg, cielo    ,       0.352, cielo
+ 569, S12   , input/openimages/4_ritagli/images/OI_79472d52ca44ac58.jpg, cielo    ,       0.356, orizzonte
+ 570, S12   , input/openimages/4_ritagli/images/OI_5f3464493aa48be6.jpg, cielo    ,       0.356, cielo
+ 571, S12   , input/openimages/4_ritagli/images/OI_6949dd4b064b1a1b.jpg, cielo    ,       0.356, orizzonte
+ 572, S12   , input/openimages/4_ritagli/images/OI_b3405661263e4ca4.jpg, cielo    ,       0.359, cielo
+ 573, S12   , input/openimages/4_ritagli/images/OI_d3eec16b5346061f.jpg, cielo    ,       0.36 , cielo
+ 574, S12   , input/openimages/4_ritagli/images/OI_625caf5ae7a8da96.jpg, cielo    ,       0.363, orizzonte
+ 575, S12   , input/openimages/4_ritagli/images/OI_6a93863235af8615.jpg, cielo    ,       0.365, cielo
+ 576, S12   , input/openimages/4_ritagli/images/OI_660188b57076b9bf.jpg, cielo    ,       0.366, orizzonte
+ 577, S13   , input/openimages/4_ritagli/images/OI_c1f6b49ccf800989.jpg, cielo    ,       0.366, cielo
+ 578, S13   , input/openimages/4_ritagli/images/OI_0687e0245e0b347a.jpg, cielo    ,       0.369, orizzonte
+ 579, S13   , input/openimages/4_ritagli/images/OI_b6b3047cfe4cde0c.jpg, cielo    ,       0.37 , orizzonte
+ 580, S13   , input/openimages/4_ritagli/images/OI_af03cdb808f76f0a.jpg, cielo    ,       0.372, cielo
+ 581, S13   , input/openimages/4_ritagli/images/OI_bb8c79b70442fb2f.jpg, cielo    ,       0.374, cielo
+ 582, S13   , input/openimages/4_ritagli/images/OI_b419e040a014bb51.jpg, cielo    ,       0.376, cielo
+ 583, S13   , input/openimages/4_ritagli/images/OI_3f292b222fb1edfd.jpg, cielo    ,       0.379, orizzonte
+ 584, S13   , input/openimages/4_ritagli/images/OI_d8f242bc19179cce.jpg, cielo    ,       0.383, orizzonte
+ 585, S13   , input/openimages/4_ritagli/images/OI_9d87254812730f6f.jpg, cielo    ,       0.391, orizzonte
+ 586, S13   , input/openimages/4_ritagli/images/OI_67f8343f2c728542.jpg, cielo    ,       0.394, orizzonte
+ 587, S13   , input/openimages/4_ritagli/images/OI_1e2bded71e50605f.jpg, cielo    ,       0.398, orizzonte
+ 588, S13   , input/openimages/4_ritagli/images/OI_29a922f592c21d87.jpg, cielo    ,       0.398, orizzonte
+ 589, S13   , input/openimages/4_ritagli/images/OI_3fa5fe81a5edac24.jpg, cielo    ,       0.4  , cielo
+ 590, S13   , input/openimages/4_ritagli/images/OI_738f7976aad78b43.jpg, cielo    ,       0.4  , cielo
+ 591, S13   , input/openimages/4_ritagli/images/OI_d4d904504b8e830f.jpg, cielo    ,       0.4  , cielo
+ 592, S13   , input/openimages/4_ritagli/images/OI_075586215b83bbea.jpg, cielo    ,       0.405, cielo
+ 593, S13   , input/openimages/4_ritagli/images/OI_c34f262826fc78b7.jpg, cielo    ,       0.411, cielo
+ 594, S13   , input/openimages/4_ritagli/images/OI_5ef34a0ca203b413.jpg, cielo    ,       0.415, cielo
+ 595, S13   , input/openimages/4_ritagli/images/OI_c3a6d40754c2eb84.jpg, cielo    ,       0.415, cielo
+ 596, S13   , input/openimages/4_ritagli/images/OI_f328dcd08b83fd2c.jpg, cielo    ,       0.415, orizzonte
+ 597, S13   , input/openimages/4_ritagli/images/OI_6d9a5f52c514c60e.jpg, cielo    ,       0.416, orizzonte
+ 598, S13   , input/openimages/4_ritagli/images/OI_2cfa37c9e524e94c.jpg, cielo    ,       0.421, orizzonte
+ 599, S13   , input/openimages/4_ritagli/images/OI_9efe0491965044e9.jpg, cielo    ,       0.423, orizzonte
+ 600, S13   , input/openimages/4_ritagli/images/OI_385d750f76d5768f.jpg, cielo    ,       0.423, cielo
+ 601, S13   , input/openimages/4_ritagli/images/OI_fc953f3f4b2150aa.jpg, cielo    ,       0.424, orizzonte
+ 602, S13   , input/openimages/4_ritagli/images/OI_9047339471ac2fef.jpg, cielo    ,       0.424, cielo
+ 603, S13   , input/openimages/4_ritagli/images/OI_c92fb97955d1ed2f.jpg, cielo    ,       0.424, orizzonte
+ 604, S13   , input/openimages/4_ritagli/images/OI_21553c1e21a47726.jpg, cielo    ,       0.426, cielo
+ 605, S13   , input/openimages/4_ritagli/images/OI_30cf84a98b8ad187.jpg, cielo    ,       0.426, orizzonte
+ 606, S13   , input/openimages/4_ritagli/images/OI_10c2fffd6708d8ec.jpg, cielo    ,       0.427, orizzonte
+ 607, S13   , input/openimages/4_ritagli/images/OI_3d1cde108aca0e59.jpg, cielo    ,       0.432, orizzonte
+ 608, S13   , input/openimages/4_ritagli/images/OI_63e5535c36acfbd9.jpg, cielo    ,       0.434, orizzonte
+ 609, S13   , input/openimages/4_ritagli/images/OI_69f15d40734b208b.jpg, cielo    ,       0.434, cielo
+ 610, S13   , input/openimages/4_ritagli/images/OI_4f61ad9e5586a66e.jpg, cielo    ,       0.436, orizzonte
+ 611, S13   , input/openimages/4_ritagli/images/OI_509205c3e35ff162.jpg, cielo    ,       0.436, orizzonte
+ 612, S13   , input/openimages/4_ritagli/images/OI_5d7c39993a112f52.jpg, cielo    ,       0.437, orizzonte
+ 613, S13   , input/openimages/4_ritagli/images/OI_e663d3f7fd250060.jpg, cielo    ,       0.438, cielo
+ 614, S13   , input/openimages/4_ritagli/images/OI_30d44b432b847a76.jpg, cielo    ,       0.438, orizzonte
+ 615, S13   , input/openimages/4_ritagli/images/OI_dae4dee292a89f94.jpg, cielo    ,       0.438, orizzonte
+ 616, S13   , input/openimages/4_ritagli/images/OI_00ce20a1f57a4bb2.jpg, cielo    ,       0.44 , orizzonte
+ 617, S13   , input/openimages/4_ritagli/images/OI_f073514f11dd7d4b.jpg, cielo    ,       0.441, cielo
+ 618, S13   , input/openimages/4_ritagli/images/OI_fe9e6766279d27bd.jpg, cielo    ,       0.442, orizzonte
+ 619, S13   , input/openimages/4_ritagli/images/OI_05fb14417f8597b4.jpg, cielo    ,       0.444, cielo
+ 620, S13   , input/openimages/4_ritagli/images/OI_1c7c9c5c7eb758cb.jpg, cielo    ,       0.446, cielo
+ 621, S13   , input/openimages/4_ritagli/images/OI_764db62cfa97de51.jpg, cielo    ,       0.446, cielo
+ 622, S13   , input/openimages/4_ritagli/images/OI_bb26fa7d49595f43.jpg, cielo    ,       0.446, orizzonte
+ 623, S13   , input/openimages/4_ritagli/images/OI_f06849dc1ce3adc6.jpg, cielo    ,       0.446, orizzonte
+ 624, S13   , input/openimages/4_ritagli/images/OI_02adaa4808969cdb.jpg, cielo    ,       0.451, cielo
+ 625, S14   , input/openimages/4_ritagli/images/OI_7c3129a463fc94b1.jpg, cielo    ,       0.451, cielo
+ 626, S14   , input/openimages/4_ritagli/images/OI_87d293cb19fc65d5.jpg, cielo    ,       0.452, orizzonte
+ 627, S14   , input/openimages/4_ritagli/images/OI_7a9397a8ebad4663.jpg, cielo    ,       0.459, cielo
+ 628, S14   , input/openimages/4_ritagli/images/OI_22fb8b8c51dea965.jpg, cielo    ,       0.459, orizzonte
+ 629, S14   , input/openimages/4_ritagli/images/OI_8e36ee0c5dc3515d.jpg, cielo    ,       0.459, cielo
+ 630, S14   , input/openimages/4_ritagli/images/OI_df4e1d973e381c1e.jpg, cielo    ,       0.461, cielo
+ 631, S14   , input/openimages/4_ritagli/images/OI_3614c415d351412c.jpg, cielo    ,       0.463, cielo
+ 632, S14   , input/openimages/4_ritagli/images/OI_b7c410d720f81a15.jpg, cielo    ,       0.463, orizzonte
+ 633, S14   , input/openimages/4_ritagli/images/OI_f154a7ef32692baf.jpg, cielo    ,       0.473, orizzonte
+ 634, S14   , input/openimages/4_ritagli/images/OI_f2b336169dcd34bd.jpg, cielo    ,       0.473, orizzonte
+ 635, S14   , input/openimages/4_ritagli/images/OI_7b455cac63d6e2e3.jpg, cielo    ,       0.475, cielo
+ 636, S14   , input/openimages/4_ritagli/images/OI_0082cc1c4e13a6dc.jpg, cielo    ,       0.479, cielo
+ 637, S14   , input/openimages/4_ritagli/images/OI_72ae5c9b2caa285b.jpg, cielo    ,       0.479, cielo
+ 638, S14   , input/openimages/4_ritagli/images/OI_e5112d924c996e3a.jpg, cielo    ,       0.479, cielo
+ 639, S14   , input/openimages/4_ritagli/images/OI_46ca274d65dd4c3d.jpg, cielo    ,       0.48 , cielo
+ 640, S14   , input/openimages/4_ritagli/images/OI_67715624a07f4f30.jpg, cielo    ,       0.48 , cielo
+ 641, S14   , input/openimages/4_ritagli/images/OI_90b7c2dcc66f13c6.jpg, cielo    ,       0.48 , cielo
+ 642, S14   , input/openimages/4_ritagli/images/OI_f4bff8e5314ed84b.jpg, cielo    ,       0.483, orizzonte
+ 643, S14   , input/openimages/4_ritagli/images/OI_8fea29207400f1dc.jpg, cielo    ,       0.484, cielo
+ 644, S14   , input/openimages/4_ritagli/images/OI_6e5b3e41a8648164.jpg, cielo    ,       0.486, cielo
+ 645, S14   , input/openimages/4_ritagli/images/OI_c0ee6fc90dd2761b.jpg, cielo    ,       0.486, cielo
+ 646, S14   , input/openimages/4_ritagli/images/OI_26ff9b68d8102051.jpg, cielo    ,       0.488, orizzonte
+ 647, S14   , input/openimages/4_ritagli/images/OI_73f9765402ee38c8.jpg, cielo    ,       0.488, cielo
+ 648, S14   , input/openimages/4_ritagli/images/OI_ff6d4363dc01a95a.jpg, cielo    ,       0.49 , orizzonte
+ 649, S14   , input/openimages/4_ritagli/images/OI_a1949ea7c3053de2.jpg, cielo    ,       0.492, cielo
+ 650, S14   , input/openimages/4_ritagli/images/OI_3c9ecdb9b05e8667.jpg, cielo    ,       0.492, cielo
+ 651, S14   , input/openimages/4_ritagli/images/OI_00404c3466952aa5.jpg, cielo    ,       0.498, cielo
+ 652, S14   , input/openimages/4_ritagli/images/OI_0b3d3cb6b589a219.jpg, cielo    ,       0.498, orizzonte
+ 653, S14   , input/openimages/4_ritagli/images/OI_87229c04ba9c39b9.jpg, orizzonte,       0.5  , orizzonte
+ 654, S14   , input/openimages/4_ritagli/images/OI_0c884af8e6078325.jpg, orizzonte,       0.5  , cielo
+ 655, S14   , input/openimages/4_ritagli/images/OI_b668b6e027e69928.jpg, orizzonte,       0.5  , orizzonte
+ 656, S14   , input/openimages/4_ritagli/images/OI_c157842097f40436.jpg, orizzonte,       0.504, cielo
+ 657, S14   , input/openimages/4_ritagli/images/OI_256a05d94b09a971.jpg, orizzonte,       0.506, cielo
+ 658, S14   , input/openimages/4_ritagli/images/OI_0ea91537326cd310.jpg, orizzonte,       0.512, orizzonte
+ 659, S14   , input/openimages/4_ritagli/images/OI_89a74d8bfbaf1e1a.jpg, orizzonte,       0.516, cielo
+ 660, S14   , input/openimages/4_ritagli/images/OI_efaad41697a4cff7.jpg, orizzonte,       0.516, cielo
+ 661, S14   , input/openimages/4_ritagli/images/OI_df6a81839c1c833a.jpg, orizzonte,       0.518, cielo
+ 662, S14   , input/openimages/4_ritagli/images/OI_34aebf619e447a56.jpg, orizzonte,       0.518, cielo
+ 663, S14   , input/openimages/4_ritagli/images/OI_9f2a8f6b9d17312d.jpg, orizzonte,       0.518, orizzonte
+ 664, S14   , input/openimages/4_ritagli/images/OI_0f637ada542e4cbb.jpg, orizzonte,       0.52 , cielo
+ 665, S14   , input/openimages/4_ritagli/images/OI_c0a544d60a47c642.jpg, orizzonte,       0.52 , orizzonte
+ 666, S14   , input/openimages/4_ritagli/images/OI_e44df01152779389.jpg, orizzonte,       0.522, orizzonte
+ 667, S14   , input/openimages/4_ritagli/images/OI_5c00f8fb5f0e494c.jpg, orizzonte,       0.523, cielo
+ 668, S14   , input/openimages/4_ritagli/images/OI_b752f28ef2038375.jpg, orizzonte,       0.525, orizzonte
+ 669, S14   , input/openimages/4_ritagli/images/OI_05005a15b6a16836.jpg, orizzonte,       0.527, cielo
+ 670, S14   , input/openimages/4_ritagli/images/OI_4437c0abbaf0839d.jpg, orizzonte,       0.529, orizzonte
+ 671, S14   , input/openimages/4_ritagli/images/OI_79f4fdf91ab44345.jpg, orizzonte,       0.529, orizzonte
+ 672, S14   , input/openimages/4_ritagli/images/OI_d564b3b7d9e1b04d.jpg, orizzonte,       0.533, cielo
+ 673, S15   , input/openimages/4_ritagli/images/OI_7350a4d093021d98.jpg, orizzonte,       0.534, orizzonte
+ 674, S15   , input/openimages/4_ritagli/images/OI_797d89d0b057f0b6.jpg, orizzonte,       0.535, orizzonte
+ 675, S15   , input/openimages/4_ritagli/images/OI_427d966d3b0ef778.jpg, orizzonte,       0.541, cielo
+ 676, S15   , input/openimages/4_ritagli/images/OI_5c1f8ef82a303065.jpg, orizzonte,       0.541, orizzonte
+ 677, S15   , input/openimages/4_ritagli/images/OI_abeea7c15eff424a.jpg, orizzonte,       0.543, cielo
+ 678, S15   , input/openimages/4_ritagli/images/OI_e06dab7e4b632c8c.jpg, orizzonte,       0.543, cielo
+ 679, S15   , input/openimages/4_ritagli/images/OI_600b4aefedbd9647.jpg, orizzonte,       0.545, cielo
+ 680, S15   , input/openimages/4_ritagli/images/OI_0001e6adc4fbab0c.jpg, orizzonte,       0.545, cielo
+ 681, S15   , input/openimages/4_ritagli/images/OI_d7c9ba7b7774dcd9.jpg, orizzonte,       0.545, orizzonte
+ 682, S15   , input/openimages/4_ritagli/images/OI_693170cefc364b75.jpg, orizzonte,       0.546, cielo
+ 683, S15   , input/openimages/4_ritagli/images/OI_1f7c65b3a8208f69.jpg, orizzonte,       0.547, cielo
+ 684, S15   , input/openimages/4_ritagli/images/OI_716cf667cf43235e.jpg, orizzonte,       0.547, cielo
+ 685, S15   , input/openimages/4_ritagli/images/OI_a79c235ffa6bd2ca.jpg, orizzonte,       0.549, cielo
+ 686, S15   , input/openimages/4_ritagli/images/OI_8f2e6b6475fe67f5.jpg, orizzonte,       0.551, cielo
+ 687, S15   , input/openimages/4_ritagli/images/OI_e2c4379b94faab07.jpg, orizzonte,       0.551, orizzonte
+ 688, S15   , input/openimages/4_ritagli/images/OI_3a15cf1454e5501e.jpg, orizzonte,       0.554, orizzonte
+ 689, S15   , input/openimages/4_ritagli/images/OI_ad06983886be932c.jpg, orizzonte,       0.554, cielo
+ 690, S15   , input/openimages/4_ritagli/images/OI_8a1a1b32dccad1a4.jpg, orizzonte,       0.556, orizzonte
+ 691, S15   , input/openimages/4_ritagli/images/OI_90a8d4ce9405c48e.jpg, orizzonte,       0.556, cielo
+ 692, S15   , input/openimages/4_ritagli/images/OI_d23609276d66cdf6.jpg, orizzonte,       0.56 , orizzonte
+ 693, S15   , input/openimages/4_ritagli/images/OI_053bbd5758ca738e.jpg, orizzonte,       0.562, cielo
+ 694, S15   , input/openimages/4_ritagli/images/OI_170bfa2886db9a70.jpg, orizzonte,       0.563, orizzonte
+ 695, S15   , input/openimages/4_ritagli/images/OI_b5deba8926a72328.jpg, orizzonte,       0.568, cielo
+ 696, S15   , input/openimages/4_ritagli/images/OI_97ef1cfe63f23c8c.jpg, orizzonte,       0.572, orizzonte
+ 697, S15   , input/openimages/4_ritagli/images/OI_92c2739d8992d15f.jpg, orizzonte,       0.575, orizzonte
+ 698, S15   , input/openimages/4_ritagli/images/OI_5110f96e072c9ba4.jpg, orizzonte,       0.576, cielo
+ 699, S15   , input/openimages/4_ritagli/images/OI_af90d65cbbcc3385.jpg, orizzonte,       0.577, orizzonte
+ 700, S15   , input/openimages/4_ritagli/images/OI_34b82ee09df5b010.jpg, orizzonte,       0.583, cielo
+ 701, S15   , input/openimages/4_ritagli/images/OI_5395dd715d278cf6.jpg, orizzonte,       0.585, orizzonte
+ 702, S15   , input/openimages/4_ritagli/images/OI_9cee20978f5583b1.jpg, orizzonte,       0.589, orizzonte
+ 703, S15   , input/openimages/4_ritagli/images/OI_9d793daf45bb25be.jpg, orizzonte,       0.589, cielo
+ 704, S15   , input/openimages/4_ritagli/images/OI_7a52c0b2f1e714bd.jpg, orizzonte,       0.591, cielo
+ 705, S15   , input/openimages/4_ritagli/images/OI_21e113ad502d11ee.jpg, orizzonte,       0.594, cielo
+ 706, S15   , input/openimages/4_ritagli/images/OI_2a0645f032aa5e34.jpg, orizzonte,       0.608, cielo
+ 707, S15   , input/openimages/4_ritagli/images/OI_065b32e85e73cdd8.jpg, orizzonte,       0.61 , cielo
+ 708, S15   , input/openimages/4_ritagli/images/OI_8db5c0e6d0eebcd9.jpg, orizzonte,       0.611, cielo
+ 709, S15   , input/openimages/4_ritagli/images/OI_d50d6c2ed2e94210.jpg, orizzonte,       0.611, cielo
+ 710, S15   , input/openimages/4_ritagli/images/OI_81fcbe5b5eaa1d09.jpg, orizzonte,       0.617, cielo
+ 711, S15   , input/openimages/4_ritagli/images/OI_97c0cd0b456b703b.jpg, orizzonte,       0.621, orizzonte
+ 712, S15   , input/openimages/4_ritagli/images/OI_00652239a1aad225.jpg, orizzonte,       0.622, cielo
+ 713, S15   , input/openimages/4_ritagli/images/OI_9d29c872d6409016.jpg, orizzonte,       0.624, orizzonte
+ 714, S15   , input/openimages/4_ritagli/images/OI_d425f8ef9c3fdd79.jpg, orizzonte,       0.624, orizzonte
+ 715, S15   , input/openimages/4_ritagli/images/OI_e91364bc1d17c5e8.jpg, orizzonte,       0.624, cielo
+ 716, S15   , input/openimages/4_ritagli/images/OI_835226c611d4e057.jpg, orizzonte,       0.626, orizzonte
+ 717, S15   , input/openimages/4_ritagli/images/OI_c3c7d4cbe58455da.jpg, orizzonte,       0.627, orizzonte
+ 718, S15   , input/openimages/4_ritagli/images/OI_d36682179e4a4ea8.jpg, orizzonte,       0.628, orizzonte
+ 719, S15   , input/openimages/4_ritagli/images/OI_76264a48d1e8b3c2.jpg, orizzonte,       0.629, orizzonte
+ 720, S15   , input/openimages/4_ritagli/images/OI_90df5459e4d740b8.jpg, orizzonte,       0.633, orizzonte
+ 721, S16   , input/openimages/4_ritagli/images/OI_07aa134bb5d6103d.jpg, orizzonte,       0.635, cielo
+ 722, S16   , input/openimages/4_ritagli/images/OI_65eb94eb2e4c6830.jpg, orizzonte,       0.64 , orizzonte
+ 723, S16   , input/openimages/4_ritagli/images/OI_a7940541222fc265.jpg, orizzonte,       0.644, cielo
+ 724, S16   , input/openimages/4_ritagli/images/OI_2dd6722712f8b508.jpg, orizzonte,       0.646, orizzonte
+ 725, S16   , input/openimages/4_ritagli/images/OI_6a591967fa91fadd.jpg, orizzonte,       0.648, orizzonte
+ 726, S16   , input/openimages/4_ritagli/images/OI_d2ff38a5c699c605.jpg, orizzonte,       0.649, orizzonte
+ 727, S16   , input/openimages/4_ritagli/images/OI_ba29a275ee99c350.jpg, orizzonte,       0.65 , orizzonte
+ 728, S16   , input/openimages/4_ritagli/images/OI_a598017c8bfa40db.jpg, orizzonte,       0.651, orizzonte
+ 729, S16   , input/openimages/4_ritagli/images/OI_8455025667c66d03.jpg, orizzonte,       0.651, cielo
+ 730, S16   , input/openimages/4_ritagli/images/OI_726cc0d9d35f922a.jpg, orizzonte,       0.651, cielo
+ 731, S16   , input/openimages/4_ritagli/images/OI_49a535a8dbfe9cda.jpg, orizzonte,       0.654, orizzonte
+ 732, S16   , input/openimages/4_ritagli/images/OI_eb149fc52ffb47b9.jpg, orizzonte,       0.655, cielo
+ 733, S16   , input/openimages/4_ritagli/images/OI_0b043b1fb1d48135.jpg, orizzonte,       0.657, cielo
+ 734, S16   , input/openimages/4_ritagli/images/OI_c00bd93c16fdb608.jpg, orizzonte,       0.658, cielo
+ 735, S16   , input/openimages/4_ritagli/images/OI_7fc6eda192c1f9ca.jpg, orizzonte,       0.664, cielo
+ 736, S16   , input/openimages/4_ritagli/images/OI_9eb5e2ab88b8a415.jpg, orizzonte,       0.665, orizzonte
+ 737, S16   , input/openimages/4_ritagli/images/OI_a5aa07f979ecd756.jpg, orizzonte,       0.665, cielo
+ 738, S16   , input/openimages/4_ritagli/images/OI_c5ef1953803cd1d6.jpg, orizzonte,       0.665, orizzonte
+ 739, S16   , input/openimages/4_ritagli/images/OI_fb49aaa0b7b65158.jpg, orizzonte,       0.668, cielo
+ 740, S16   , input/openimages/4_ritagli/images/OI_455bb8f48f22aa88.jpg, orizzonte,       0.671, cielo
+ 741, S16   , input/openimages/4_ritagli/images/OI_49bc103c7cd6c0cd.jpg, orizzonte,       0.671, orizzonte
+ 742, S16   , input/openimages/4_ritagli/images/OI_b65ed16351de96fb.jpg, orizzonte,       0.671, orizzonte
+ 743, S16   , input/openimages/4_ritagli/images/OI_fcee2b2a4aeb0c30.jpg, orizzonte,       0.674, cielo
+ 744, S16   , input/openimages/4_ritagli/images/OI_7dc4556ae01d4f05.jpg, orizzonte,       0.674, cielo
+ 745, S16   , input/openimages/4_ritagli/images/OI_de63141798e7fe45.jpg, orizzonte,       0.676, orizzonte
+ 746, S16   , input/openimages/4_ritagli/images/OI_b1dab535d0cc4181.jpg, orizzonte,       0.677, orizzonte
+ 747, S16   , input/openimages/4_ritagli/images/OI_3cf1bad835c5fa72.jpg, orizzonte,       0.679, orizzonte
+ 748, S16   , input/openimages/4_ritagli/images/OI_3e3dbf5a0af73798.jpg, orizzonte,       0.679, orizzonte
+ 749, S16   , input/openimages/4_ritagli/images/OI_e8f6a1a530583474.jpg, orizzonte,       0.679, cielo
+ 750, S16   , input/openimages/4_ritagli/images/OI_1e37b41c209d48ea.jpg, orizzonte,       0.681, orizzonte
+ 751, S16   , input/openimages/4_ritagli/images/OI_1a4582a86c5cd54c.jpg, orizzonte,       0.684, cielo
+ 752, S16   , input/openimages/4_ritagli/images/OI_0b6df88b604a0da7.jpg, orizzonte,       0.685, orizzonte
+ 753, S16   , input/openimages/4_ritagli/images/OI_c70ff8978b74bba3.jpg, orizzonte,       0.687, orizzonte
+ 754, S16   , input/openimages/4_ritagli/images/OI_9e4584730c5aeb09.jpg, orizzonte,       0.688, orizzonte
+ 755, S16   , input/openimages/4_ritagli/images/OI_6b5cd78ead4c58d2.jpg, orizzonte,       0.689, orizzonte
+ 756, S16   , input/openimages/4_ritagli/images/OI_886498fd3b4e106a.jpg, orizzonte,       0.689, cielo
+ 757, S16   , input/openimages/4_ritagli/images/OI_fa4bcecb1458f580.jpg, orizzonte,       0.693, cielo
+ 758, S16   , input/openimages/4_ritagli/images/OI_d9df76d31dd00c26.jpg, orizzonte,       0.695, cielo
+ 759, S16   , input/openimages/4_ritagli/images/OI_d512b7942833e79f.jpg, orizzonte,       0.696, cielo
+ 760, S16   , input/openimages/4_ritagli/images/OI_20f1d74bd936e7f9.jpg, orizzonte,       0.698, orizzonte
+ 761, S16   , input/openimages/4_ritagli/images/OI_b37b8596667e26a6.jpg, orizzonte,       0.698, cielo
+ 762, S16   , input/openimages/4_ritagli/images/OI_9d12d162695a2c7b.jpg, orizzonte,       0.701, cielo
+ 763, S16   , input/openimages/4_ritagli/images/OI_d6a662c6ac5e5549.jpg, orizzonte,       0.703, cielo
+ 764, S16   , input/openimages/4_ritagli/images/OI_dc19136aff211836.jpg, orizzonte,       0.703, cielo
+ 765, S16   , input/openimages/4_ritagli/images/OI_14d20ae02b4a0aa7.jpg, orizzonte,       0.705, orizzonte
+ 766, S16   , input/openimages/4_ritagli/images/OI_7dae4e52c5f8cd95.jpg, orizzonte,       0.706, orizzonte
+ 767, S16   , input/openimages/4_ritagli/images/OI_78634db038dcdd87.jpg, orizzonte,       0.708, cielo
+ 768, S16   , input/openimages/4_ritagli/images/OI_7c4d51d544a419ab.jpg, orizzonte,       0.712, orizzonte
+ 769, S17   , input/openimages/4_ritagli/images/OI_9705dda3fa9c37a7.jpg, orizzonte,       0.712, cielo
+ 770, S17   , input/openimages/4_ritagli/images/OI_2d02611316fc8e88.jpg, orizzonte,       0.722, orizzonte
+ 771, S17   , input/openimages/4_ritagli/images/OI_a507b74e3a853b17.jpg, orizzonte,       0.73 , cielo
+ 772, S17   , input/openimages/4_ritagli/images/OI_45481ea1c6f6f657.jpg, orizzonte,       0.73 , cielo
+ 773, S17   , input/openimages/4_ritagli/images/OI_3435cb595a332948.jpg, orizzonte,       0.731, orizzonte
+ 774, S17   , input/openimages/4_ritagli/images/OI_b2395868527b7b2d.jpg, orizzonte,       0.731, cielo
+ 775, S17   , input/openimages/4_ritagli/images/OI_ce6ad3025ab9ee2c.jpg, orizzonte,       0.733, cielo
+ 776, S17   , input/openimages/4_ritagli/images/OI_e9c0a453611a82bd.jpg, orizzonte,       0.733, orizzonte
+ 777, S17   , input/openimages/4_ritagli/images/OI_a1edbae76805c33a.jpg, orizzonte,       0.737, cielo
+ 778, S17   , input/openimages/4_ritagli/images/OI_e3abdfc48d94e254.jpg, orizzonte,       0.739, cielo
+ 779, S17   , input/openimages/4_ritagli/images/OI_0871c7ac40d02883.jpg, orizzonte,       0.74 , orizzonte
+ 780, S17   , input/openimages/4_ritagli/images/OI_1af64982b7d7c436.jpg, orizzonte,       0.74 , orizzonte
+ 781, S17   , input/openimages/4_ritagli/images/OI_daf09c1e8272a82d.jpg, orizzonte,       0.743, orizzonte
+ 782, S17   , input/openimages/4_ritagli/images/OI_03350879057d4c89.jpg, orizzonte,       0.745, cielo
+ 783, S17   , input/openimages/4_ritagli/images/OI_da70b2c9e1bc3505.jpg, orizzonte,       0.749, orizzonte
+ 784, S17   , input/openimages/4_ritagli/images/OI_f50845acf26eb774.jpg, orizzonte,       0.749, orizzonte
+ 785, S17   , input/openimages/4_ritagli/images/OI_a4e426f5cecd67df.jpg, orizzonte,       0.754, orizzonte
+ 786, S17   , input/openimages/4_ritagli/images/OI_0de2459ff4a327a7.jpg, orizzonte,       0.755, cielo
+ 787, S17   , input/openimages/4_ritagli/images/OI_7cc12c707affde0e.jpg, orizzonte,       0.755, cielo
+ 788, S17   , input/openimages/4_ritagli/images/OI_b3dc4d68df67c90f.jpg, orizzonte,       0.755, cielo
+ 789, S17   , input/openimages/4_ritagli/images/OI_4dc901b60a5ea003.jpg, orizzonte,       0.759, cielo
+ 790, S17   , input/openimages/4_ritagli/images/OI_1d94cdc4047d6059.jpg, orizzonte,       0.76 , orizzonte
+ 791, S17   , input/openimages/4_ritagli/images/OI_23d7bb32f41755b8.jpg, orizzonte,       0.761, orizzonte
+ 792, S17   , input/openimages/4_ritagli/images/OI_c74a5c228829e8e5.jpg, orizzonte,       0.762, cielo
+ 793, S17   , input/openimages/4_ritagli/images/OI_3275c0cd0cb2d0bf.jpg, orizzonte,       0.763, cielo
+ 794, S17   , input/openimages/4_ritagli/images/OI_5bdc78f6d5679921.jpg, orizzonte,       0.766, orizzonte
+ 795, S17   , input/openimages/4_ritagli/images/OI_2356a8e8b96ff61f.jpg, orizzonte,       0.766, orizzonte
+ 796, S17   , input/openimages/4_ritagli/images/OI_a20aa4a69ea60622.jpg, orizzonte,       0.769, orizzonte
+ 797, S17   , input/openimages/4_ritagli/images/OI_3d2622d174512e6f.jpg, orizzonte,       0.769, orizzonte
+ 798, S17   , input/openimages/4_ritagli/images/OI_21e8010d3eba9d41.jpg, orizzonte,       0.77 , cielo
+ 799, S17   , input/openimages/4_ritagli/images/OI_52dba63c2e18acf6.jpg, orizzonte,       0.776, cielo
+ 800, S17   , input/openimages/4_ritagli/images/OI_a2d9c8c87c444505.jpg, orizzonte,       0.776, orizzonte
+ 801, S17   , input/openimages/4_ritagli/images/OI_c7b71227a058502d.jpg, orizzonte,       0.777, orizzonte
+ 802, S17   , input/openimages/4_ritagli/images/OI_a3d4d56506529214.jpg, orizzonte,       0.779, orizzonte
+ 803, S17   , input/openimages/4_ritagli/images/OI_ed02e036e654c41b.jpg, orizzonte,       0.779, cielo
+ 804, S17   , input/openimages/4_ritagli/images/OI_80d0b260ca14edde.jpg, orizzonte,       0.78 , orizzonte
+ 805, S17   , input/openimages/4_ritagli/images/OI_2cbd7c1091b5f6db.jpg, orizzonte,       0.781, cielo
+ 806, S17   , input/openimages/4_ritagli/images/OI_e79febea92fb2578.jpg, orizzonte,       0.783, cielo
+ 807, S17   , input/openimages/4_ritagli/images/OI_1e048c12743e16eb.jpg, orizzonte,       0.783, orizzonte
+ 808, S17   , input/openimages/4_ritagli/images/OI_90caa1238d79a408.jpg, orizzonte,       0.784, cielo
+ 809, S17   , input/openimages/4_ritagli/images/OI_00940ac8aa9754df.jpg, orizzonte,       0.784, orizzonte
+ 810, S17   , input/openimages/4_ritagli/images/OI_4467d44e69508759.jpg, orizzonte,       0.785, orizzonte
+ 811, S17   , input/openimages/4_ritagli/images/OI_b15f87882fc21872.jpg, orizzonte,       0.786, orizzonte
+ 812, S17   , input/openimages/4_ritagli/images/OI_78a821e036d06e77.jpg, orizzonte,       0.788, orizzonte
+ 813, S17   , input/openimages/4_ritagli/images/OI_c96d26f843da9b8d.jpg, orizzonte,       0.79 , orizzonte
+ 814, S17   , input/openimages/4_ritagli/images/OI_de8adee099df7762.jpg, orizzonte,       0.791, cielo
+ 815, S17   , input/openimages/4_ritagli/images/OI_3f0b1a20be15bff4.jpg, orizzonte,       0.792, cielo
+ 816, S17   , input/openimages/4_ritagli/images/OI_932bf2dbf52533f5.jpg, orizzonte,       0.793, orizzonte
+ 817, S18   , input/openimages/4_ritagli/images/OI_c6d7fc78f6bfcd30.jpg, orizzonte,       0.793, orizzonte
+ 818, S18   , input/openimages/4_ritagli/images/OI_9e9421d18465e0a6.jpg, orizzonte,       0.794, orizzonte
+ 819, S18   , input/openimages/4_ritagli/images/OI_6b1d105e7cfd8d71.jpg, orizzonte,       0.794, cielo
+ 820, S18   , input/openimages/4_ritagli/images/OI_668da5e822f7b3e4.jpg, orizzonte,       0.797, cielo
+ 821, S18   , input/openimages/4_ritagli/images/OI_da69cbe6578bade8.jpg, orizzonte,       0.798, orizzonte
+ 822, S18   , input/openimages/4_ritagli/images/OI_fca1b2042b3d91ac.jpg, orizzonte,       0.798, orizzonte
+ 823, S18   , input/openimages/4_ritagli/images/OI_610ad6445cdd6011.jpg, orizzonte,       0.799, cielo
+ 824, S18   , input/openimages/4_ritagli/images/OI_267495119381bce3.jpg, orizzonte,       0.799, cielo
+ 825, S18   , input/openimages/4_ritagli/images/OI_d3596b90e73fb708.jpg, orizzonte,       0.799, orizzonte
+ 826, S18   , input/openimages/4_ritagli/images/OI_041b646d6dd01c8d.jpg, orizzonte,       0.803, cielo
+ 827, S18   , input/openimages/4_ritagli/images/OI_11068b36f53faf45.jpg, orizzonte,       0.806, cielo
+ 828, S18   , input/openimages/4_ritagli/images/OI_6cba5b02e07ffd80.jpg, orizzonte,       0.806, orizzonte
+ 829, S18   , input/openimages/4_ritagli/images/OI_7ff354e3fcab891b.jpg, orizzonte,       0.806, orizzonte
+ 830, S18   , input/openimages/4_ritagli/images/OI_b41023593c34333f.jpg, orizzonte,       0.806, orizzonte
+ 831, S18   , input/openimages/4_ritagli/images/OI_69d7915107cf7cbe.jpg, orizzonte,       0.807, cielo
+ 832, S18   , input/openimages/4_ritagli/images/OI_fbc629fe0cd5596d.jpg, orizzonte,       0.807, orizzonte
+ 833, S18   , input/openimages/4_ritagli/images/OI_85bf6428bfc41ad2.jpg, orizzonte,       0.808, orizzonte
+ 834, S18   , input/openimages/4_ritagli/images/OI_1ff3c675c9f5837e.jpg, orizzonte,       0.811, orizzonte
+ 835, S18   , input/openimages/4_ritagli/images/OI_ccc1b55f0d2fa6d4.jpg, orizzonte,       0.814, orizzonte
+ 836, S18   , input/openimages/4_ritagli/images/OI_cefa1b1cffccb828.jpg, orizzonte,       0.816, orizzonte
+ 837, S18   , input/openimages/4_ritagli/images/OI_0577c8057778ff31.jpg, orizzonte,       0.816, orizzonte
+ 838, S18   , input/openimages/4_ritagli/images/OI_62f3e83d70b6d664.jpg, orizzonte,       0.818, orizzonte
+ 839, S18   , input/openimages/4_ritagli/images/OI_e40266b905f5a0d5.jpg, orizzonte,       0.821, cielo
+ 840, S18   , input/openimages/4_ritagli/images/OI_176113a1bf6761e4.jpg, orizzonte,       0.822, cielo
+ 841, S18   , input/openimages/4_ritagli/images/OI_2b151de4ee62161f.jpg, orizzonte,       0.822, orizzonte
+ 842, S18   , input/openimages/4_ritagli/images/OI_0fe4ac16d9dbf085.jpg, orizzonte,       0.826, cielo
+ 843, S18   , input/openimages/4_ritagli/images/OI_5b3bf73d48134149.jpg, orizzonte,       0.826, cielo
+ 844, S18   , input/openimages/4_ritagli/images/OI_9bbd1545bd9fd7c8.jpg, orizzonte,       0.826, orizzonte
+ 845, S18   , input/openimages/4_ritagli/images/OI_61262fe5ead9ebf6.jpg, orizzonte,       0.827, orizzonte
+ 846, S18   , input/openimages/4_ritagli/images/OI_6e56bfeb3d3a802f.jpg, orizzonte,       0.827, cielo
+ 847, S18   , input/openimages/4_ritagli/images/OI_420235f897c28111.jpg, orizzonte,       0.829, cielo
+ 848, S18   , input/openimages/4_ritagli/images/OI_dc636c5febb73c11.jpg, orizzonte,       0.83 , orizzonte
+ 849, S18   , input/openimages/4_ritagli/images/OI_88bc9da00e28289e.jpg, orizzonte,       0.83 , cielo
+ 850, S18   , input/openimages/4_ritagli/images/OI_82af3c196a93b7ee.jpg, orizzonte,       0.831, orizzonte
+ 851, S18   , input/openimages/4_ritagli/images/OI_73b37198017137d3.jpg, orizzonte,       0.832, orizzonte
+ 852, S18   , input/openimages/4_ritagli/images/OI_61d42d4f99156015.jpg, orizzonte,       0.833, orizzonte
+ 853, S18   , input/openimages/4_ritagli/images/OI_6f9ab8a5ff488984.jpg, orizzonte,       0.834, orizzonte
+ 854, S18   , input/openimages/4_ritagli/images/OI_abc1575f00477bdd.jpg, orizzonte,       0.837, orizzonte
+ 855, S18   , input/openimages/4_ritagli/images/OI_6b859b4b5adf52e2.jpg, orizzonte,       0.84 , orizzonte
+ 856, S18   , input/openimages/4_ritagli/images/OI_0cb53d4367aab417.jpg, orizzonte,       0.84 , orizzonte
+ 857, S18   , input/openimages/4_ritagli/images/OI_9c22610a5d1a317a.jpg, orizzonte,       0.85 , cielo
+ 858, S18   , input/openimages/4_ritagli/images/OI_154005c980887353.jpg, orizzonte,       0.851, cielo
+ 859, S18   , input/openimages/4_ritagli/images/OI_c5c563e92f0089f6.jpg, orizzonte,       0.851, cielo
+ 860, S18   , input/openimages/4_ritagli/images/OI_138c7e98c2ee9c23.jpg, orizzonte,       0.853, cielo
+ 861, S18   , input/openimages/4_ritagli/images/OI_cbfe8a6ccae46d31.jpg, orizzonte,       0.853, cielo
+ 862, S18   , input/openimages/4_ritagli/images/OI_69f969fce6ad8a26.jpg, orizzonte,       0.856, orizzonte
+ 863, S18   , input/openimages/4_ritagli/images/OI_ed45230b3f01a4f6.jpg, orizzonte,       0.856, orizzonte
+ 864, S18   , input/openimages/4_ritagli/images/OI_5d0bd0390961bd18.jpg, orizzonte,       0.856, orizzonte
+ 865, S19   , input/openimages/4_ritagli/images/OI_a2b55b359d51900c.jpg, orizzonte,       0.859, cielo
+ 866, S19   , input/openimages/4_ritagli/images/OI_5d3d1cbc60f652fe.jpg, orizzonte,       0.861, orizzonte
+ 867, S19   , input/openimages/4_ritagli/images/OI_876221e69e688d86.jpg, orizzonte,       0.862, orizzonte
+ 868, S19   , input/openimages/4_ritagli/images/OI_60810490a4b2c8a4.jpg, orizzonte,       0.862, orizzonte
+ 869, S19   , input/openimages/4_ritagli/images/OI_5dab7cbee95c5695.jpg, orizzonte,       0.864, orizzonte
+ 870, S19   , input/openimages/4_ritagli/images/OI_031a81e87a37f447.jpg, orizzonte,       0.866, orizzonte
+ 871, S19   , input/openimages/4_ritagli/images/OI_0e20f679da5a8582.jpg, orizzonte,       0.869, orizzonte
+ 872, S19   , input/openimages/4_ritagli/images/OI_df0034b16c5712bf.jpg, orizzonte,       0.869, orizzonte
+ 873, S19   , input/openimages/4_ritagli/images/OI_0084f0974e125d89.jpg, orizzonte,       0.871, cielo
+ 874, S19   , input/openimages/4_ritagli/images/OI_896bbd3379c43f76.jpg, orizzonte,       0.871, cielo
+ 875, S19   , input/openimages/4_ritagli/images/OI_c22cbb2b06a89627.jpg, orizzonte,       0.872, orizzonte
+ 876, S19   , input/openimages/4_ritagli/images/OI_31e62624206193b2.jpg, orizzonte,       0.875, orizzonte
+ 877, S19   , input/openimages/4_ritagli/images/OI_e1a824c210316f8b.jpg, orizzonte,       0.878, cielo
+ 878, S19   , input/openimages/4_ritagli/images/OI_4c82a952a7e97978.jpg, orizzonte,       0.881, orizzonte
+ 879, S19   , input/openimages/4_ritagli/images/OI_6dac34f258e2f3f3.jpg, orizzonte,       0.885, cielo
+ 880, S19   , input/openimages/4_ritagli/images/OI_6a898ab4d067717e.jpg, orizzonte,       0.886, orizzonte
+ 881, S19   , input/openimages/4_ritagli/images/OI_7247367371f04890.jpg, orizzonte,       0.886, orizzonte
+ 882, S19   , input/openimages/4_ritagli/images/OI_55cece073f430dc8.jpg, orizzonte,       0.886, cielo
+ 883, S19   , input/openimages/4_ritagli/images/OI_7ebb71f06c1ba607.jpg, orizzonte,       0.887, orizzonte
+ 884, S19   , input/openimages/4_ritagli/images/OI_149ec0f9fbf8c904.jpg, orizzonte,       0.888, cielo
+ 885, S19   , input/openimages/4_ritagli/images/OI_5bd803dba3c0847b.jpg, orizzonte,       0.888, cielo
+ 886, S19   , input/openimages/4_ritagli/images/OI_da41326c522686d9.jpg, orizzonte,       0.889, orizzonte
+ 887, S19   , input/openimages/4_ritagli/images/OI_61960d61464db34e.jpg, orizzonte,       0.89 , orizzonte
+ 888, S19   , input/openimages/4_ritagli/images/OI_bb645a1d9eef9802.jpg, orizzonte,       0.89 , cielo
+ 889, S19   , input/openimages/4_ritagli/images/OI_d374556186fc3526.jpg, orizzonte,       0.891, orizzonte
+ 890, S19   , input/openimages/4_ritagli/images/OI_e3fe58a9e72f8ab5.jpg, orizzonte,       0.891, orizzonte
+ 891, S19   , input/openimages/4_ritagli/images/OI_75696ba1ae0a1525.jpg, orizzonte,       0.891, cielo
+ 892, S19   , input/openimages/4_ritagli/images/OI_ee1a50b2b49e028e.jpg, orizzonte,       0.892, orizzonte
+ 893, S19   , input/openimages/4_ritagli/images/OI_4054413079e3b6e1.jpg, orizzonte,       0.892, cielo
+ 894, S19   , input/openimages/4_ritagli/images/OI_584d11faaf916354.jpg, orizzonte,       0.893, orizzonte
+ 895, S19   , input/openimages/4_ritagli/images/OI_6984d3cd13c638e1.jpg, orizzonte,       0.894, orizzonte
+ 896, S19   , input/openimages/4_ritagli/images/OI_773621a57471a6f7.jpg, orizzonte,       0.894, orizzonte
+ 897, S19   , input/openimages/4_ritagli/images/OI_71c71d3e7ef83c94.jpg, orizzonte,       0.896, orizzonte
+ 898, S19   , input/openimages/4_ritagli/images/OI_3f01d51eb6154144.jpg, orizzonte,       0.896, orizzonte
+ 899, S19   , input/openimages/4_ritagli/images/OI_626afde82efd5d24.jpg, orizzonte,       0.897, orizzonte
+ 900, S19   , input/openimages/4_ritagli/images/OI_caa29ae7dfa69808.jpg, orizzonte,       0.897, cielo
+ 901, S19   , input/openimages/4_ritagli/images/OI_45f14a2a8912ab67.jpg, orizzonte,       0.898, cielo
+ 902, S19   , input/openimages/4_ritagli/images/OI_e1a47b11bf030f3b.jpg, orizzonte,       0.902, orizzonte
+ 903, S19   , input/openimages/4_ritagli/images/OI_4c88221b7a22e645.jpg, orizzonte,       0.907, cielo
+ 904, S19   , input/openimages/4_ritagli/images/OI_f87dc2311e435e1b.jpg, orizzonte,       0.912, cielo
+ 905, S19   , input/openimages/4_ritagli/images/OI_170651fb47d9f090.jpg, orizzonte,       0.912, orizzonte
+ 906, S19   , input/openimages/4_ritagli/images/OI_4de2ba666bf1491e.jpg, orizzonte,       0.913, orizzonte
+ 907, S19   , input/openimages/4_ritagli/images/OI_478a26c5a75b1450.jpg, orizzonte,       0.913, cielo
+ 908, S19   , input/openimages/4_ritagli/images/OI_e67e7d3f101c87c4.jpg, orizzonte,       0.914, orizzonte
+ 909, S19   , input/openimages/4_ritagli/images/OI_4f97cfbfbb7110ea.jpg, orizzonte,       0.915, cielo
+ 910, S19   , input/openimages/4_ritagli/images/OI_b77e681d3c4e28d5.jpg, orizzonte,       0.916, orizzonte
+ 911, S19   , input/openimages/4_ritagli/images/OI_cfdc0a1c0a8e00f0.jpg, orizzonte,       0.917, orizzonte
+ 912, S19   , input/openimages/4_ritagli/images/OI_47f122194104d847.jpg, orizzonte,       0.917, cielo
+ 913, S20   , input/openimages/4_ritagli/images/OI_49fd527c26863395.jpg, orizzonte,       0.918, orizzonte
+ 914, S20   , input/openimages/4_ritagli/images/OI_9cc1ce58361ad8fd.jpg, orizzonte,       0.92 , orizzonte
+ 915, S20   , input/openimages/4_ritagli/images/OI_3793691590546f57.jpg, orizzonte,       0.921, cielo
+ 916, S20   , input/openimages/4_ritagli/images/OI_307cdd658713fc5b.jpg, orizzonte,       0.921, orizzonte
+ 917, S20   , input/openimages/4_ritagli/images/OI_2262bb92cddabbd9.jpg, orizzonte,       0.923, orizzonte
+ 918, S20   , input/openimages/4_ritagli/images/OI_04cbe332b0f8b498.jpg, orizzonte,       0.924, orizzonte
+ 919, S20   , input/openimages/4_ritagli/images/OI_e4510922cc127a68.jpg, orizzonte,       0.927, orizzonte
+ 920, S20   , input/openimages/4_ritagli/images/OI_d2187740c82cc2ef.jpg, orizzonte,       0.931, orizzonte
+ 921, S20   , input/openimages/4_ritagli/images/OI_f4c379e2efc98590.jpg, orizzonte,       0.932, orizzonte
+ 922, S20   , input/openimages/4_ritagli/images/OI_15f31225779efbe6.jpg, orizzonte,       0.932, cielo
+ 923, S20   , input/openimages/4_ritagli/images/OI_972a9180f735d9c4.jpg, orizzonte,       0.932, orizzonte
+ 924, S20   , input/openimages/4_ritagli/images/OI_fb60f8f9956826a1.jpg, orizzonte,       0.933, orizzonte
+ 925, S20   , input/openimages/4_ritagli/images/OI_371b4f4363161325.jpg, orizzonte,       0.933, cielo
+ 926, S20   , input/openimages/4_ritagli/images/OI_a8cd276189c1b9b5.jpg, orizzonte,       0.933, orizzonte
+ 927, S20   , input/openimages/4_ritagli/images/OI_c374dfbc5df852a2.jpg, orizzonte,       0.933, orizzonte
+ 928, S20   , input/openimages/4_ritagli/images/OI_d1630819e623bb9a.jpg, orizzonte,       0.933, cielo
+ 929, S20   , input/openimages/4_ritagli/images/OI_0eb65a496e0f63b0.jpg, orizzonte,       0.934, cielo
+ 930, S20   , input/openimages/4_ritagli/images/OI_39daaa13c46aee2a.jpg, orizzonte,       0.934, cielo
+ 931, S20   , input/openimages/4_ritagli/images/OI_58ac3db1b43c868f.jpg, orizzonte,       0.936, cielo
+ 932, S20   , input/openimages/4_ritagli/images/OI_b3f3582a60aa21fc.jpg, orizzonte,       0.938, orizzonte
+ 933, S20   , input/openimages/4_ritagli/images/OI_fe170c604c69b938.jpg, orizzonte,       0.938, orizzonte
+ 934, S20   , input/openimages/4_ritagli/images/OI_05f5b63647c7b0a2.jpg, orizzonte,       0.939, cielo
+ 935, S20   , input/openimages/4_ritagli/images/OI_6407dc313a4c9c06.jpg, orizzonte,       0.94 , orizzonte
+ 936, S20   , input/openimages/4_ritagli/images/OI_c0ef4c30ed72bfbc.jpg, orizzonte,       0.943, orizzonte
+ 937, S20   , input/openimages/4_ritagli/images/OI_0932d053fed7e3ca.jpg, orizzonte,       0.943, cielo
+ 938, S20   , input/openimages/4_ritagli/images/OI_48b65d74573eef74.jpg, orizzonte,       0.945, orizzonte
+ 939, S20   , input/openimages/4_ritagli/images/OI_5982d7903ae15873.jpg, orizzonte,       0.945, orizzonte
+ 940, S20   , input/openimages/4_ritagli/images/OI_04f53baa632c45fc.jpg, orizzonte,       0.948, cielo
+ 941, S20   , input/openimages/4_ritagli/images/OI_01240c0b5b8940e4.jpg, orizzonte,       0.948, orizzonte
+ 942, S20   , input/openimages/4_ritagli/images/OI_0ea56c1cfe9e2656.jpg, orizzonte,       0.948, orizzonte
+ 943, S20   , input/openimages/4_ritagli/images/OI_10bf27203baa2e1e.jpg, orizzonte,       0.95 , orizzonte
+ 944, S20   , input/openimages/4_ritagli/images/OI_05ae93c054a95cfd.jpg, orizzonte,       0.95 , orizzonte
+ 945, S20   , input/openimages/4_ritagli/images/OI_1306ffc0c68bbdb4.jpg, orizzonte,       0.95 , orizzonte
+ 946, S20   , input/openimages/4_ritagli/images/OI_b81be63f63c30681.jpg, orizzonte,       0.95 , orizzonte
+ 947, S20   , input/openimages/4_ritagli/images/OI_8a4e758f3bc7e418.jpg, orizzonte,       0.952, cielo
+ 948, S20   , input/openimages/4_ritagli/images/OI_2896fbff6d612401.jpg, orizzonte,       0.952, cielo
+ 949, S20   , input/openimages/4_ritagli/images/OI_9301222dd62833d1.jpg, orizzonte,       0.953, cielo
+ 950, S20   , input/openimages/4_ritagli/images/OI_3e3f6b32089cac76.jpg, orizzonte,       0.954, orizzonte
+ 951, S20   , input/openimages/4_ritagli/images/OI_c7ed4660a5e9354b.jpg, orizzonte,       0.955, orizzonte
+ 952, S20   , input/openimages/4_ritagli/images/OI_2c54baa99da8e854.jpg, orizzonte,       0.956, orizzonte
+ 953, S20   , input/openimages/4_ritagli/images/OI_b9dcfc09e0b65c5b.jpg, orizzonte,       0.956, orizzonte
+ 954, S20   , input/openimages/4_ritagli/images/OI_f33e6e908392acb7.jpg, orizzonte,       0.957, orizzonte
+ 955, S20   , input/openimages/4_ritagli/images/OI_d40f1ae2346f9682.jpg, orizzonte,       0.958, orizzonte
+ 956, S20   , input/openimages/4_ritagli/images/OI_17cb29992ef87b81.jpg, orizzonte,       0.958, cielo
+ 957, S20   , input/openimages/4_ritagli/images/OI_00ce6c4b7f54e2cc.jpg, orizzonte,       0.959, orizzonte
+ 958, S20   , input/openimages/4_ritagli/images/OI_b13fdaa17caa95aa.jpg, orizzonte,       0.959, orizzonte
+ 959, S20   , input/openimages/4_ritagli/images/OI_c7d64c2c908d66e4.jpg, orizzonte,       0.96 , orizzonte
+ 960, S20   , input/openimages/4_ritagli/images/OI_bbac6baae095bd09.jpg, orizzonte,       0.961, orizzonte
+ 961, S21   , input/openimages/4_ritagli/images/OI_f257e99777e39153.jpg, orizzonte,       0.962, orizzonte
+ 962, S21   , input/openimages/4_ritagli/images/OI_88271a437cd311a0.jpg, orizzonte,       0.963, orizzonte
+ 963, S21   , input/openimages/4_ritagli/images/OI_f9ba4261f2ca41e7.jpg, orizzonte,       0.963, cielo
+ 964, S21   , input/openimages/4_ritagli/images/OI_bd2739620c316429.jpg, orizzonte,       0.964, orizzonte
+ 965, S21   , input/openimages/4_ritagli/images/OI_76e9a9d2f83c9de8.jpg, orizzonte,       0.965, orizzonte
+ 966, S21   , input/openimages/4_ritagli/images/OI_b496eca22b61cd7c.jpg, orizzonte,       0.965, orizzonte
+ 967, S21   , input/openimages/4_ritagli/images/OI_19b9be1b6e3b543a.jpg, orizzonte,       0.966, cielo
+ 968, S21   , input/openimages/4_ritagli/images/OI_ac659a1013dabab3.jpg, orizzonte,       0.967, cielo
+ 969, S21   , input/openimages/4_ritagli/images/OI_0f99c2297b4f7a1a.jpg, orizzonte,       0.968, orizzonte
+ 970, S21   , input/openimages/4_ritagli/images/OI_59e9127ebb7f7b44.jpg, orizzonte,       0.968, orizzonte
+ 971, S21   , input/openimages/4_ritagli/images/OI_1fcd0ea6fabb23c6.jpg, orizzonte,       0.969, cielo
+ 972, S21   , input/openimages/4_ritagli/images/OI_27391fd9432c150c.jpg, orizzonte,       0.969, orizzonte
+ 973, S21   , input/openimages/4_ritagli/images/OI_7a1cbd0bfb4c5dda.jpg, orizzonte,       0.97 , orizzonte
+ 974, S21   , input/openimages/4_ritagli/images/OI_28789243c8be0a90.jpg, orizzonte,       0.97 , orizzonte
+ 975, S21   , input/openimages/4_ritagli/images/OI_8571ea4b2ba87293.jpg, orizzonte,       0.97 , orizzonte
+ 976, S21   , input/openimages/4_ritagli/images/OI_5e74aca9428e1ec9.jpg, orizzonte,       0.97 , orizzonte
+ 977, S21   , input/openimages/4_ritagli/images/OI_92e8d140e4c832c7.jpg, orizzonte,       0.974, orizzonte
+ 978, S21   , input/openimages/4_ritagli/images/OI_a6837abeab12f4cc.jpg, orizzonte,       0.974, orizzonte
+ 979, S21   , input/openimages/4_ritagli/images/OI_e4c59fe23231adc8.jpg, orizzonte,       0.975, cielo
+ 980, S21   , input/openimages/4_ritagli/images/OI_899e6ecd22a35466.jpg, orizzonte,       0.975, orizzonte
+ 981, S21   , input/openimages/4_ritagli/images/OI_34b9657bf3e8efb8.jpg, orizzonte,       0.975, cielo
+ 982, S21   , input/openimages/4_ritagli/images/OI_0aae541e21006a78.jpg, orizzonte,       0.976, orizzonte
+ 983, S21   , input/openimages/4_ritagli/images/OI_f71759023a69bfe9.jpg, orizzonte,       0.977, orizzonte
+ 984, S21   , input/openimages/4_ritagli/images/OI_6440fac36e2ca8c9.jpg, orizzonte,       0.978, cielo
+ 985, S21   , input/openimages/4_ritagli/images/OI_63a81f8869f1da28.jpg, orizzonte,       0.978, cielo
+ 986, S21   , input/openimages/4_ritagli/images/OI_b5a80ed2dda17b77.jpg, orizzonte,       0.978, orizzonte
+ 987, S21   , input/openimages/4_ritagli/images/OI_bc6918c7c46a0f44.jpg, orizzonte,       0.979, orizzonte
+ 988, S21   , input/openimages/4_ritagli/images/OI_3f04f5f1b3ae34b3.jpg, orizzonte,       0.979, orizzonte
+ 989, S21   , input/openimages/4_ritagli/images/OI_caf816899da8e9d7.jpg, orizzonte,       0.98 , orizzonte
+ 990, S21   , input/openimages/4_ritagli/images/OI_34a6dbcd4341e49c.jpg, orizzonte,       0.98 , orizzonte
+ 991, S21   , input/openimages/4_ritagli/images/OI_d43b1e8bfba79cd9.jpg, orizzonte,       0.981, orizzonte
+ 992, S21   , input/openimages/4_ritagli/images/OI_29aab66624934a46.jpg, orizzonte,       0.981, cielo
+ 993, S21   , input/openimages/4_ritagli/images/OI_1e2465645cdd8c3e.jpg, orizzonte,       0.982, cielo
+ 994, S21   , input/openimages/4_ritagli/images/OI_6a29949432003eb5.jpg, orizzonte,       0.982, cielo
+ 995, S21   , input/openimages/4_ritagli/images/OI_6ce4804fdec0a586.jpg, orizzonte,       0.982, orizzonte
+ 996, S21   , input/openimages/4_ritagli/images/OI_e8ea081c1bdf3345.jpg, orizzonte,       0.982, cielo
+ 997, S21   , input/openimages/4_ritagli/images/OI_7b72a6c3cd4fd383.jpg, orizzonte,       0.983, cielo
+ 998, S21   , input/openimages/4_ritagli/images/OI_d6112215a0061c02.jpg, orizzonte,       0.983, orizzonte
+ 999, S21   , input/openimages/4_ritagli/images/OI_4cbcf90245cfa61f.jpg, orizzonte,       0.984, cielo
+1000, S21   , input/openimages/4_ritagli/images/OI_a3cbc96688df5d02.jpg, orizzonte,       0.985, orizzonte
+1001, S21   , input/openimages/4_ritagli/images/OI_fc1c02a16522a7c2.jpg, orizzonte,       0.985, orizzonte
+1002, S21   , input/openimages/4_ritagli/images/OI_386980f8a2d6608c.jpg, orizzonte,       0.986, cielo
+1003, S21   , input/openimages/4_ritagli/images/OI_7c93b2c6d544aa90.jpg, orizzonte,       0.986, orizzonte
+1004, S21   , input/openimages/4_ritagli/images/OI_d175bf6ce39dc8d4.jpg, orizzonte,       0.986, cielo
+1005, S21   , input/openimages/4_ritagli/images/OI_2e58b9da4267de68.jpg, orizzonte,       0.987, cielo
+1006, S21   , input/openimages/4_ritagli/images/OI_11bd25c0fb50157f.jpg, orizzonte,       0.987, orizzonte
+1007, S21   , input/openimages/4_ritagli/images/OI_0afb3e0beab24519.jpg, orizzonte,       0.988, orizzonte
+1008, S21   , input/openimages/4_ritagli/images/OI_c77c6b918317b570.jpg, orizzonte,       0.988, orizzonte
+1009, S22   , input/openimages/4_ritagli/images/OI_4749eb732d1d67f2.jpg, orizzonte,       0.988, orizzonte
+1010, S22   , input/openimages/4_ritagli/images/OI_644f5a1c0a96d136.jpg, orizzonte,       0.988, orizzonte
+1011, S22   , input/openimages/4_ritagli/images/OI_12babdd12f75d084.jpg, orizzonte,       0.988, orizzonte
+1012, S22   , input/openimages/4_ritagli/images/OI_ce47cec5a8296cda.jpg, orizzonte,       0.989, orizzonte
+1013, S22   , input/openimages/4_ritagli/images/OI_b20e05e3eda130f0.jpg, orizzonte,       0.989, orizzonte
+1014, S22   , input/openimages/4_ritagli/images/OI_1b259ce24db29505.jpg, orizzonte,       0.989, cielo
+1015, S22   , input/openimages/4_ritagli/images/OI_c25f0430942393fe.jpg, orizzonte,       0.99 , orizzonte
+1016, S22   , input/openimages/4_ritagli/images/OI_cba9ae76db408995.jpg, orizzonte,       0.99 , orizzonte
+1017, S22   , input/openimages/4_ritagli/images/OI_03bfd1b4d1747f40.jpg, orizzonte,       0.99 , orizzonte
+1018, S22   , input/openimages/4_ritagli/images/OI_8d8e9ba8a5278179.jpg, orizzonte,       0.99 , cielo
+1019, S22   , input/openimages/4_ritagli/images/OI_00d8b7f7018c6f18.jpg, orizzonte,       0.991, orizzonte
+1020, S22   , input/openimages/4_ritagli/images/OI_b9312c19a9b78753.jpg, orizzonte,       0.991, orizzonte
+1021, S22   , input/openimages/4_ritagli/images/OI_136df7b31222f2da.jpg, orizzonte,       0.992, orizzonte
+1022, S22   , input/openimages/4_ritagli/images/OI_5c41d4c6c1a7a666.jpg, orizzonte,       0.992, orizzonte
+1023, S22   , input/openimages/4_ritagli/images/OI_d15e1adb94b7e87e.jpg, orizzonte,       0.992, orizzonte
+1024, S22   , input/openimages/4_ritagli/images/OI_5a5e87921309f65d.jpg, orizzonte,       0.993, cielo
+1025, S22   , input/openimages/4_ritagli/images/OI_4a843571ee1c624f.jpg, orizzonte,       0.993, orizzonte
+1026, S22   , input/openimages/4_ritagli/images/OI_d507f326bbec14dd.jpg, orizzonte,       0.994, orizzonte
+1027, S22   , input/openimages/4_ritagli/images/OI_86d1914f076463a6.jpg, orizzonte,       0.994, orizzonte
+1028, S22   , input/openimages/4_ritagli/images/OI_bf9f79b1517453a7.jpg, orizzonte,       0.994, cielo
+1029, S22   , input/openimages/4_ritagli/images/OI_00b9bef0809cc3c3.jpg, orizzonte,       0.994, orizzonte
+1030, S22   , input/openimages/4_ritagli/images/OI_9c157b2f9c8c7db2.jpg, orizzonte,       0.994, orizzonte
+1031, S22   , input/openimages/4_ritagli/images/OI_0797f518c7160758.jpg, orizzonte,       0.994, orizzonte
+1032, S22   , input/openimages/4_ritagli/images/OI_6eba6c7d8e1ca5b9.jpg, orizzonte,       0.995, orizzonte
+1033, S22   , input/openimages/4_ritagli/images/OI_9c854268e506a071.jpg, orizzonte,       0.995, cielo
+1034, S22   , input/openimages/4_ritagli/images/OI_2e59ebfaa79bfefb.jpg, orizzonte,       0.996, cielo
+1035, S22   , input/openimages/4_ritagli/images/OI_a8dfdf6005de1808.jpg, orizzonte,       0.996, orizzonte
+1036, S22   , input/openimages/4_ritagli/images/OI_6815b258eb66f99b.jpg, orizzonte,       0.996, orizzonte
+1037, S22   , input/openimages/4_ritagli/images/OI_3489f450a553ad47.jpg, orizzonte,       0.996, orizzonte
+1038, S22   , input/openimages/4_ritagli/images/OI_e5f72f2ce4fd23ac.jpg, orizzonte,       0.996, cielo
+1039, S22   , input/openimages/4_ritagli/images/OI_0102bc443592c22b.jpg, orizzonte,       0.996, orizzonte
+1040, S22   , input/openimages/4_ritagli/images/OI_b9b8a9f6e4fc42b3.jpg, orizzonte,       0.996, orizzonte
+1041, S22   , input/openimages/4_ritagli/images/OI_056749c88efb6ad5.jpg, orizzonte,       0.996, orizzonte
+1042, S22   , input/openimages/4_ritagli/images/OI_17970fdba943c1b8.jpg, orizzonte,       0.997, orizzonte
+1043, S22   , input/openimages/4_ritagli/images/OI_696076288d129b1a.jpg, orizzonte,       0.997, orizzonte
+1044, S22   , input/openimages/4_ritagli/images/OI_58a37452504162d5.jpg, orizzonte,       0.997, cielo
+1045, S22   , input/openimages/4_ritagli/images/OI_c4cd1a1a1e914a60.jpg, orizzonte,       0.997, orizzonte
+1046, S22   , input/openimages/4_ritagli/images/OI_a72205e115bf2ea8.jpg, orizzonte,       0.997, orizzonte
+1047, S22   , input/openimages/4_ritagli/images/OI_8b72c949528d701f.jpg, orizzonte,       0.997, cielo
+1048, S22   , input/openimages/4_ritagli/images/OI_4e332acba8a44a06.jpg, orizzonte,       0.997, cielo
+1049, S22   , input/openimages/4_ritagli/images/OI_759b2269da4432f0.jpg, orizzonte,       0.997, orizzonte
+1050, S22   , input/openimages/4_ritagli/images/OI_925b910e5677348a.jpg, orizzonte,       0.998, cielo
+1051, S22   , input/openimages/4_ritagli/images/OI_42c9a1733eab24ae.jpg, orizzonte,       0.998, orizzonte
+1052, S22   , input/openimages/4_ritagli/images/OI_52eccb99e85bf128.jpg, orizzonte,       0.999, orizzonte
+1053, S22   , input/openimages/4_ritagli/images/OI_24e869726f653138.jpg, orizzonte,       0.999, orizzonte
+1054, S22   , input/openimages/4_ritagli/images/OI_8a34167013df16ea.jpg, orizzonte,       0.999, cielo
+1055, S22   , input/openimages/4_ritagli/images/OI_13197e7eed521622.jpg, orizzonte,       0.999, orizzonte
+1056, S22   , input/openimages/4_ritagli/images/OI_e6d168eab4ed98f2.jpg, orizzonte,       0.999, orizzonte
+1057, S23   , input/openimages/4_ritagli/images/OI_38f4ad86a419a5e9.jpg, orizzonte,       0.999, cielo
+1058, S23   , input/openimages/4_ritagli/images/OI_2c8de43fcced4210.jpg, orizzonte,       0.999, orizzonte
+1059, S23   , input/openimages/4_ritagli/images/OI_ca3eb828d4e6b920.jpg, orizzonte,       0.999, orizzonte

@@ -1,0 +1,6 @@
+# Coppie di coppie.csv da unire (operatore, 23/10/2026): un numero o un intervallo per riga, `N via` per togliere B.
+# Risposta dell'utente: "sono tutte tipo 2" (stesso posto anche nella seconda coppia) -> tutte unite.
+# 135-140 e 142-145 (Svanström, solo cielo): l'utente non sa distinguerle -> unite per prudenza (nel dubbio
+# unite, regole.md); costo piccolo, 853 frame (S003, S011, S015, S043, S047, S067 714; S106+S107 139). 141 sicuro.
+# Nessun `via`: i frame quasi identici si tolgono dopo, dentro ogni gruppo, invece di togliere video interi.
+1-146

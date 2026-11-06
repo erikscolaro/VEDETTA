@@ -1,0 +1,721 @@
+id,decisione,nota
+K00000,ignora,"già box verde sull'oggetto"
+K00001,ignora,
+K00002,aggiungi,"box verde minuscola su parte dell'aereo"
+K00003,tieni,"box_stretta"
+K00004,aggiungi,"box verde minuscola su parte dell'aereo"
+K00005,tieni,"box_stretta"
+K00006,aggiungi,"box verde minuscola su parte dell'aereo"
+K00007,tieni,"box_stretta"
+K00008,tieni,"aereo a quattro motori"
+K00009,tieni,"aereo a quattro motori"
+K00010,tieni,"aereo a quattro motori"
+K00011,tieni,"aereo a quattro motori"
+K00012,tieni,"aereo a quattro motori"
+K00013,tieni,"aereo a quattro motori"
+K00014,tieni,"aereo a quattro motori"
+K00015,tieni,"aereo a quattro motori"
+K00016,tieni,"aereo a quattro motori"
+K00017,tieni,"aereo a quattro motori"
+K00018,tieni,"aereo a quattro motori"
+K00019,tieni,"aereo a quattro motori"
+K00020,tieni,"aereo a quattro motori"
+K00021,tieni,"aereo a quattro motori"
+K00022,tieni,"aereo a quattro motori"
+K00023,tieni,"aereo a quattro motori"
+K00024,tieni,"aereo a quattro motori"
+K00025,tieni,"aereo a quattro motori"
+K00026,tieni,"aereo a quattro motori"
+K00027,tieni,"aereo a quattro motori"
+K00028,tieni,"aereo a quattro motori"
+K00029,tieni,"aereo a quattro motori"
+K00030,tieni,"aereo a quattro motori"
+K00031,tieni,"aereo a quattro motori"
+K00032,tieni,"aereo a quattro motori"
+K00033,tieni,"aereo a quattro motori"
+K00034,tieni,"aereo a quattro motori"
+K00035,togli,
+K00036,togli,
+K00037,togli,
+K00038,togli,
+K00039,togli,
+K00040,tieni,"macchia scura minuscola"
+K00041,togli,
+K00042,togli,
+K00043,togli,
+K00044,togli,
+K00045,togli,
+K00046,togli,
+K00047,togli,
+K00048,togli,
+K00049,togli,
+K00050,togli,
+K00051,togli,
+K00052,togli,
+K00053,tieni,"puntino scuro"
+K00054,togli,
+K00055,togli,
+K00056,togli,
+K00057,togli,
+K00058,togli,
+K00059,togli,
+K00060,togli,
+K00061,togli,
+K00062,tieni,"box_spostata"
+K00063,dubbio,"puntino verde sul bordo alto"
+K00064,togli,
+K00065,togli,
+K00066,togli,
+K00067,togli,
+K00068,togli,
+K00069,tieni,"puntino scuro"
+K00070,tieni,"puntino scuro"
+K00071,tieni,"puntini scuri"
+K00072,togli,
+K00073,togli,
+K00074,tieni,"puntino scuro"
+K00075,tieni,"puntino scuro"
+K00076,aggiungi:bird,"gabbiano in volo"
+K00077,tieni,"uccellino piccolo"
+K00078,aggiungi:bird,"gabbiano in volo"
+K00079,togli,
+K00080,tieni,"uccellino piccolo"
+K00081,togli,
+K00082,togli,
+K00083,togli,
+K00084,togli,
+K00085,aggiungi:bird,"gabbiano in volo"
+K00086,togli,
+K00087,togli,
+K00088,tieni,
+K00089,aggiungi:bird,"gabbiano in volo"
+K00090,togli,
+K00091,togli,
+K00092,togli,
+K00093,togli,
+K00094,togli,"box grande con altre label piccole dentro"
+K00095,togli,"box grande con altre label piccole dentro"
+K00096,togli,"box grande con altre label piccole dentro"
+K00097,togli,
+K00098,togli,
+K00099,togli,
+K00100,tieni,"segni scuri minuscoli"
+K00101,togli,
+K00102,togli,"duplicata della box verde accanto"
+K00103,togli,
+K00104,togli,
+K00105,tieni,
+K00106,togli,
+K00107,tieni,"box_spostata"
+K00108,tieni,"box_spostata"
+K00109,togli,
+K00110,togli,
+K00111,togli,
+K00112,togli,
+K00113,togli,
+K00114,togli,
+K00115,togli,
+K00116,togli,
+K00117,togli,
+K00118,togli,
+K00119,togli,
+K00120,togli,
+K00121,togli,
+K00122,togli,
+K00123,togli,
+K00124,togli,
+K00125,tieni,"macchia scura sulla torre"
+K00126,togli,
+K00127,togli,
+K00128,togli,
+K00129,togli,
+K00130,togli,
+K00131,togli,
+K00132,togli,
+K00133,togli,
+K00134,aggiungi,
+K00135,togli,
+K00136,togli,
+K00137,tieni,"macchia scura minuscola"
+K00138,tieni,"macchia scura vicino al palo"
+K00139,tieni,"macchia scura vicino al palo"
+K00140,togli,
+K00141,togli,
+K00142,togli,
+K00143,tieni,"macchia scura sul traliccio"
+K00144,aggiungi,
+K00145,togli,
+K00146,tieni,"uccello sulla cima del palo"
+K00147,togli,"uccello fuori dalla box"
+K00148,togli,"uccello fuori dalla box"
+K00149,togli,"uccello fuori dalla box"
+K00150,aggiungi,
+K00151,aggiungi,
+K00152,aggiungi,
+K00153,aggiungi,
+K00154,aggiungi,
+K00155,aggiungi,
+K00156,tieni,"box_larga"
+K00157,aggiungi,
+K00158,aggiungi,
+K00159,aggiungi,
+K00160,aggiungi,
+K00161,aggiungi,
+K00162,aggiungi,
+K00163,aggiungi,
+K00164,aggiungi,
+K00165,aggiungi,
+K00166,aggiungi,
+K00167,aggiungi,
+K00168,aggiungi,
+K00169,aggiungi,
+K00170,aggiungi,
+K00171,aggiungi,
+K00172,aggiungi,
+K00173,aggiungi,
+K00174,aggiungi,
+K00175,aggiungi,
+K00176,aggiungi,
+K00177,aggiungi,
+K00178,aggiungi,
+K00179,aggiungi,
+K00180,aggiungi,
+K00181,aggiungi,
+K00182,aggiungi,
+K00183,aggiungi,
+K00184,aggiungi,
+K00185,aggiungi,
+K00186,aggiungi,
+K00187,aggiungi,
+K00188,aggiungi,
+K00189,aggiungi,
+K00190,tieni,
+K00191,aggiungi,
+K00192,aggiungi,
+K00193,aggiungi,
+K00194,aggiungi,
+K00195,aggiungi,
+K00196,tieni,"uccelli minuscoli"
+K00197,aggiungi,
+K00198,aggiungi,
+K00199,aggiungi,
+K00200,aggiungi,
+K00201,aggiungi,
+K00202,aggiungi,
+K00203,aggiungi,
+K00204,aggiungi,
+K00205,tieni,"puntini scuri minuscoli"
+K00206,aggiungi,
+K00207,aggiungi,
+K00208,aggiungi,
+K00209,aggiungi,
+K00210,aggiungi,
+K00211,aggiungi,
+K00212,aggiungi,
+K00213,aggiungi,
+K00214,aggiungi,
+K00215,aggiungi,
+K00216,aggiungi,
+K00217,aggiungi,
+K00218,aggiungi,
+K00219,aggiungi,
+K00220,aggiungi,
+K00221,aggiungi,
+K00222,aggiungi,
+K00223,aggiungi,
+K00224,aggiungi,
+K00225,tieni,"puntino scuro"
+K00226,togli,"uccelli fuori dalla box"
+K00227,aggiungi,
+K00228,aggiungi,
+K00229,aggiungi:bird,"uccello in volo planato"
+K00230,aggiungi:bird,"uccello in volo planato"
+K00231,tieni,
+K00232,aggiungi,
+K00233,aggiungi,
+K00234,aggiungi,
+K00235,aggiungi,
+K00236,aggiungi,
+K00237,aggiungi,
+K00238,aggiungi,
+K00239,aggiungi,
+K00240,aggiungi,
+K00241,aggiungi,
+K00242,aggiungi,
+K00243,aggiungi,
+K00244,aggiungi,
+K00245,aggiungi,
+K00246,aggiungi,
+K00247,aggiungi,
+K00248,aggiungi,
+K00249,aggiungi,
+K00250,tieni,"puntino scuro"
+K00251,aggiungi,
+K00252,aggiungi,
+K00253,aggiungi,
+K00254,aggiungi,
+K00255,tieni,"box_stretta"
+K00256,aggiungi,
+K00257,aggiungi,
+K00258,aggiungi,
+K00259,aggiungi,
+K00260,aggiungi,
+K00261,aggiungi,
+K00262,aggiungi,
+K00263,aggiungi,
+K00264,togli,"uccello fuori dalla box"
+K00265,aggiungi,
+K00266,aggiungi,
+K00267,aggiungi,
+K00268,aggiungi,
+K00269,aggiungi,
+K00270,aggiungi,
+K00271,togli,
+K00272,togli,
+K00273,togli,
+K00274,togli,
+K00275,togli,
+K00276,togli,
+K00277,togli,
+K00278,togli,
+K00279,togli,
+K00280,togli,
+K00281,togli,
+K00282,togli,
+K00283,togli,
+K00284,ignora,"scoglio in mare"
+K00285,ignora,"scoglio in mare"
+K00286,ignora,"scoglio in mare"
+K00287,ignora,"scoglio in mare"
+K00288,ignora,"scoglio in mare"
+K00289,ignora,"scoglio in mare"
+K00290,ignora,"scoglio in mare"
+K00291,togli,
+K00292,ignora,"scoglio in mare"
+K00293,ignora,"scoglio in mare"
+K00294,ignora,"scoglio in mare"
+K00295,ignora,"scoglio in mare"
+K00296,togli,
+K00297,ignora,"scoglio in mare"
+K00298,ignora,"scoglio in mare"
+K00299,ignora,"scoglio in mare"
+K00300,ignora,"scoglio in mare"
+K00301,ignora,"scoglio in mare"
+K00302,ignora,"scoglio in mare"
+K00303,ignora,"scoglio in mare"
+K00304,togli,
+K00305,togli,
+K00306,togli,
+K00307,ignora,"scoglio in mare"
+K00308,ignora,"scoglio in mare"
+K00309,togli,
+K00310,togli,
+K00311,togli,
+K00312,togli,
+K00313,togli,
+K00314,togli,
+K00315,togli,
+K00316,tieni,
+K00317,tieni,
+K00318,tieni,
+K00319,tieni,
+K00320,tieni,"drone lontano chiaro"
+K00321,tieni,"drone lontano chiaro"
+K00322,tieni,"drone lontano chiaro"
+K00323,aggiungi,
+K00324,aggiungi,
+K00325,tieni,"box_larga"
+K00326,aggiungi,"box verde esistente molto più grande del drone"
+K00327,tieni,"box_larga"
+K00328,aggiungi,
+K00329,tieni,
+K00330,tieni,
+K00331,tieni,
+K00332,tieni,
+K00333,aggiungi,"box verde esistente molto più grande del drone"
+K00334,tieni,"box_larga"
+K00335,aggiungi,
+K00336,aggiungi,
+K00337,tieni,"box_larga"
+K00338,aggiungi,
+K00339,aggiungi,
+K00340,tieni,"box_stretta"
+K00341,aggiungi,
+K00342,tieni,"box_larga"
+K00343,aggiungi,
+K00344,tieni,"box_larga"
+K00345,togli,
+K00346,tieni,"box_spostata"
+K00347,tieni,
+K00348,tieni,
+K00349,tieni,
+K00350,tieni,
+K00351,tieni,
+K00352,tieni,
+K00353,aggiungi,
+K00354,tieni,"box_stretta"
+K00355,aggiungi,
+K00356,tieni,"box_larga"
+K00357,aggiungi,
+K00358,aggiungi,
+K00359,aggiungi,
+K00360,aggiungi,
+K00361,aggiungi,
+K00362,aggiungi,
+K00363,aggiungi,
+K00364,aggiungi,
+K00365,aggiungi,
+K00366,tieni,"box_larga"
+K00367,tieni,"box_larga"
+K00368,tieni,"box_spostata"
+K00369,tieni,
+K00370,tieni,
+K00371,tieni,
+K00372,tieni,
+K00373,tieni,
+K00374,tieni,
+K00375,tieni,
+K00376,tieni,
+K00377,togli,
+K00378,tieni,
+K00379,tieni,
+K00380,tieni,
+K00381,tieni,
+K00382,tieni,"box_spostata"
+K00383,tieni,
+K00384,tieni,
+K00385,tieni,
+K00386,tieni,
+K00387,tieni,
+K00388,tieni,
+K00389,dubbio,"oggetto scuro vicino al terreno"
+K00390,aggiungi,
+K00391,aggiungi,
+K00392,tieni,"box_larga"
+K00393,aggiungi,
+K00394,aggiungi,
+K00395,aggiungi,
+K00396,aggiungi,
+K00397,aggiungi,
+K00398,aggiungi,
+K00399,aggiungi,
+K00400,aggiungi,
+K00401,aggiungi,
+K00402,aggiungi,
+K00403,aggiungi,
+K00404,aggiungi,
+K00405,aggiungi,
+K00406,aggiungi,
+K00407,tieni,"box_larga"
+K00408,aggiungi,
+K00409,aggiungi,
+K00410,tieni,"box_stretta"
+K00411,aggiungi,
+K00412,aggiungi,
+K00413,aggiungi,
+K00414,tieni,"box_stretta"
+K00415,aggiungi,
+K00416,tieni,"box_stretta"
+K00417,aggiungi,
+K00418,tieni,"box_stretta"
+K00419,aggiungi,
+K00420,tieni,"box_stretta"
+K00421,aggiungi,
+K00422,tieni,"box_stretta"
+K00423,aggiungi,
+K00424,tieni,"box_stretta"
+K00425,aggiungi:drone,"quadricottero"
+K00426,tieni,"box_stretta"
+K00427,aggiungi,
+K00428,aggiungi,
+K00429,tieni,
+K00430,tieni,
+K00431,tieni,
+K00432,tieni,
+K00433,tieni,
+K00434,tieni,
+K00435,tieni,
+K00436,tieni,
+K00437,tieni,
+K00438,tieni,
+K00439,tieni,
+K00440,tieni,
+K00441,tieni,
+K00442,tieni,
+K00443,tieni,
+K00444,tieni,
+K00445,tieni,
+K00446,tieni,
+K00447,tieni,
+K00448,tieni,
+K00449,tieni,
+K00450,tieni,
+K00451,tieni,
+K00452,tieni,
+K00453,tieni,
+K00454,tieni,
+K00455,tieni,
+K00456,tieni,
+K00457,tieni,
+K00458,tieni,
+K00459,tieni,
+K00460,tieni,
+K00461,tieni,
+K00462,tieni,
+K00463,tieni,
+K00464,tieni,
+K00465,tieni,
+K00466,tieni,
+K00467,tieni,
+K00468,tieni,
+K00469,aggiungi,
+K00470,aggiungi,
+K00471,aggiungi,
+K00472,aggiungi,
+K00473,aggiungi,
+K00474,aggiungi,
+K00475,aggiungi,
+K00476,tieni,
+K00477,tieni,
+K00478,tieni,
+K00479,tieni,
+K00480,tieni,
+K00481,tieni,
+K00482,tieni,
+K00483,tieni,
+K00484,tieni,
+K00485,tieni,
+K00486,tieni,
+K00487,tieni,
+K00488,tieni,
+K00489,tieni,
+K00490,tieni,
+K00491,tieni,
+K00492,tieni,
+K00493,tieni,
+K00494,tieni,
+K00495,tieni,
+K00496,tieni,
+K00497,tieni,
+K00498,tieni,
+K00499,tieni,
+K00500,tieni,
+K00501,tieni,
+K00502,aggiungi,
+K00503,tieni,"box_larga"
+K00504,tieni,"box_larga"
+K00505,tieni,
+K00506,tieni,
+K00507,tieni,
+K00508,tieni,"box_spostata"
+K00509,tieni,"box_larga"
+K00510,aggiungi,
+K00511,togli,"drone fuori dalla box"
+K00512,tieni,
+K00513,tieni,
+K00514,aggiungi,"box verde esistente molto più grande del drone"
+K00515,tieni,"box_larga"
+K00516,aggiungi,"box verde esistente molto più grande del drone"
+K00517,tieni,"box_larga"
+K00518,aggiungi,
+K00519,tieni,"box_larga"
+K00520,aggiungi,
+K00521,aggiungi,
+K00522,tieni,"box_stretta"
+K00523,aggiungi,
+K00524,tieni,"box_stretta"
+K00525,aggiungi,
+K00526,tieni,"box_stretta"
+K00527,aggiungi,
+K00528,tieni,"box_stretta"
+K00529,aggiungi,
+K00530,tieni,"box_stretta"
+K00531,aggiungi,
+K00532,tieni,"box_stretta"
+K00533,aggiungi,
+K00534,tieni,"box_stretta"
+K00535,aggiungi,
+K00536,aggiungi,
+K00537,aggiungi,
+K00538,tieni,"box_stretta"
+K00539,aggiungi,
+K00540,tieni,"box_stretta"
+K00541,aggiungi,
+K00542,aggiungi,
+K00543,aggiungi,
+K00544,aggiungi,
+K00545,aggiungi,
+K00546,aggiungi,
+K00547,tieni,
+K00548,tieni,
+K00549,tieni,
+K00550,tieni,
+K00551,tieni,
+K00552,tieni,
+K00553,aggiungi:drone,"quadricottero"
+K00554,tieni,
+K00555,tieni,
+K00556,tieni,
+K00557,tieni,
+K00558,tieni,
+K00559,tieni,
+K00560,tieni,
+K00561,tieni,
+K00562,tieni,
+K00563,tieni,
+K00564,tieni,
+K00565,tieni,
+K00566,tieni,
+K00567,tieni,
+K00568,tieni,
+K00569,tieni,
+K00570,tieni,
+K00571,tieni,
+K00572,tieni,
+K00573,tieni,
+K00574,tieni,
+K00575,tieni,
+K00576,tieni,
+K00577,togli,
+K00578,togli,
+K00579,togli,
+K00580,togli,
+K00581,tieni,"puntino piccolo"
+K00582,tieni,"macchia chiara piccola"
+K00583,tieni,"box_spostata"
+K00584,togli,
+K00585,tieni,
+K00586,tieni,
+K00587,tieni,
+K00588,tieni,
+K00589,tieni,
+K00590,tieni,
+K00591,tieni,
+K00592,tieni,
+K00593,tieni,
+K00594,tieni,
+K00595,aggiungi,
+K00596,tieni,"macchia chiara piccola"
+K00597,tieni,"macchia chiara piccola"
+K00598,tieni,"macchia chiara piccola"
+K00599,tieni,"macchia chiara piccola"
+K00600,tieni,"macchia chiara piccola"
+K00601,tieni,"macchia chiara piccola"
+K00602,tieni,"macchia chiara piccola"
+K00603,tieni,"macchia chiara piccola"
+K00604,tieni,"macchia chiara piccola"
+K00605,tieni,"macchia chiara piccola"
+K00606,tieni,"macchia chiara piccola"
+K00607,tieni,"macchia chiara piccola"
+K00608,tieni,"macchia chiara piccola"
+K00609,tieni,"macchia chiara piccola"
+K00610,tieni,"macchia chiara piccola"
+K00611,aggiungi,
+K00612,aggiungi,
+K00613,tieni,"macchia chiara piccola"
+K00614,tieni,"macchia chiara piccola"
+K00615,tieni,"macchia chiara piccola"
+K00616,tieni,"macchia chiara piccola"
+K00617,tieni,"macchia chiara piccola"
+K00618,tieni,"macchia chiara piccola"
+K00619,tieni,"macchia chiara piccola"
+K00620,tieni,"macchia chiara piccola"
+K00621,tieni,"macchia chiara piccola"
+K00622,tieni,"macchia chiara piccola"
+K00623,tieni,"macchia chiara piccola"
+K00624,tieni,"macchia chiara piccola"
+K00625,tieni,"macchia chiara piccola"
+K00626,tieni,"macchia chiara piccola"
+K00627,tieni,"macchia chiara piccola"
+K00628,togli,
+K00629,togli,
+K00630,tieni,"macchia chiara piccola"
+K00631,togli,
+K00632,togli,
+K00633,ignora,"edificio, l'elicottero ha già la sua box"
+K00634,ignora,"edificio, l'elicottero ha già la sua box"
+K00635,ignora,"edificio, l'elicottero ha già la sua box"
+K00636,ignora,"edificio, l'elicottero ha già la sua box"
+K00637,ignora,"edificio, l'elicottero ha già la sua box"
+K00638,aggiungi,
+K00639,tieni,"box_stretta"
+K00640,aggiungi,
+K00641,tieni,"box_stretta"
+K00642,tieni,
+K00643,tieni,
+K00644,tieni,
+K00645,tieni,
+K00646,tieni,"macchia scura piccola"
+K00647,tieni,"macchia scura piccola"
+K00648,tieni,"macchia scura piccola"
+K00649,tieni,"macchia scura piccola"
+K00650,tieni,"macchia scura piccola"
+K00651,tieni,"macchia scura piccola"
+K00652,tieni,"macchia scura piccola"
+K00653,tieni,"macchia scura piccola"
+K00654,tieni,"macchia scura piccola"
+K00655,aggiungi,
+K00656,aggiungi,
+K00657,tieni,"box_stretta"
+K00658,ignora,"pala dell'elicottero che ha già la sua box"
+K00659,ignora,"edificio"
+K00660,ignora,"recinzione"
+K00661,aggiungi,
+K00662,tieni,"box_stretta"
+K00663,aggiungi,
+K00664,tieni,"box_stretta"
+K00665,aggiungi,
+K00666,tieni,"box_stretta"
+K00667,aggiungi,
+K00668,tieni,
+K00669,tieni,
+K00670,tieni,"drone scuro sul muro"
+K00671,tieni,"drone scuro sul muro"
+K00672,tieni,
+K00673,tieni,
+K00674,tieni,
+K00675,tieni,
+K00676,tieni,
+K00677,tieni,
+K00678,aggiungi,
+K00679,dubbio,"forma scura poco chiara"
+K00680,dubbio,"forma scura poco chiara"
+K00681,dubbio,"forma scura poco chiara"
+K00682,dubbio,"forma scura poco chiara"
+K00683,tieni,
+K00684,aggiungi,
+K00685,dubbio,"forma scura poco chiara"
+K00686,dubbio,
+K00687,ignora,"finestra"
+K00688,ignora,"finestra"
+K00689,tieni,
+K00690,tieni,
+K00691,tieni,
+K00692,tieni,
+K00693,tieni,
+K00694,togli,
+K00695,togli,"ombra sul muro"
+K00696,tieni,
+K00697,tieni,
+K00698,tieni,
+K00699,tieni,
+K00700,tieni,
+K00701,tieni,
+K00702,tieni,
+K00703,tieni,
+K00704,ignora,"persiana"
+K00705,tieni,
+K00706,togli,"palo scuro"
+K00707,togli,"palo scuro"
+K00708,ignora,"persiana"
+K00709,tieni,
+K00710,togli,
+K00711,togli,
+K00712,tieni,
+K00713,tieni,
+K00714,tieni,
+K00715,tieni,
+K00716,tieni,
+K00717,tieni,
+K00718,tieni,
+K00719,tieni,

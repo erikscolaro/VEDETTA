@@ -1,0 +1,106 @@
+# passo 4: revisione umana della proposta (fogli in fogli/), 13/10/2026
+# formato: '<clip> con gNN' | '<clip> con <clip>' | 'gNN + gMM' | 'gNN: via <clip>'
+
+# fogli gNN
+V_AIRPLANE_031/s0 con g01
+V_BIRD_004/s0 con g02
+V_AIRPLANE_013/s0 con g03
+V_AIRPLANE_032/s0 con g05
+V_AIRPLANE_032/s0 con g06
+V_AIRPLANE_025/s0 con g08
+V_BIRD_002/s0 con g13
+V_DRONE_013/s0 con g15
+V_BIRD_031/s0 con g21
+V_BIRD_042/s0 con g22
+V_BIRD_051/s0 con g23
+V_DRONE_052/s0 con g28
+V_DRONE_047/s0 con g29
+V_DRONE_072/s0 con g30
+V_DRONE_081/s0 con g31
+V_DRONE_105/s0 con g32
+V_DRONE_095/s0 con g33
+V_DRONE_069/s0 con g34
+V_DRONE_069/s0 con g35
+V_HELICOPTER_004/s0 con g36
+V_HELICOPTER_003/s0 con g37
+V_HELICOPTER_012/s0 con g38
+V_HELICOPTER_016/s0 con g39
+V_HELICOPTER_008/s0 con g40
+V_HELICOPTER_014/s0 con g41
+V_HELICOPTER_011/s0 con g42
+V_HELICOPTER_022/s0 con g43
+V_HELICOPTER_059/s0 con g46
+V_HELICOPTER_057/s0 con g47
+g05 + g06
+g45: via V_HELICOPTER_052/s0
+g45: via V_HELICOPTER_053/s0
+
+# fogli soli_NN, una lettera per coppia (v = stessa sessione; 'probabile' = v)
+V_AIRPLANE_001/s0 con V_AIRPLANE_004/s0   # soli_01 coppia 1
+V_AIRPLANE_004/s0 con V_AIRPLANE_001/s0   # soli_01 coppia 3
+V_AIRPLANE_006/s0 con V_AIRPLANE_005/s0   # soli_01 coppia 4
+V_AIRPLANE_013/s0 con V_AIRPLANE_010/s0   # soli_02 coppia 4
+V_AIRPLANE_015/s0 con V_AIRPLANE_036/s0   # soli_02 coppia 5
+V_AIRPLANE_032/s0 con V_AIRPLANE_017/s0   # soli_03 coppia 2
+V_AIRPLANE_035/s1 con V_AIRPLANE_034/s0   # soli_03 coppia 4
+V_AIRPLANE_038/s0 con V_AIRPLANE_039/s0   # soli_03 coppia 6
+V_AIRPLANE_038/s2 con V_AIRPLANE_039/s0   # soli_04 coppia 2
+V_AIRPLANE_039/s0 con V_AIRPLANE_038/s0   # soli_04 coppia 4
+V_AIRPLANE_039/s2 con V_AIRPLANE_040/s2   # soli_04 coppia 6
+V_AIRPLANE_040/s2 con V_AIRPLANE_039/s2   # soli_05 coppia 5
+V_AIRPLANE_043/s0 con V_HELICOPTER_036/s0   # soli_07 coppia 1
+V_AIRPLANE_045/s0 con V_AIRPLANE_048/s1   # soli_07 coppia 3
+V_AIRPLANE_046/s0 con V_AIRPLANE_048/s0   # soli_07 coppia 4
+V_AIRPLANE_048/s0 con V_AIRPLANE_048/s1   # soli_07 coppia 6
+V_AIRPLANE_048/s1 con V_AIRPLANE_048/s0   # soli_08 coppia 1
+V_AIRPLANE_049/s0 con V_AIRPLANE_050/s0   # soli_08 coppia 2
+V_AIRPLANE_050/s0 con V_AIRPLANE_049/s0   # soli_08 coppia 3
+V_AIRPLANE_051/s0 con V_AIRPLANE_049/s0   # soli_08 coppia 4
+V_BIRD_002/s0 con V_BIRD_003/s0   # soli_09 coppia 3
+V_BIRD_004/s0 con V_AIRPLANE_014/s0   # soli_09 coppia 4
+V_BIRD_008/s0 con V_BIRD_006/s0   # soli_09 coppia 6
+V_BIRD_009/s0 con V_BIRD_012/s0   # soli_10 coppia 1
+V_BIRD_010/s0 con V_BIRD_015/s1   # soli_10 coppia 2
+V_BIRD_012/s0 con V_BIRD_009/s0   # soli_10 coppia 4
+V_BIRD_012/s1 con V_BIRD_007/s0   # soli_10 coppia 5
+V_BIRD_012/s2 con V_BIRD_015/s0   # soli_10 coppia 6
+V_BIRD_013/s0 con V_BIRD_012/s1   # soli_11 coppia 1
+V_BIRD_013/s1 con V_BIRD_014/s1   # soli_11 coppia 2
+V_BIRD_014/s0 con V_BIRD_012/s2   # soli_11 coppia 4
+V_BIRD_014/s1 con V_BIRD_013/s1   # soli_11 coppia 5
+V_BIRD_015/s0 con V_BIRD_007/s0   # soli_11 coppia 6
+V_BIRD_015/s1 con V_BIRD_010/s0   # soli_12 coppia 1
+V_BIRD_020/s0 con V_BIRD_023/s0   # soli_12 coppia 2
+V_BIRD_024/s0 con V_DRONE_114/s0   # soli_12 coppia 3
+V_BIRD_030/s0 con V_BIRD_042/s0   # soli_12 coppia 5
+V_BIRD_031/s0 con V_BIRD_025/s0   # soli_12 coppia 6
+V_BIRD_036/s0 con V_BIRD_047/s0   # soli_13 coppia 1
+V_BIRD_038/s0 con V_BIRD_051/s1   # soli_13 coppia 3
+V_BIRD_042/s0 con V_BIRD_030/s0   # soli_13 coppia 4
+V_BIRD_046/s1 con V_BIRD_028/s0   # soli_13 coppia 6
+V_BIRD_047/s0 con V_BIRD_036/s0   # soli_14 coppia 1
+V_BIRD_048/s0 con V_AIRPLANE_016/s0   # soli_14 coppia 3
+V_BIRD_048/s2 con V_BIRD_008/s0   # soli_14 coppia 4
+V_BIRD_051/s0 con V_BIRD_032/s0   # soli_14 coppia 6
+V_BIRD_051/s1 con V_BIRD_038/s0   # soli_15 coppia 1
+V_DRONE_005/s1 con V_DRONE_044/s0   # soli_15 coppia 2
+V_DRONE_013/s0 con V_DRONE_012/s0   # soli_15 coppia 3
+V_HELICOPTER_001/s0 con V_HELICOPTER_002/s0   # soli_15 coppia 4
+V_HELICOPTER_021/s0 con V_HELICOPTER_022/s0   # soli_16 coppia 3
+V_HELICOPTER_022/s0 con V_HELICOPTER_023/s0   # soli_16 coppia 4
+V_HELICOPTER_025/s0 con V_HELICOPTER_026/s1   # soli_16 coppia 5
+V_HELICOPTER_026/s0 con V_HELICOPTER_027/s1   # soli_16 coppia 6
+V_HELICOPTER_026/s1 con V_HELICOPTER_025/s0   # soli_17 coppia 1
+V_HELICOPTER_027/s1 con V_HELICOPTER_026/s0   # soli_17 coppia 3
+V_HELICOPTER_033/s0 con V_HELICOPTER_032/s0   # soli_18 coppia 2
+
+V_HELICOPTER_043/s0 con V_HELICOPTER_044/s0   # soli_19 coppia 6
+V_HELICOPTER_046/s0 con V_HELICOPTER_047/s0   # soli_20 coppia 3
+V_HELICOPTER_047/s0 con V_HELICOPTER_046/s0   # soli_20 coppia 4
+V_HELICOPTER_048/s0 con V_HELICOPTER_050/s0   # soli_20 coppia 5
+V_HELICOPTER_050/s0 con V_HELICOPTER_048/s0   # soli_21 coppia 1
+V_HELICOPTER_054/s0 con V_HELICOPTER_053/s0   # soli_21 coppia 3
+V_HELICOPTER_055/s0 con V_AIRPLANE_043/s0   # soli_21 coppia 4
+V_HELICOPTER_055/s2 con V_HELICOPTER_046/s0   # soli_21 coppia 6
+V_HELICOPTER_056/s1 con V_HELICOPTER_022/s0   # soli_22 coppia 2
+V_HELICOPTER_061/s1 con V_HELICOPTER_061/s0   # soli_22 coppia 4
