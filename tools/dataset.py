@@ -766,7 +766,7 @@ def export(bg_share: float = 0.10, seed: int = 0) -> None:
         if r["lab"]:
             (OUT / "labels" / r["split"] / f"{r['nome']}.txt").write_text("".join(
                 f"{OUT_ID[int(c)]} {rest}\n" for c, rest in (ln.split(" ", 1) for ln in (DATA / r["lab"]).read_text().splitlines() if ln.strip())))
-    (OUT / "dataset.yaml").write_text(f"# air-detection, tools/dataset.py --step export\npath: {OUT}\ntrain: images/train\n"
+    (OUT / "dataset.yaml").write_text(f"# VEDETTA, tools/dataset.py --step export\npath: {OUT}\ntrain: images/train\n"
                                       "val: images/val\ntest: images/test\nnames:\n" + "".join(f"  {k}: {c}\n" for k, c in enumerate(OUT_NAMES)))
     (OUT / "calib.yaml").write_text(f"# calibrazione int8\npath: {OUT}\ntrain: images/calib\nval: images/calib\nnames:\n"
                                     + "".join(f"  {k}: {c}\n" for k, c in enumerate(OUT_NAMES)))

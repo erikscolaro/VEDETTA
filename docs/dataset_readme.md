@@ -1,6 +1,6 @@
-# air-detection: dataset per la rilevazione di velivoli e uccelli
+# VEDETTA: dataset per la rilevazione di velivoli e uccelli
 
-Generato da `tools/dataset.py --step export` il {data} (repo air-detection; procedura completa nel README della
+Generato da `tools/dataset.py --step export` il {data} (repo vedetta; procedura completa nel README della
 repo). Formato Ultralytics YOLO: `images/<split>/*.jpg`, `labels/<split>/*.txt` (una riga per box: classe, centro x,
 centro y, larghezza, altezza, normalizzati), `dataset.yaml`. Tutte le immagini sono 640×512, mai ingrandite. Le
 immagini sono hardlink ai file del repo; le label sono riscritte qui con gli id sotto (nel repo restano nell'ordine
@@ -102,7 +102,7 @@ l'immagine più vicina dell'addestramento. Si confronta con due riferimenti pres
 - `gruppo`, `fonte`, `sessione`, `clip` (o camera);
 - `frame`: indice nel video originale;
 - `scenario`, `meteo` (vuoto per ora);
-- `sorgente`: file nel repo air-detection, sotto `data/`.
+- `sorgente`: file nel repo vedetta, sotto `data/`.
 
 Attribuzioni e origini:
 - **DVIDS**: pagina, autore e licenza di ogni video in `fonti_dvids.csv`.

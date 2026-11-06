@@ -1,4 +1,4 @@
-# air-detection
+# VEDETTA
 
 *[English version](README.en.md)*
 
@@ -316,7 +316,7 @@ Fissate prima di toccare i dati e aggiornate con le decisioni prese durante la c
 | Clouds-1500, Mendeley Data 2023 | background | CC BY 4.0 | [Mendeley](https://data.mendeley.com/datasets/2khchjbgzr/2) |
 | SkyFinder, Mihail et al., WACV 2016 (copia di Nice e Wijnands 2019) | background | CC BY 4.0 | [Zenodo 2562396](https://zenodo.org/records/2562396) |
 
-Licenze verificate dall'autore il 06/11/2026. Il dataset è su Hugging Face, [`Einrich99/air-detection`](https://huggingface.co/datasets/Einrich99/air-detection), con licenza CC BY 4.0; ogni immagine mantiene la licenza della sua fonte.
+Licenze verificate dall'autore il 06/11/2026. Il dataset è su Hugging Face, [`Einrich99/vedetta`](https://huggingface.co/datasets/Einrich99/vedetta), con licenza CC BY 4.0; ogni immagine mantiene la licenza della sua fonte.
 
 Attribuzione:
 - citare gli articoli delle fonti;

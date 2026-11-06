@@ -1,5 +1,5 @@
 ---
-pretty_name: air-detection
+pretty_name: VEDETTA
 license: cc-by-4.0
 task_categories:
   - object-detection
@@ -19,7 +19,7 @@ size_categories:
   - 10K<n<100K
 ---
 
-# air-detection: drones, airplanes, helicopters and birds against the sky
+# VEDETTA: drones, airplanes, helicopters and birds against the sky
 
 Object detection dataset for a ground-based anti-drone turret: an RGB camera on the ground looking at the sky and
 the horizon. Four classes, 32 058 images at 640×512 (plus 511 calibration copies), built from eight public sources with a split by groups of
@@ -27,7 +27,7 @@ recording sessions, so the same footage is never in two splits. Built for a mast
 models for edge devices (Politecnico di Torino, 2026).
 
 Italian version of this card: [`README.it.md`](README.it.md). Code and full procedure:
-[github.com/erikscolaro/air-detection](https://github.com/erikscolaro/air-detection).
+[github.com/erikscolaro/vedetta](https://github.com/erikscolaro/vedetta).
 
 ## Format
 
@@ -42,8 +42,8 @@ height, normalized), `dataset.yaml`. All images are 640×512 and never upscaled.
 | bird | 3 |
 
 ```bash
-hf download Einrich99/air-detection --repo-type dataset --local-dir air-detection
-yolo train data=air-detection/dataset.yaml model=yolo26n.yaml imgsz=640
+hf download Einrich99/vedetta --repo-type dataset --local-dir vedetta
+yolo train data=vedetta/dataset.yaml model=yolo26n.yaml imgsz=640
 ```
 
 ## Splits
@@ -99,7 +99,7 @@ later); `<clip>` and `<camera>` are the first 8 characters of the SHA-1 of `sour
 
 `manifest.csv` has one row per image: `immagine` (path), `split`, `tipo` (real, mosaic, background), `gruppo`,
 `fonte` (source), `sessione`, `clip`, `frame` (index in the original video), `scenario` (sky, horizon, ground, wall),
-`meteo` (empty for now), `sorgente` (file in the air-detection repo).
+`meteo` (empty for now), `sorgente` (file in the vedetta repo).
 
 Labels were proposed by detectors, contrast and SAM 2, then reviewed by hand in CVAT, with a second review of
 candidates flagged by two independent detectors. Every operator decision is versioned in the GitHub repo.
@@ -134,12 +134,12 @@ Counts are train, val and test images, background included; the 511 mosaics (tra
 ## Citation
 
 ```bibtex
-@misc{scolaro2026airdetection,
+@misc{scolaro2026vedetta,
   author       = {Scolaro, Erik},
-  title        = {air-detection: drones, airplanes, helicopters and birds against the sky},
+  title        = {{VEDETTA}: drones, airplanes, helicopters and birds against the sky},
   year         = {2026},
   howpublished = {Hugging Face},
-  url          = {https://huggingface.co/datasets/Einrich99/air-detection}
+  url          = {https://huggingface.co/datasets/Einrich99/vedetta}
 }
 ```
 

@@ -2,7 +2,7 @@
 # secondo giro FRED (README, Procedura)
 set -e
 : "${DETECTOR_PESI:?serve DETECTOR_PESI per --step yolo}"
-cd ~/Desktop/air-detection
+cd ~/Desktop/vedetta
 S="2 0 198 209 111 108 133 165 19 28"
 py() { .venv/bin/python tools/fred.py "$@" 2>&1 | grep -v "^download"; }
 py --step frame --seq $S

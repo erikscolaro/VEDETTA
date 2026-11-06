@@ -1,4 +1,4 @@
-# air-detection, tools/dataset.py --step export
+# VEDETTA, tools/dataset.py --step export
 train: images/train
 val: images/val
 test: images/test
