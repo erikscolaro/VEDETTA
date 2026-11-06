@@ -1,0 +1,8 @@
+# calibrazione int8
+train: images/calib
+val: images/calib
+names:
+  0: drone
+  1: airplane
+  2: helicopter
+  3: bird

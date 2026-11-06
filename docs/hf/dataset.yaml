@@ -1,0 +1,9 @@
+# air-detection, tools/dataset.py --step export
+train: images/train
+val: images/val
+test: images/test
+names:
+  0: drone
+  1: airplane
+  2: helicopter
+  3: bird

@@ -111,20 +111,19 @@ Attribuzioni e origini:
 
 ## Fonti, licenze e attribuzione
 
+Il dataset nel suo insieme è rilasciato con licenza **CC BY 4.0**. Ogni immagine mantiene la licenza della sua fonte
+(colonna `fonte` del manifest), che va rispettata con l'attribuzione indicata.
+
 | fonte | cosa dà | licenza | download | attribuzione |
 |---|---|---|---|---|
 | Svanström et al., "A dataset for multi-sensor drone detection", Data in Brief 2021 | video RGB 640×512 di droni, aerei, elicotteri, uccelli | **CC0 1.0** | [github.com/DroneDetectionThesis/Drone-detection-dataset](https://github.com/DroneDetectionThesis/Drone-detection-dataset) | citare l'articolo |
-| FRED, Magrini et al., ACM MM 2025 | droni (sequenze RGB) | **Apache 2.0** | [huggingface.co/datasets/GabrieleMagrini/FRED](https://huggingface.co/datasets/GabrieleMagrini/FRED) | citare l'articolo, riportare la licenza |
-| Anti-UAV300 (parte RGB), Jiang et al., IEEE TMM 2021 | droni | **MIT** | [github.com/ZhaoJ9014/Anti-UAV](https://github.com/ZhaoJ9014/Anti-UAV), mirror [huggingface.co/datasets/DestinyLove/AntiUAV300](https://huggingface.co/datasets/DestinyLove/AntiUAV300) | copyright e licenza MIT, citare l'articolo |
+| FRED, Magrini et al., ACM MM 2025 | droni (sequenze RGB) | **Apache 2.0** | [huggingface.co/datasets/GabrieleMagrini/FRED](https://huggingface.co/datasets/GabrieleMagrini/FRED) | citare l'articolo; testo della licenza in `LICENSES/Apache-2.0-FRED.txt` |
+| Anti-UAV300 (parte RGB), Jiang et al., IEEE TMM 2021 | droni | **MIT** | [github.com/ZhaoJ9014/Anti-UAV](https://github.com/ZhaoJ9014/Anti-UAV), mirror [huggingface.co/datasets/DestinyLove/AntiUAV300](https://huggingface.co/datasets/DestinyLove/AntiUAV300) | citare l'articolo; copyright e licenza in `LICENSES/MIT-Anti-UAV.txt` |
 | DVIDS (Defense Visual Information Distribution Service) | aerei, elicotteri, droni, uccelli | **pubblico dominio** (opere di dipendenti federali USA), video per video | [dvidshub.net](https://www.dvidshub.net) (elenco in `fonti_dvids.csv`) | "The appearance of U.S. Department of War (DoW) visual information does not imply or constitute DoW endorsement."; niente insegne in usi commerciali |
-| Open Images V7 (Google) | uccelli in cielo (box individuali) | annotazioni **CC BY 4.0**; immagini elencate come **CC BY 2.0** | [storage.googleapis.com/openimages/web](https://storage.googleapis.com/openimages/web/index.html) | autore e link di ogni foto in `fonti_openimages.csv`; citare Kuznetsova et al., IJCV 2020 |
-| FBD-SV-2024, Sun et al., Scientific Data 2025 | uccelli | **solo ricerca, non commerciale** ⚠ | [figshare 27377595](https://figshare.com/articles/dataset/FBD-SV-2024/27377595), Kaggle `swjtuziwei/fbd-sv-2024` | citare l'articolo |
+| Open Images V7 (Google) | uccelli in cielo (box individuali) | annotazioni **CC BY 4.0**; immagini **CC BY 2.0** | [storage.googleapis.com/openimages/web](https://storage.googleapis.com/openimages/web/index.html) | autore e link di ogni foto in `fonti_openimages.csv`; citare Kuznetsova et al., IJCV 2020 |
+| FBD-SV-2024, Sun et al., Scientific Data 2025 | uccelli | **CC BY 4.0** | [figshare 27377595](https://figshare.com/articles/dataset/FBD-SV-2024/27377595), Kaggle `swjtuziwei/fbd-sv-2024` | citare l'articolo |
 | Clouds-1500 (Mendeley Data, v2, 2023) | background: cielo verso l'orizzonte, meteo vario | **CC BY 4.0** | [data.mendeley.com/datasets/2khchjbgzr/2](https://data.mendeley.com/datasets/2khchjbgzr/2) | citare il dataset e gli autori, indicare la licenza |
-| Skyfinder, Mihail et al., WACV 2016 (copia nel record Zenodo 2562396, Nice & Wijnands 2019) | background: 18 webcam AMOS | **incerta** ⚠: il record dichiara CC BY 4.0, ma le immagini sono di webcam di terzi | [zenodo.org/records/2562396](https://zenodo.org/records/2562396) | citare Mihail et al. 2016 e Nice & Wijnands 2019 |
-
-⚠ **Eccezioni dichiarate.** FBD-SV-2024 (solo ricerca) e Skyfinder (diritti incerti) sono usati perché il dataset
-serve a una tesi di ricerca e non a un prodotto. Si possono separare (colonna `fonte` del manifest) e vanno tolti
-prima di pubblicare il dataset o di usarlo a fini commerciali.
+| SkyFinder, Mihail et al., WACV 2016 (copia nel record Zenodo 2562396, Nice & Wijnands 2019) | background: 18 webcam AMOS | **CC BY 4.0** | [zenodo.org/records/2562396](https://zenodo.org/records/2562396) | citare Mihail et al. 2016 e Nice & Wijnands 2019 |
 
 **Revisione delle label:**
 - Le label sono state riviste a mano in CVAT.

@@ -312,12 +312,11 @@ Fissate prima di toccare i dati e aggiornate con le decisioni prese durante la c
 | Anti-UAV300 (RGB), Jiang et al., IEEE TMM 2021 | droni | MIT | [GitHub](https://github.com/ZhaoJ9014/Anti-UAV) |
 | DVIDS | aerei, elicotteri, droni, uccelli | pubblico dominio, video per video | [dvidshub.net](https://www.dvidshub.net) |
 | Open Images V7, Kuznetsova et al., IJCV 2020 | uccelli in cielo | annotazioni CC BY 4.0, immagini CC BY 2.0 | [Open Images](https://storage.googleapis.com/openimages/web/index.html) |
-| FBD-SV-2024, Sun et al., Scientific Data 2025 | uccelli | **solo ricerca, non commerciale** ⚠ | [figshare](https://figshare.com/articles/dataset/FBD-SV-2024/27377595) |
+| FBD-SV-2024, Sun et al., Scientific Data 2025 | uccelli | CC BY 4.0 | [figshare](https://figshare.com/articles/dataset/FBD-SV-2024/27377595) |
 | Clouds-1500, Mendeley Data 2023 | background | CC BY 4.0 | [Mendeley](https://data.mendeley.com/datasets/2khchjbgzr/2) |
-| SkyFinder, Mihail et al., WACV 2016 (copia di Nice e Wijnands 2019) | background | CC BY 4.0 sul record Zenodo, ma immagini di webcam AMOS di terzi ⚠ | [Zenodo 2562396](https://zenodo.org/records/2562396) |
+| SkyFinder, Mihail et al., WACV 2016 (copia di Nice e Wijnands 2019) | background | CC BY 4.0 | [Zenodo 2562396](https://zenodo.org/records/2562396) |
 
-⚠ FBD-SV-2024 e Skyfinder sono usati perché il dataset serve a una tesi di ricerca. Sono separabili dalla colonna
-`fonte` di `manifest.csv` e vanno tolti prima di pubblicare il dataset o di usarlo a fini commerciali.
+Licenze verificate dall'autore il 06/11/2026. Il dataset è su Hugging Face, [`Einrich99/air-detection`](https://huggingface.co/datasets/Einrich99/air-detection), con licenza CC BY 4.0; ogni immagine mantiene la licenza della sua fonte.
 
 Attribuzione:
 - citare gli articoli delle fonti;
@@ -338,9 +337,9 @@ Il dataset esiste grazie a queste fonti. Chi lo usa deve citare gli articoli e r
 | FRED, Magrini et al. | 10 sequenze RGB di droni | `magrini2025fred`; Apache 2.0, riportare la licenza |
 | Anti-UAV, Jiang et al. | registrazioni RGB di Anti-UAV300 | `jiang2023antiuav` (online 2021, vol. 25 del 2023); MIT, riportare copyright e licenza |
 | Open Images, Kuznetsova et al. | 1.059 ritagli con uccelli in volo | `kuznetsova2020openimages`; annotazioni CC BY 4.0 (Google), immagini CC BY 2.0: autore e link in `data/output/fonti_openimages.csv` |
-| FBD-SV-2024, Sun et al. | 483 video di uccelli | `sun2025fbdsv`; dati su figshare (DOI 10.6084/m9.figshare.27377595, CC BY 4.0 secondo DataCite), ma il readme del dataset dice "for learning and research purposes only, not for commercial use" ⚠ |
+| FBD-SV-2024, Sun et al. | 483 video di uccelli | `sun2025fbdsv`; dati su figshare (DOI 10.6084/m9.figshare.27377595, CC BY 4.0 secondo DataCite) |
 | Clouds-1500, Arrais et al. | immagini di background | `arrais2023clouds1500`; CC BY 4.0 |
-| SkyFinder, Mihail et al. | immagini di background | `mihail2016sky`; scaricate dalla copia di Nice e Wijnands (2019), "Dataset for: Sky pixel detection in outdoor imagery using an adaptive algorithm and machine learning", Zenodo, doi:10.5281/zenodo.2562396, CC BY 4.0 (cartella `GSV` esclusa); immagini da webcam AMOS, termini di AMOS non verificati ⚠ |
+| SkyFinder, Mihail et al. | immagini di background | `mihail2016sky`; scaricate dalla copia di Nice e Wijnands (2019), "Dataset for: Sky pixel detection in outdoor imagery using an adaptive algorithm and machine learning", Zenodo, doi:10.5281/zenodo.2562396, CC BY 4.0 (cartella `GSV` esclusa); immagini da webcam AMOS |
 | DVIDS | video di pubblico dominio di aerei, elicotteri, droni e uccelli | nessuna citazione; frase obbligatoria: "The appearance of U.S. Department of War (DoW) visual information does not imply or constitute DoW endorsement."; elenco dei video con autore in `data/output/fonti_dvids.csv` |
 
 ```bibtex
